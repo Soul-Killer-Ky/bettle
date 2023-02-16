@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package api.im.service.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "beetle/api/im/service/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.im.service.v1";
+
+service Im {
+	rpc CreateIm (CreateImRequest) returns (CreateImReply);
+	rpc UpdateIm (UpdateImRequest) returns (UpdateImReply);
+	rpc DeleteIm (DeleteImRequest) returns (DeleteImReply);
+	rpc GetIm (GetImRequest) returns (GetImReply);
+	rpc ListIm (ListImRequest) returns (ListImReply);
+	rpc ConnectIm (ConnectImRequest) returns (ConnectImReply) {
+		option (google.api.http) = {
+			get: "/im/v1/connect"
+		};
+	}
+}
+
+message CreateImRequest {}
+message CreateImReply {}
+
+message UpdateImRequest {}
+message UpdateImReply {}
+
+message DeleteImRequest {}
+message DeleteImReply {}
+
+message GetImRequest {}
+message GetImReply {}
+
+message ListImRequest {}
+message ListImReply {}
+
+message ConnectImRequest {}
+message ConnectImReply {}

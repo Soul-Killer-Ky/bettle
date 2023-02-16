@@ -1,0 +1,214 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /helloworld/{name}:
+        get:
+            tags:
+                - Greeter
+            description: Sends a greeting
+            operationId: Greeter_SayHello
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
+    /im/v1/connect:
+        get:
+            tags:
+                - Im
+            operationId: Im_ConnectIm
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.im.service.v1.ConnectImReply'
+    /user/v1/create:
+        post:
+            tags:
+                - User
+            operationId: User_CreateUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.user.service.v1.CreateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.user.service.v1.CreateUserReply'
+    /user/v1/delete:
+        post:
+            tags:
+                - User
+            operationId: User_DeleteUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.user.service.v1.DeleteUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.user.service.v1.DeleteUserReply'
+    /user/v1/get:
+        post:
+            tags:
+                - User
+            operationId: User_GetUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.user.service.v1.GetUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.user.service.v1.GetUserReply'
+    /user/v1/list:
+        post:
+            tags:
+                - User
+            operationId: User_ListUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.user.service.v1.ListUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.user.service.v1.ListUserReply'
+    /user/v1/login:
+        post:
+            tags:
+                - User
+            operationId: User_LoginUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.user.service.v1.LoginUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.user.service.v1.LoginUserReply'
+    /user/v1/update:
+        post:
+            tags:
+                - User
+            operationId: User_UpdateUser
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.user.service.v1.UpdateUserRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.user.service.v1.UpdateUserReply'
+components:
+    schemas:
+        api.im.service.v1.ConnectImReply:
+            type: object
+            properties: {}
+        api.user.service.v1.CreateUserReply:
+            type: object
+            properties: {}
+        api.user.service.v1.CreateUserRequest:
+            type: object
+            properties: {}
+        api.user.service.v1.DeleteUserReply:
+            type: object
+            properties: {}
+        api.user.service.v1.DeleteUserRequest:
+            type: object
+            properties: {}
+        api.user.service.v1.GetUserReply:
+            type: object
+            properties: {}
+        api.user.service.v1.GetUserRequest:
+            type: object
+            properties: {}
+        api.user.service.v1.ListUserReply:
+            type: object
+            properties: {}
+        api.user.service.v1.ListUserRequest:
+            type: object
+            properties: {}
+        api.user.service.v1.LoginUserReply:
+            type: object
+            properties:
+                token:
+                    type: string
+                expiredTime:
+                    type: integer
+                    format: int64
+                username:
+                    type: string
+                nickname:
+                    type: string
+                avatar:
+                    type: string
+        api.user.service.v1.LoginUserRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+        api.user.service.v1.UpdateUserReply:
+            type: object
+            properties: {}
+        api.user.service.v1.UpdateUserRequest:
+            type: object
+            properties: {}
+        helloworld.v1.HelloReply:
+            type: object
+            properties:
+                message:
+                    type: string
+            description: The response message containing the greetings
+tags:
+    - name: Greeter
+      description: The greeting service definition.
+    - name: Im
+    - name: User

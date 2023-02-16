@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package api.user.service.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "beetle/api/user/service/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.user.service.v1";
+
+service User {
+	rpc CreateUser (CreateUserRequest) returns (CreateUserReply) {
+		option (google.api.http) = {
+			post: "/user/v1/create"
+			body: "*"
+		};
+	}
+	rpc UpdateUser (UpdateUserRequest) returns (UpdateUserReply) {
+		option (google.api.http) = {
+			post: "/user/v1/update"
+			body: "*"
+		};
+	}
+	rpc DeleteUser (DeleteUserRequest) returns (DeleteUserReply) {
+		option (google.api.http) = {
+			post: "/user/v1/delete"
+			body: "*"
+		};
+	}
+	rpc GetUser (GetUserRequest) returns (GetUserReply) {
+		option (google.api.http) = {
+			post: "/user/v1/get"
+			body: "*"
+		};
+	}
+	rpc ListUser (ListUserRequest) returns (ListUserReply) {
+		option (google.api.http) = {
+			post: "/user/v1/list"
+			body: "*"
+		};
+	}
+	rpc LoginUser (LoginUserRequest) returns (LoginUserReply) {
+		option (google.api.http) = {
+			post: "/user/v1/login"
+			body: "*"
+		};
+	}
+}
+
+message CreateUserRequest {}
+message CreateUserReply {}
+
+message UpdateUserRequest {}
+message UpdateUserReply {}
+
+message DeleteUserRequest {}
+message DeleteUserReply {}
+
+message GetUserRequest {}
+message GetUserReply {}
+
+message ListUserRequest {}
+message ListUserReply {}
+
+message LoginUserRequest {
+	string username = 1;
+	string password = 2;
+}
+message LoginUserReply {
+	string token = 1;
+	int64 expired_time = 2;
+	string username = 3;
+	string nickname = 4;
+	string avatar = 5;
+}

@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package api.im.service.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "beetle/api/im/service/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.im.service.v1";
+
+enum ProtocolType {
+	Chat = 0; // 单聊
+	Group = 1; // 群聊
+	Broadcast = 2;
+	HeartBeat = 3;
+}
+
+enum MessageType {
+	Text = 0;
+	Image = 1;
+	Voice = 2;
+	Video = 3;
+	File = 4;
+	Location = 5;
+}
+
+message Message {
+	MessageType type = 1;
+	string body = 2;
+}
+
+message ChatMessage {
+	Message message = 1;
+	uint64 from = 2;
+	uint64 sender = 3;
+	google.protobuf.Timestamp timestamp = 4;
+}
+
+message GroupMessage {
+	Message message = 1;
+	uint64 from = 2;
+	string group_id = 3;
+	google.protobuf.Timestamp timestamp = 4;
+}
+
+message BroadcastMessage {
+	Message message = 1;
+	uint64 from = 2;
+	google.protobuf.Timestamp timestamp = 3;
+}
