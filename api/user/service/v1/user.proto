@@ -3,6 +3,7 @@ syntax = "proto3";
 package api.user.service.v1;
 
 import "google/api/annotations.proto";
+import "validate/validate.proto";
 
 option go_package = "beetle/api/user/service/v1;v1";
 option java_multiple_files = true;
@@ -63,8 +64,8 @@ message ListUserRequest {}
 message ListUserReply {}
 
 message LoginUserRequest {
-	string username = 1;
-	string password = 2;
+	string username = 1 [(validate.rules).string.pattern = "(?i)^[0-9a-z]{4,16}$"];
+	string password = 2 [(validate.rules).string.pattern = "(?i)^[0-9_a-z]{6,16}$"];
 }
 message LoginUserReply {
 	string token = 1;

@@ -1,6 +1,7 @@
 package biz
 
 import (
+	"beetle/internal/pkg/util"
 	"context"
 
 	pb "beetle/api/user/service/v1"
@@ -83,19 +84,14 @@ func (uc *UserUseCase) Consume(ctx context.Context, c *Consume) (int64, error) {
 
 func (uc *UserUseCase) VerifyUser(ctx context.Context, req *pb.LoginUserRequest) (*User, error) {
 	uc.log.WithContext(ctx).Infof("VerifyUser: %v", req.Username)
-	if req.Username != "root" {
-		//return nil, pb.ErrorUserAccountFormatError("user account must be %s", "root")
-	}
-	if len(req.Password) != 6 {
-		return nil, pb.ErrorUserPasswordFormatError("user password's length must be %d", 6)
-	}
 	u, err := uc.userRepo.FindByName(ctx, req.Username)
 	if err != nil {
 		return nil, pb.ErrorUserNotFound("user not found")
 	}
-	if u.Password != req.Password {
+	if !util.Md5Equal(u.Password, req.Password) {
 		return nil, pb.ErrorUserPasswordError("user password error")
 	}
+
 	return u, nil
 }
 

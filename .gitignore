@@ -1,1 +1,5 @@
 .idea
+bin/
+deploy/docker/**/data
+deploy/**/tmp
+app/demo/

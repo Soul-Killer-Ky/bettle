@@ -1,0 +1,62 @@
+version: '3'
+networks:
+  beetle_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.16.0/24
+services:
+  user-db:
+    image: mysql:8
+    labels:
+      kompose.volume.type: persistentVolumeClaim
+    hostname: user-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    expose:
+      - "3306"
+    volumes:
+      - ./deploy/docker/user/mysql/data:/var/lib/mysql
+    networks:
+      beetle_network:
+        ipv4_address: 192.168.16.100
+  user-svc:
+    build:
+      context: .
+      args:
+        APP: user
+    image: beetle/user:0.0.1
+    labels:
+      kompose.volume.type: configMap
+    hostname: user-svc
+    volumes:
+      - ./app/user/configs:/data/conf
+    expose:
+      - "8000"
+      - "9000"
+    depends_on:
+      - user-db
+    networks:
+      beetle_network:
+        ipv4_address: 192.168.16.101
+  gateway:
+    build:
+      context: .
+      args:
+        APP: gateway
+    image: beetle/gateway:0.0.1
+    labels:
+      kompose.volume.type: configMap
+      kompose.service.type: loadbalancer
+    hostname: gateway
+    volumes:
+      - ./app/gateway/configs:/data/conf
+    ports:
+      - "8000"
+      - "9000"
+    depends_on:
+      - user-svc
+    networks:
+      beetle_network:
+        ipv4_address: 192.168.16.200

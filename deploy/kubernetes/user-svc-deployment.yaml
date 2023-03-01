@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -o deploy/kubernetes
+    kompose.version: 1.28.0 (c4137012e)
+    kompose.volume.type: configMap
+  creationTimestamp: null
+  labels:
+    io.kompose.service: user-svc
+  name: user-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: user-svc
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -o deploy/kubernetes
+        kompose.version: 1.28.0 (c4137012e)
+        kompose.volume.type: configMap
+      creationTimestamp: null
+      labels:
+        io.kompose.network/beetle-beetle-network: "true"
+        io.kompose.service: user-svc
+    spec:
+      containers:
+        - image: beetle/user:0.0.1
+          name: user-svc
+          ports:
+            - containerPort: 8000
+            - containerPort: 9000
+          resources: {}
+          volumeMounts:
+            - mountPath: /data/conf
+              name: user-svc-cm0
+      hostname: user-svc
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            name: user-svc-cm0
+          name: user-svc-cm0
+status: {}

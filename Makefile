@@ -63,9 +63,24 @@ generate:
 errors:
 	protoc --proto_path=. \
     	       --proto_path=./third_party \
-     	       --go_out=paths=source_relative:. \
      	       --go-errors_out=paths=source_relative:. \
     	       $(API_ERROR_PROTO_FILES)
+
+.PHONY: validate
+# generate validate proto
+validate:
+	protoc --proto_path=. \
+           --proto_path=./third_party \
+           --validate_out=paths=source_relative,lang=go:. \
+           $(API_PROTO_FILES)
+
+.PHONY: gateway
+# generate gateway proto
+gateway:
+	protoc --proto_path=. \
+          	   --proto_path=./third_party \
+               --grpc-gateway_out=logtostderr=true:. \
+               $(API_PROTO_FILES)
 
 .PHONY: all
 # generate all
