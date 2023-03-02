@@ -12,9 +12,12 @@ import (
 	"beetle/app/gateway/internal/data"
 	"beetle/app/gateway/internal/server"
 	"beetle/app/gateway/internal/service"
-
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
+)
+
+import (
+	_ "go.uber.org/automaxprocs"
 )
 
 // Injectors from wire.go:

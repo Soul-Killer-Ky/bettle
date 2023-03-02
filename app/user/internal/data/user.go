@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"beetle/app/user/internal/biz"
+	"beetle/app/user/internal/data/ent/user"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -34,12 +35,17 @@ func (r *userRepo) FindByID(context.Context, int64) (*biz.User, error) {
 }
 
 func (r *userRepo) FindByName(ctx context.Context, name string) (*biz.User, error) {
-	u := biz.User{}
-	err := r.data.DB(ctx).Where("username = ?", name).First(&u).Error
+	u, err := r.data.db.User.Query().Where(user.Username(name)).First(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &u, nil
+	return &biz.User{
+		ID:       u.ID,
+		Username: u.Username,
+		Password: u.Password,
+		Nickname: u.Nickname,
+		Avatar:   u.Avatar,
+	}, nil
 }
 
 func (r *userRepo) ListByHello(context.Context, string) ([]*biz.User, error) {
@@ -48,29 +54,4 @@ func (r *userRepo) ListByHello(context.Context, string) ([]*biz.User, error) {
 
 func (r *userRepo) ListAll(context.Context) ([]*biz.User, error) {
 	return nil, nil
-}
-
-type consumeRepo struct {
-	data *Data
-	log  *log.Helper
-}
-
-type Consume struct {
-	ID         int64
-	UserID     int64
-	OrderID    string
-	OrderPrice int64
-}
-
-// NewConsumeRepo  .
-func NewConsumeRepo(data *Data, logger log.Logger) biz.ConsumeRepo {
-	return &consumeRepo{
-		data: data,
-		log:  log.NewHelper(logger),
-	}
-}
-
-func (c *consumeRepo) CreateConsume(ctx context.Context, cs *biz.Consume) (int64, error) {
-	result := c.data.DB(ctx).Create(&cs)
-	return cs.ID, result.Error
 }

@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"flag"
+	"github.com/gorilla/handlers"
 
 	pbUser "beetle/api/user/service/v1"
 	"beetle/app/gateway/internal/conf"
@@ -28,6 +29,11 @@ func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, logger log.L
 		http.Middleware(
 			recovery.Recovery(),
 		),
+		http.Filter(handlers.CORS(
+			handlers.AllowedHeaders([]string{"Content-Type", "X-Requested-With"}),
+			handlers.AllowedOrigins([]string{"*"}),
+			handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS"}),
+		)),
 	}
 	if c.Http.Network != "" {
 		opts = append(opts, http.Network(c.Http.Network))

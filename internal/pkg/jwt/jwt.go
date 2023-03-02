@@ -40,11 +40,11 @@ func WithClaims(f func() jwtv4.Claims) Option {
 }
 
 type CustomUserClaims struct {
-	ID uint `json:"id"`
+	ID int `json:"id"`
 	jwtv4.RegisteredClaims
 }
 
-func WithCustomUserClaims(uid uint, exp int64) Option {
+func WithCustomUserClaims(uid int, exp int64) Option {
 	now := time.Now()
 	claims := CustomUserClaims{
 		uid,

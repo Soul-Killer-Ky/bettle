@@ -14,10 +14,10 @@ services:
     hostname: user-db
     environment:
       MYSQL_ROOT_PASSWORD: 123456
-    expose:
-      - "3306"
+    ports:
+      - "3306:3306"
     volumes:
-      - ./deploy/docker/user/mysql/data:/var/lib/mysql
+      - /data/docker/mount/beetle_user_db:/var/lib/mysql
     networks:
       beetle_network:
         ipv4_address: 192.168.16.100
@@ -53,8 +53,8 @@ services:
     volumes:
       - ./app/gateway/configs:/data/conf
     ports:
-      - "8000"
-      - "9000"
+      - "8000:8000"
+      - "9000:9000"
     depends_on:
       - user-svc
     networks:
