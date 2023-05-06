@@ -8,6 +8,35 @@ import (
 )
 
 var (
+	// FriendsColumns holds the columns for the "friends" table.
+	FriendsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "user_users", Type: field.TypeInt, Nullable: true},
+		{Name: "user_friends", Type: field.TypeInt, Nullable: true},
+	}
+	// FriendsTable holds the schema information for the "friends" table.
+	FriendsTable = &schema.Table{
+		Name:       "friends",
+		Columns:    FriendsColumns,
+		PrimaryKey: []*schema.Column{FriendsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "friends_users_users",
+				Columns:    []*schema.Column{FriendsColumns[4]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "friends_users_friends",
+				Columns:    []*schema.Column{FriendsColumns[5]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -27,9 +56,12 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		FriendsTable,
 		UsersTable,
 	}
 )
 
 func init() {
+	FriendsTable.ForeignKeys[0].RefTable = UsersTable
+	FriendsTable.ForeignKeys[1].RefTable = UsersTable
 }

@@ -25,7 +25,7 @@ func init() {
 func main() {
 	flag.Parse()
 	cli := websocket.NewClient(
-		websocket.WithEndpoint("ws://localhost:10000/ws"),
+		websocket.WithEndpoint("ws://localhost:8000/chat"),
 		websocket.WithClientCodec("json"),
 		websocket.WithRequestHeader("Authorization", fmt.Sprintf("Bearer %s", token)),
 	)

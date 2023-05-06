@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"beetle/app/user/internal/data/ent/friend"
 	"beetle/app/user/internal/data/ent/user"
 	"context"
 	"errors"
@@ -84,6 +85,36 @@ func (uc *UserCreate) SetNickname(s string) *UserCreate {
 func (uc *UserCreate) SetAvatar(s string) *UserCreate {
 	uc.mutation.SetAvatar(s)
 	return uc
+}
+
+// AddUserIDs adds the "users" edge to the Friend entity by IDs.
+func (uc *UserCreate) AddUserIDs(ids ...int) *UserCreate {
+	uc.mutation.AddUserIDs(ids...)
+	return uc
+}
+
+// AddUsers adds the "users" edges to the Friend entity.
+func (uc *UserCreate) AddUsers(f ...*Friend) *UserCreate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uc.AddUserIDs(ids...)
+}
+
+// AddFriendIDs adds the "friends" edge to the Friend entity by IDs.
+func (uc *UserCreate) AddFriendIDs(ids ...int) *UserCreate {
+	uc.mutation.AddFriendIDs(ids...)
+	return uc
+}
+
+// AddFriends adds the "friends" edges to the Friend entity.
+func (uc *UserCreate) AddFriends(f ...*Friend) *UserCreate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uc.AddFriendIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -233,6 +264,44 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Avatar(); ok {
 		_spec.SetField(user.FieldAvatar, field.TypeString, value)
 		_node.Avatar = value
+	}
+	if nodes := uc.mutation.UsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UsersTable,
+			Columns: []string{user.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: friend.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.FriendsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FriendsTable,
+			Columns: []string{user.FriendsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: friend.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

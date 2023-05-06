@@ -73,16 +73,16 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.user.service.v1.DeleteUserReply'
-    /user/v1/get:
+    /user/v1/friend/get:
         post:
             tags:
                 - User
-            operationId: User_GetUser
+            operationId: User_GetFriend
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/api.user.service.v1.GetUserRequest'
+                            $ref: '#/components/schemas/api.user.service.v1.GetFriendRequest'
                 required: true
             responses:
                 "200":
@@ -90,7 +90,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.user.service.v1.GetUserReply'
+                                $ref: '#/components/schemas/api.user.service.v1.GetFriendReply'
     /user/v1/list:
         post:
             tags:
@@ -162,10 +162,29 @@ components:
         api.user.service.v1.DeleteUserRequest:
             type: object
             properties: {}
-        api.user.service.v1.GetUserReply:
+        api.user.service.v1.GetFriendReply:
             type: object
-            properties: {}
-        api.user.service.v1.GetUserRequest:
+            properties:
+                friends:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.user.service.v1.GetFriendReply_Friend'
+        api.user.service.v1.GetFriendReply_Friend:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                userId:
+                    type: integer
+                    format: int64
+                username:
+                    type: string
+                nickname:
+                    type: string
+                avatar:
+                    type: string
+        api.user.service.v1.GetFriendRequest:
             type: object
             properties: {}
         api.user.service.v1.ListUserReply:
@@ -180,6 +199,9 @@ components:
                 token:
                     type: string
                 expiredTime:
+                    type: integer
+                    format: int64
+                id:
                     type: integer
                     format: int64
                 username:

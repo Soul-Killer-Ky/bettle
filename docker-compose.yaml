@@ -11,6 +11,7 @@ services:
     image: mysql:8
     labels:
       kompose.volume.type: persistentVolumeClaim
+      kompose.service.type: loadbalancer
     hostname: user-db
     environment:
       MYSQL_ROOT_PASSWORD: 123456
@@ -40,6 +41,40 @@ services:
     networks:
       beetle_network:
         ipv4_address: 192.168.16.101
+  im-db:
+    image: mysql:8
+    labels:
+      kompose.volume.type: persistentVolumeClaim
+      kompose.service.type: loadbalancer
+    hostname: im-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - "3306:3306"
+    volumes:
+      - /data/docker/mount/beetle_im_db:/var/lib/mysql
+    networks:
+      beetle_network:
+        ipv4_address: 192.168.16.102
+  im-svc:
+    build:
+      context: .
+      args:
+        APP: im
+    image: beetle/im:0.0.1
+    labels:
+      kompose.volume.type: configMap
+    hostname: im-svc
+    volumes:
+      - ./app/im/configs:/data/conf
+    expose:
+      - "9000"
+      - "10000"
+    depends_on:
+      - im-db
+    networks:
+      beetle_network:
+        ipv4_address: 192.168.16.103
   gateway:
     build:
       context: .

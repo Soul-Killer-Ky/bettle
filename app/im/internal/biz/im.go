@@ -42,7 +42,7 @@ func (ic *ImUseCase) Connect(ctx context.Context, req *http.Request, resp *http.
 	if err != nil {
 		return pb.ErrorImConnectFailure("Failure to establish connection")
 	}
-	client := ws2.NewImClient(claims.ID, conn, ic.log)
+	client := ws2.NewImClient(uint(claims.ID), conn, ic.log)
 
 	go client.Read()
 	go client.Write()

@@ -28,12 +28,6 @@ service User {
 			body: "*"
 		};
 	}
-	rpc GetUser (GetUserRequest) returns (GetUserReply) {
-		option (google.api.http) = {
-			post: "/user/v1/get"
-			body: "*"
-		};
-	}
 	rpc ListUser (ListUserRequest) returns (ListUserReply) {
 		option (google.api.http) = {
 			post: "/user/v1/list"
@@ -43,6 +37,12 @@ service User {
 	rpc LoginUser (LoginUserRequest) returns (LoginUserReply) {
 		option (google.api.http) = {
 			post: "/user/v1/login"
+			body: "*"
+		};
+	}
+	rpc GetFriend (GetFriendRequest) returns (GetFriendReply) {
+		option (google.api.http) = {
+			post: "/user/v1/friend/get"
 			body: "*"
 		};
 	}
@@ -57,9 +57,6 @@ message UpdateUserReply {}
 message DeleteUserRequest {}
 message DeleteUserReply {}
 
-message GetUserRequest {}
-message GetUserReply {}
-
 message ListUserRequest {}
 message ListUserReply {}
 
@@ -70,7 +67,20 @@ message LoginUserRequest {
 message LoginUserReply {
 	string token = 1;
 	int64 expired_time = 2;
-	string username = 3;
-	string nickname = 4;
-	string avatar = 5;
+	int64 id = 3;
+	string username = 4;
+	string nickname = 5;
+	string avatar = 6;
+}
+
+message GetFriendRequest {}
+message GetFriendReply {
+	message Friend {
+		int64 id = 1;
+		int64 user_id = 2;
+		string username = 3;
+		string nickname = 4;
+		string avatar = 5;
+	}
+	repeated Friend friends = 1;
 }

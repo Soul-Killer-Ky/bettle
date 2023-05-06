@@ -1,11 +1,10 @@
 package data
 
 import (
-	"context"
-	"fmt"
-
 	"beetle/app/user/internal/conf"
 	"beetle/app/user/internal/data/ent"
+	"context"
+	"fmt"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -22,7 +21,7 @@ import (
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewUserRepo)
+var ProviderSet = wire.NewSet(NewData, NewUserRepo, NewFriendRepo)
 
 // Data .
 type Data struct {
@@ -49,7 +48,7 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 		)
 		span.End()
 	})
-	client := ent.NewClient(ent.Driver(sqlDrv))
+	client := ent.NewClient(ent.Driver(sqlDrv), ent.Debug())
 	if err != nil {
 		l.Errorf("failed opening connection to sql: %v", err)
 		return nil, nil, err

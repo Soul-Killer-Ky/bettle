@@ -11,7 +11,6 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 )
 
-// User is a User model.
 type User struct {
 	ID       int
 	Username string
@@ -20,24 +19,21 @@ type User struct {
 	Avatar   string
 }
 
-// UserRepo is a Greater repo.
 type UserRepo interface {
 	Save(context.Context, *User) (*User, error)
 	Update(context.Context, *User) (*User, error)
-	FindByID(context.Context, int64) (*User, error)
+	FindByID(context.Context, int) (*User, error)
 	FindByName(context.Context, string) (*User, error)
 	ListByHello(context.Context, string) ([]*User, error)
 	ListAll(context.Context) ([]*User, error)
 }
 
-// UserUseCase is a User use case.
 type UserUseCase struct {
 	authConf *conf.Auth
 	userRepo UserRepo
 	log      *log.Helper
 }
 
-// NewUserUseCase new a User use case.
 func NewUserUseCase(authConf *conf.Auth, userRepo UserRepo, logger log.Logger) *UserUseCase {
 	return &UserUseCase{authConf: authConf, userRepo: userRepo, log: log.NewHelper(logger)}
 }

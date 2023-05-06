@@ -30,8 +30,18 @@ func (r *userRepo) Update(ctx context.Context, g *biz.User) (*biz.User, error) {
 	return g, nil
 }
 
-func (r *userRepo) FindByID(context.Context, int64) (*biz.User, error) {
-	return nil, nil
+func (r *userRepo) FindByID(ctx context.Context, id int) (*biz.User, error) {
+	u, err := r.data.db.User.Query().Where(user.ID(id)).First(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &biz.User{
+		ID:       u.ID,
+		Username: u.Username,
+		Password: u.Password,
+		Nickname: u.Nickname,
+		Avatar:   u.Avatar,
+	}, nil
 }
 
 func (r *userRepo) FindByName(ctx context.Context, name string) (*biz.User, error) {

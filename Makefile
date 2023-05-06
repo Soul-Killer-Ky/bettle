@@ -26,6 +26,7 @@ init:
 	go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
 	go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
 	go install github.com/google/wire/cmd/wire@latest
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
 
 .PHONY: config
 # generate internal proto
@@ -79,8 +80,17 @@ validate:
 gateway:
 	protoc --proto_path=. \
           	   --proto_path=./third_party \
-               --grpc-gateway_out=logtostderr=true:. \
+          	   --grpc-gateway_opt=logtostderr=true \
+               --grpc-gateway_out=paths=source_relative:. \
                $(API_PROTO_FILES)
+
+.PHONY: proto
+# generate gateway proto
+proto:
+	make api;
+	make validate;
+	make gateway;
+	make errors;
 
 .PHONY: all
 # generate all

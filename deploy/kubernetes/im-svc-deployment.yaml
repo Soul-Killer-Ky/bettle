@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -o deploy/tmp/
+    kompose.version: 1.28.0 (c4137012e)
+    kompose.volume.type: configMap
+  creationTimestamp: null
+  labels:
+    io.kompose.service: im-svc
+  name: im-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: im-svc
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -o deploy/tmp/
+        kompose.version: 1.28.0 (c4137012e)
+        kompose.volume.type: configMap
+      creationTimestamp: null
+      labels:
+        io.kompose.network/beetle-beetle-network: "true"
+        io.kompose.service: im-svc
+    spec:
+      containers:
+        - image: beetle/im:0.0.1
+          name: im-svc
+          ports:
+            - containerPort: 8000
+            - containerPort: 9000
+          resources: {}
+          volumeMounts:
+            - mountPath: /data/conf
+              name: im-svc-cm0
+      hostname: im-svc
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            name: im-svc-cm0
+          name: im-svc-cm0
+status: {}

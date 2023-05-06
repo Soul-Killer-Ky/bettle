@@ -3,6 +3,7 @@
 package runtime
 
 import (
+	"beetle/app/user/internal/data/ent/friend"
 	"beetle/app/user/internal/data/ent/schema"
 	"beetle/app/user/internal/data/ent/user"
 	"time"
@@ -12,6 +13,27 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	friendMixin := schema.Friend{}.Mixin()
+	friendMixinHooks2 := friendMixin[2].Hooks()
+	friend.Hooks[0] = friendMixinHooks2[0]
+	friendMixinInters2 := friendMixin[2].Interceptors()
+	friend.Interceptors[0] = friendMixinInters2[0]
+	friendMixinFields0 := friendMixin[0].Fields()
+	_ = friendMixinFields0
+	friendMixinFields1 := friendMixin[1].Fields()
+	_ = friendMixinFields1
+	friendFields := schema.Friend{}.Fields()
+	_ = friendFields
+	// friendDescCreatedAt is the schema descriptor for created_at field.
+	friendDescCreatedAt := friendMixinFields0[0].Descriptor()
+	// friend.DefaultCreatedAt holds the default value on creation for the created_at field.
+	friend.DefaultCreatedAt = friendDescCreatedAt.Default.(func() time.Time)
+	// friendDescUpdatedAt is the schema descriptor for updated_at field.
+	friendDescUpdatedAt := friendMixinFields1[0].Descriptor()
+	// friend.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	friend.DefaultUpdatedAt = friendDescUpdatedAt.Default.(func() time.Time)
+	// friend.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	friend.UpdateDefaultUpdatedAt = friendDescUpdatedAt.UpdateDefault.(func() time.Time)
 	userMixin := schema.User{}.Mixin()
 	userMixinHooks2 := userMixin[2].Hooks()
 	user.Hooks[0] = userMixinHooks2[0]

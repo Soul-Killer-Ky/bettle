@@ -3,16 +3,17 @@ package server
 import (
 	"context"
 	"flag"
-	"github.com/gorilla/handlers"
+	http2 "net/http"
 
 	pbUser "beetle/api/user/service/v1"
 	"beetle/app/gateway/internal/conf"
-	"beetle/app/gateway/internal/service"
 
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/http"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/gorilla/handlers"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -24,15 +25,17 @@ var (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, logger log.Logger) *http.Server {
+func NewHTTPServer(c *conf.Server, websocketProxy http2.HandlerFunc, logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
+			logging.Server(logger),
 			recovery.Recovery(),
 		),
 		http.Filter(handlers.CORS(
-			handlers.AllowedHeaders([]string{"Content-Type", "X-Requested-With"}),
+			handlers.AllowedHeaders([]string{"Content-Type", "X-Requested-With", "Upgrade", "Authorization"}),
 			handlers.AllowedOrigins([]string{"*"}),
 			handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS"}),
+			handlers.AllowCredentials(),
 		)),
 	}
 	if c.Http.Network != "" {
@@ -53,7 +56,16 @@ func NewHTTPServer(c *conf.Server, greeter *service.GreeterService, logger log.L
 	}
 
 	srv := http.NewServer(opts...)
+	srv.HandleFunc("/chat", func(a http2.ResponseWriter, b *http2.Request) {
+		websocketProxy(a, b)
+	})
 	srv.HandlePrefix("/", mux)
+
+	//r := srv.Route("/")
+	//r.GET("/", func(ctx http.Context) error {
+	//	mux.ServeHTTP(ctx.Response(), ctx.Request())
+	//	return nil
+	//})
 
 	return srv
 }

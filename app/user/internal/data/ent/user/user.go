@@ -27,8 +27,26 @@ const (
 	FieldNickname = "nickname"
 	// FieldAvatar holds the string denoting the avatar field in the database.
 	FieldAvatar = "avatar"
+	// EdgeUsers holds the string denoting the users edge name in mutations.
+	EdgeUsers = "users"
+	// EdgeFriends holds the string denoting the friends edge name in mutations.
+	EdgeFriends = "friends"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// UsersTable is the table that holds the users relation/edge.
+	UsersTable = "friends"
+	// UsersInverseTable is the table name for the Friend entity.
+	// It exists in this package in order to avoid circular dependency with the "friend" package.
+	UsersInverseTable = "friends"
+	// UsersColumn is the table column denoting the users relation/edge.
+	UsersColumn = "user_users"
+	// FriendsTable is the table that holds the friends relation/edge.
+	FriendsTable = "friends"
+	// FriendsInverseTable is the table name for the Friend entity.
+	// It exists in this package in order to avoid circular dependency with the "friend" package.
+	FriendsInverseTable = "friends"
+	// FriendsColumn is the table column denoting the friends relation/edge.
+	FriendsColumn = "user_friends"
 )
 
 // Columns holds all SQL columns for user fields.
