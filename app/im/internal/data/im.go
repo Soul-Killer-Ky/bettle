@@ -34,3 +34,21 @@ func (r *imRepo) CreateClient(ctx context.Context, conn *websocket.Conn, uid uin
 
 	return &client
 }
+
+func (r *imRepo) ListByUserID(ctx context.Context, userID int) ([]*biz.Group, error) {
+	ps, err := r.data.db.Group.Query().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	r.log.Warn(ps)
+	rv := make([]*biz.Group, 0)
+	for _, p := range ps {
+		rv = append(rv, &biz.Group{
+			ID:   p.ID,
+			Name: p.Name,
+			Icon: p.Icon,
+			Memo: p.Memo,
+		})
+	}
+	return rv, nil
+}

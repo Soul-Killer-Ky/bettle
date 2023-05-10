@@ -87,6 +87,12 @@ func (uc *UserCreate) SetAvatar(s string) *UserCreate {
 	return uc
 }
 
+// SetMemo sets the "memo" field.
+func (uc *UserCreate) SetMemo(s string) *UserCreate {
+	uc.mutation.SetMemo(s)
+	return uc
+}
+
 // AddUserIDs adds the "users" edge to the Friend entity by IDs.
 func (uc *UserCreate) AddUserIDs(ids ...int) *UserCreate {
 	uc.mutation.AddUserIDs(ids...)
@@ -211,6 +217,14 @@ func (uc *UserCreate) check() error {
 			return &ValidationError{Name: "avatar", err: fmt.Errorf(`ent: validator failed for field "User.avatar": %w`, err)}
 		}
 	}
+	if _, ok := uc.mutation.Memo(); !ok {
+		return &ValidationError{Name: "memo", err: errors.New(`ent: missing required field "User.memo"`)}
+	}
+	if v, ok := uc.mutation.Memo(); ok {
+		if err := user.MemoValidator(v); err != nil {
+			return &ValidationError{Name: "memo", err: fmt.Errorf(`ent: validator failed for field "User.memo": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -264,6 +278,10 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Avatar(); ok {
 		_spec.SetField(user.FieldAvatar, field.TypeString, value)
 		_node.Avatar = value
+	}
+	if value, ok := uc.mutation.Memo(); ok {
+		_spec.SetField(user.FieldMemo, field.TypeString, value)
+		_node.Memo = value
 	}
 	if nodes := uc.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

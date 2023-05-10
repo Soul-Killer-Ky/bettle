@@ -27,6 +27,8 @@ const (
 	FieldNickname = "nickname"
 	// FieldAvatar holds the string denoting the avatar field in the database.
 	FieldAvatar = "avatar"
+	// FieldMemo holds the string denoting the memo field in the database.
+	FieldMemo = "memo"
 	// EdgeUsers holds the string denoting the users edge name in mutations.
 	EdgeUsers = "users"
 	// EdgeFriends holds the string denoting the friends edge name in mutations.
@@ -59,6 +61,7 @@ var Columns = []string{
 	FieldPassword,
 	FieldNickname,
 	FieldAvatar,
+	FieldMemo,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -94,4 +97,6 @@ var (
 	NicknameValidator func(string) error
 	// AvatarValidator is a validator for the "avatar" field. It is called by the builders before save.
 	AvatarValidator func(string) error
+	// MemoValidator is a validator for the "memo" field. It is called by the builders before save.
+	MemoValidator func(string) error
 )

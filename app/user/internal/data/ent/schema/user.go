@@ -22,6 +22,8 @@ func (User) Fields() []ent.Field {
 			MaxLen(20).Comment("昵称"),
 		field.String("avatar").
 			MaxLen(50).Comment("头像"),
+		field.String("memo").
+			MaxLen(50).Comment("个人简介"),
 	}
 }
 

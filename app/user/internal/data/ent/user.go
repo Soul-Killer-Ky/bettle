@@ -30,6 +30,8 @@ type User struct {
 	Nickname string `json:"nickname,omitempty"`
 	// 头像
 	Avatar string `json:"avatar,omitempty"`
+	// 个人简介
+	Memo string `json:"memo,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges UserEdges `json:"edges"`
@@ -71,7 +73,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUsername, user.FieldPassword, user.FieldNickname, user.FieldAvatar:
+		case user.FieldUsername, user.FieldPassword, user.FieldNickname, user.FieldAvatar, user.FieldMemo:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt, user.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -139,6 +141,12 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.Avatar = value.String
 			}
+		case user.FieldMemo:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field memo", values[i])
+			} else if value.Valid {
+				u.Memo = value.String
+			}
 		}
 	}
 	return nil
@@ -199,6 +207,9 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("avatar=")
 	builder.WriteString(u.Avatar)
+	builder.WriteString(", ")
+	builder.WriteString("memo=")
+	builder.WriteString(u.Memo)
 	builder.WriteByte(')')
 	return builder.String()
 }

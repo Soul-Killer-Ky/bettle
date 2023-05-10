@@ -14,10 +14,9 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
+	_ "beetle/app/user/internal/data/ent/runtime"
 	// init mysql driver
 	_ "github.com/go-sql-driver/mysql"
-
-	_ "beetle/app/user/internal/data/ent/runtime"
 )
 
 // ProviderSet is data providers.

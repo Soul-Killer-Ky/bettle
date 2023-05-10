@@ -47,6 +47,7 @@ var (
 		{Name: "password", Type: field.TypeString, Size: 100},
 		{Name: "nickname", Type: field.TypeString, Size: 20},
 		{Name: "avatar", Type: field.TypeString, Size: 50},
+		{Name: "memo", Type: field.TypeString, Size: 50},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

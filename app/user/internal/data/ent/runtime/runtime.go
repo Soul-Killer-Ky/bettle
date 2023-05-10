@@ -71,6 +71,10 @@ func init() {
 	userDescAvatar := userFields[3].Descriptor()
 	// user.AvatarValidator is a validator for the "avatar" field. It is called by the builders before save.
 	user.AvatarValidator = userDescAvatar.Validators[0].(func(string) error)
+	// userDescMemo is the schema descriptor for memo field.
+	userDescMemo := userFields[4].Descriptor()
+	// user.MemoValidator is a validator for the "memo" field. It is called by the builders before save.
+	user.MemoValidator = userDescMemo.Validators[0].(func(string) error)
 }
 
 const (

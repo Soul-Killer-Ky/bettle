@@ -81,6 +81,7 @@ message GetFriendReply {
 		string username = 3;
 		string nickname = 4;
 		string avatar = 5;
+		string memo = 6;
 	}
 	repeated Friend friends = 1;
 }

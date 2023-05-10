@@ -624,6 +624,7 @@ type UserMutation struct {
 	password       *string
 	nickname       *string
 	avatar         *string
+	memo           *string
 	clearedFields  map[string]struct{}
 	users          map[int]struct{}
 	removedusers   map[int]struct{}
@@ -999,6 +1000,42 @@ func (m *UserMutation) ResetAvatar() {
 	m.avatar = nil
 }
 
+// SetMemo sets the "memo" field.
+func (m *UserMutation) SetMemo(s string) {
+	m.memo = &s
+}
+
+// Memo returns the value of the "memo" field in the mutation.
+func (m *UserMutation) Memo() (r string, exists bool) {
+	v := m.memo
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMemo returns the old "memo" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldMemo(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMemo is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMemo requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMemo: %w", err)
+	}
+	return oldValue.Memo, nil
+}
+
+// ResetMemo resets all changes to the "memo" field.
+func (m *UserMutation) ResetMemo() {
+	m.memo = nil
+}
+
 // AddUserIDs adds the "users" edge to the Friend entity by ids.
 func (m *UserMutation) AddUserIDs(ids ...int) {
 	if m.users == nil {
@@ -1141,7 +1178,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, user.FieldCreatedAt)
 	}
@@ -1162,6 +1199,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.avatar != nil {
 		fields = append(fields, user.FieldAvatar)
+	}
+	if m.memo != nil {
+		fields = append(fields, user.FieldMemo)
 	}
 	return fields
 }
@@ -1185,6 +1225,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Nickname()
 	case user.FieldAvatar:
 		return m.Avatar()
+	case user.FieldMemo:
+		return m.Memo()
 	}
 	return nil, false
 }
@@ -1208,6 +1250,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldNickname(ctx)
 	case user.FieldAvatar:
 		return m.OldAvatar(ctx)
+	case user.FieldMemo:
+		return m.OldMemo(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -1265,6 +1309,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAvatar(v)
+		return nil
+	case user.FieldMemo:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMemo(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -1344,6 +1395,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldAvatar:
 		m.ResetAvatar()
+		return nil
+	case user.FieldMemo:
+		m.ResetMemo()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

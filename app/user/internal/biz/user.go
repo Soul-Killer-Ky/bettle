@@ -17,6 +17,7 @@ type User struct {
 	Password string
 	Nickname string
 	Avatar   string
+	Memo     string
 }
 
 type UserRepo interface {

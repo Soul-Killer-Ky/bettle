@@ -40,6 +40,7 @@ func (r *friendRepo) ListByUserID(ctx context.Context, userID int) ([]*biz.Frien
 			Username: fu.Username,
 			Nickname: fu.Nickname,
 			Avatar:   fu.Avatar,
+			Memo:     fu.Memo,
 		})
 	}
 	return rv, nil

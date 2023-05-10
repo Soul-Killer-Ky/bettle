@@ -13,6 +13,7 @@ type Friend struct {
 	Username string
 	Nickname string
 	Avatar   string
+	Memo     string
 }
 
 type FriendRepo interface {

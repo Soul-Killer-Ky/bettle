@@ -79,6 +79,12 @@ func (uu *UserUpdate) SetAvatar(s string) *UserUpdate {
 	return uu
 }
 
+// SetMemo sets the "memo" field.
+func (uu *UserUpdate) SetMemo(s string) *UserUpdate {
+	uu.mutation.SetMemo(s)
+	return uu
+}
+
 // AddUserIDs adds the "users" edge to the Friend entity by IDs.
 func (uu *UserUpdate) AddUserIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddUserIDs(ids...)
@@ -220,6 +226,11 @@ func (uu *UserUpdate) check() error {
 			return &ValidationError{Name: "avatar", err: fmt.Errorf(`ent: validator failed for field "User.avatar": %w`, err)}
 		}
 	}
+	if v, ok := uu.mutation.Memo(); ok {
+		if err := user.MemoValidator(v); err != nil {
+			return &ValidationError{Name: "memo", err: fmt.Errorf(`ent: validator failed for field "User.memo": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -255,6 +266,9 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.Avatar(); ok {
 		_spec.SetField(user.FieldAvatar, field.TypeString, value)
+	}
+	if value, ok := uu.mutation.Memo(); ok {
+		_spec.SetField(user.FieldMemo, field.TypeString, value)
 	}
 	if uu.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -434,6 +448,12 @@ func (uuo *UserUpdateOne) SetAvatar(s string) *UserUpdateOne {
 	return uuo
 }
 
+// SetMemo sets the "memo" field.
+func (uuo *UserUpdateOne) SetMemo(s string) *UserUpdateOne {
+	uuo.mutation.SetMemo(s)
+	return uuo
+}
+
 // AddUserIDs adds the "users" edge to the Friend entity by IDs.
 func (uuo *UserUpdateOne) AddUserIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddUserIDs(ids...)
@@ -588,6 +608,11 @@ func (uuo *UserUpdateOne) check() error {
 			return &ValidationError{Name: "avatar", err: fmt.Errorf(`ent: validator failed for field "User.avatar": %w`, err)}
 		}
 	}
+	if v, ok := uuo.mutation.Memo(); ok {
+		if err := user.MemoValidator(v); err != nil {
+			return &ValidationError{Name: "memo", err: fmt.Errorf(`ent: validator failed for field "User.memo": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -640,6 +665,9 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Avatar(); ok {
 		_spec.SetField(user.FieldAvatar, field.TypeString, value)
+	}
+	if value, ok := uuo.mutation.Memo(); ok {
+		_spec.SetField(user.FieldMemo, field.TypeString, value)
 	}
 	if uuo.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{

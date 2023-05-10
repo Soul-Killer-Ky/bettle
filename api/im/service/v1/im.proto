@@ -19,6 +19,12 @@ service Im {
 			get: "/im/v1/connect"
 		};
 	}
+	rpc GetGroup (GetGroupRequest) returns (GetGroupReply) {
+		option (google.api.http) = {
+			post: "/user/v1/friend/get"
+			body: "*"
+		};
+	}
 }
 
 message CreateImRequest {}
@@ -38,3 +44,14 @@ message ListImReply {}
 
 message ConnectImRequest {}
 message ConnectImReply {}
+
+message GetGroupRequest {}
+message GetGroupReply {
+	message Group {
+		int64 id = 1;
+		string name = 2;
+		string icon = 3;
+		string memo = 4;
+	}
+	repeated Group groups = 1;
+}

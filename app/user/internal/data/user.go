@@ -41,6 +41,7 @@ func (r *userRepo) FindByID(ctx context.Context, id int) (*biz.User, error) {
 		Password: u.Password,
 		Nickname: u.Nickname,
 		Avatar:   u.Avatar,
+		Memo:     u.Memo,
 	}, nil
 }
 
@@ -55,6 +56,7 @@ func (r *userRepo) FindByName(ctx context.Context, name string) (*biz.User, erro
 		Password: u.Password,
 		Nickname: u.Nickname,
 		Avatar:   u.Avatar,
+		Memo:     u.Memo,
 	}, nil
 }
 

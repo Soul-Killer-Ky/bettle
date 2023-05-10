@@ -90,6 +90,11 @@ func Avatar(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldAvatar, v))
 }
 
+// Memo applies equality check predicate on the "memo" field. It's identical to MemoEQ.
+func Memo(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldMemo, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldCreatedAt, v))
@@ -478,6 +483,71 @@ func AvatarEqualFold(v string) predicate.User {
 // AvatarContainsFold applies the ContainsFold predicate on the "avatar" field.
 func AvatarContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldAvatar, v))
+}
+
+// MemoEQ applies the EQ predicate on the "memo" field.
+func MemoEQ(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldMemo, v))
+}
+
+// MemoNEQ applies the NEQ predicate on the "memo" field.
+func MemoNEQ(v string) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldMemo, v))
+}
+
+// MemoIn applies the In predicate on the "memo" field.
+func MemoIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldIn(FieldMemo, vs...))
+}
+
+// MemoNotIn applies the NotIn predicate on the "memo" field.
+func MemoNotIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldMemo, vs...))
+}
+
+// MemoGT applies the GT predicate on the "memo" field.
+func MemoGT(v string) predicate.User {
+	return predicate.User(sql.FieldGT(FieldMemo, v))
+}
+
+// MemoGTE applies the GTE predicate on the "memo" field.
+func MemoGTE(v string) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldMemo, v))
+}
+
+// MemoLT applies the LT predicate on the "memo" field.
+func MemoLT(v string) predicate.User {
+	return predicate.User(sql.FieldLT(FieldMemo, v))
+}
+
+// MemoLTE applies the LTE predicate on the "memo" field.
+func MemoLTE(v string) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldMemo, v))
+}
+
+// MemoContains applies the Contains predicate on the "memo" field.
+func MemoContains(v string) predicate.User {
+	return predicate.User(sql.FieldContains(FieldMemo, v))
+}
+
+// MemoHasPrefix applies the HasPrefix predicate on the "memo" field.
+func MemoHasPrefix(v string) predicate.User {
+	return predicate.User(sql.FieldHasPrefix(FieldMemo, v))
+}
+
+// MemoHasSuffix applies the HasSuffix predicate on the "memo" field.
+func MemoHasSuffix(v string) predicate.User {
+	return predicate.User(sql.FieldHasSuffix(FieldMemo, v))
+}
+
+// MemoEqualFold applies the EqualFold predicate on the "memo" field.
+func MemoEqualFold(v string) predicate.User {
+	return predicate.User(sql.FieldEqualFold(FieldMemo, v))
+}
+
+// MemoContainsFold applies the ContainsFold predicate on the "memo" field.
+func MemoContainsFold(v string) predicate.User {
+	return predicate.User(sql.FieldContainsFold(FieldMemo, v))
 }
 
 // HasUsers applies the HasEdge predicate on the "users" edge.

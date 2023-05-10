@@ -150,6 +150,28 @@ components:
         api.im.service.v1.ConnectImReply:
             type: object
             properties: {}
+        api.im.service.v1.GetGroupReply:
+            type: object
+            properties:
+                groups:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.im.service.v1.GetGroupReply_Group'
+        api.im.service.v1.GetGroupReply_Group:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                name:
+                    type: string
+                icon:
+                    type: string
+                memo:
+                    type: string
+        api.im.service.v1.GetGroupRequest:
+            type: object
+            properties: {}
         api.user.service.v1.CreateUserReply:
             type: object
             properties: {}
@@ -183,6 +205,8 @@ components:
                 nickname:
                     type: string
                 avatar:
+                    type: string
+                memo:
                     type: string
         api.user.service.v1.GetFriendRequest:
             type: object

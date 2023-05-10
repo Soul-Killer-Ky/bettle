@@ -63,9 +63,11 @@ func (s *UserService) GetFriend(ctx context.Context, req *pb.GetFriendRequest) (
 	for _, p := range ps {
 		friends = append(friends, &pb.GetFriendReply_Friend{
 			Id:       int64(p.ID),
+			UserId:   int64(p.UserID),
 			Username: p.Username,
 			Nickname: p.Nickname,
 			Avatar:   p.Avatar,
+			Memo:     p.Memo,
 		})
 	}
 	return &pb.GetFriendReply{

@@ -1,9 +1,12 @@
 package service
 
 import (
+	"context"
+
 	pb "beetle/api/im/service/v1"
 	"beetle/app/im/internal/biz"
-	"context"
+	"beetle/internal/pkg/jwt"
+
 	"github.com/Soul-Killer-Ky/kratos/websocket"
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -54,4 +57,24 @@ func (s *ImService) ConnectIm(ctx context.Context, req *pb.ConnectImRequest) (*p
 	//s.ic.Connect(ctx, request, response.(*http.ResponseWriter))
 
 	return &pb.ConnectImReply{}, nil
+}
+
+func (s *ImService) GetGroup(ctx context.Context, req *pb.GetGroupRequest) (*pb.GetGroupReply, error) {
+	userID, err := jwt.GetUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ps, err := s.ic.GetGroups(ctx, userID)
+	groups := make([]*pb.GetGroupReply_Group, 0)
+	for _, p := range ps {
+		groups = append(groups, &pb.GetGroupReply_Group{
+			Id:   int64(p.ID),
+			Name: p.Name,
+			Icon: p.Icon,
+			Memo: p.Memo,
+		})
+	}
+	return &pb.GetGroupReply{
+		Groups: groups,
+	}, nil
 }
