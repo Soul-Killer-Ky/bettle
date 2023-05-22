@@ -9,24 +9,24 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type imRepo struct {
+type groupRepo struct {
 	data *Data
 	log  *log.Helper
 }
 
-// NewImRepo .
-func NewImRepo(data *Data, logger log.Logger) biz.ImRepo {
-	return &imRepo{
+// NewGroupRepo .
+func NewGroupRepo(data *Data, logger log.Logger) biz.GroupRepo {
+	return &groupRepo{
 		data: data,
 		log:  log.NewHelper(logger),
 	}
 }
 
-func (r *imRepo) Connect(ctx context.Context) error {
+func (r *groupRepo) Connect(ctx context.Context) error {
 	return nil
 }
 
-func (r *imRepo) CreateClient(ctx context.Context, conn *websocket.Conn, uid uint) *imClient {
+func (r *groupRepo) CreateClient(ctx context.Context, conn *websocket.Conn, uid uint) *imClient {
 	client := imClient{
 		ID:     uid,
 		Socket: conn,
@@ -35,12 +35,11 @@ func (r *imRepo) CreateClient(ctx context.Context, conn *websocket.Conn, uid uin
 	return &client
 }
 
-func (r *imRepo) ListByUserID(ctx context.Context, userID int) ([]*biz.Group, error) {
+func (r *groupRepo) ListByUserID(ctx context.Context, userID int) ([]*biz.Group, error) {
 	ps, err := r.data.db.Group.Query().All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	r.log.Warn(ps)
 	rv := make([]*biz.Group, 0)
 	for _, p := range ps {
 		rv = append(rv, &biz.Group{

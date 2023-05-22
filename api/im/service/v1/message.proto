@@ -8,14 +8,16 @@ option go_package = "beetle/api/im/service/v1;v1";
 option java_multiple_files = true;
 option java_package = "api.im.service.v1";
 
-enum ProtocolType {
-	Chat = 0; // 单聊
-	Group = 1; // 群聊
-	Broadcast = 2;
-	HeartBeat = 3;
+enum MessageType {
+	HeartBeat = 0; // 心跳
+	Chat = 1; // 单聊
+	Group = 2; // 群聊
+	Broadcast = 3; // 广播
 }
 
-enum MessageType {
+enum ContentType {
+	// 不使用类型默认值0，因为proto生成的go结构存在`omitempty`选项，导致json序列化时忽略空(默认值)字段，js解析json后该字段为undefined
+//	None = 0;
 	Text = 0;
 	Image = 1;
 	Voice = 2;
@@ -24,27 +26,27 @@ enum MessageType {
 	Location = 5;
 }
 
-message Message {
-	MessageType type = 1;
+message Content {
+	ContentType type = 1;
 	string body = 2;
 }
 
 message ChatMessage {
-	Message message = 1;
+	Content content = 1;
 	uint64 from = 2;
 	uint64 sender = 3;
 	google.protobuf.Timestamp timestamp = 4;
 }
 
 message GroupMessage {
-	Message message = 1;
+	Content content = 1;
 	uint64 from = 2;
 	string group_id = 3;
 	google.protobuf.Timestamp timestamp = 4;
 }
 
 message BroadcastMessage {
-	Message message = 1;
+	Content content = 1;
 	uint64 from = 2;
 	google.protobuf.Timestamp timestamp = 3;
 }

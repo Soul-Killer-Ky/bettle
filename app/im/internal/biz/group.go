@@ -1,14 +1,13 @@
 package biz
 
 import (
-	"context"
-	"github.com/go-kratos/kratos/v2/errors"
-
 	pb2 "beetle/api/beetle/v1"
 	pb "beetle/api/im/service/v1"
 	ws2 "beetle/app/im/internal/pkg/ws"
 	"beetle/internal/pkg/jwt"
 	"beetle/internal/pkg/ws"
+	"context"
+	"github.com/go-kratos/kratos/v2/errors"
 
 	"github.com/go-kratos/kratos/v2/log"
 	jwt2 "github.com/go-kratos/kratos/v2/middleware/auth/jwt"
@@ -22,25 +21,25 @@ type Group struct {
 	Memo string
 }
 
-// ImRepo is a Greater repo.
-type ImRepo interface {
+// GroupRepo is a Greater repo.
+type GroupRepo interface {
 	Connect(ctx context.Context) error
 	ListByUserID(context.Context, int) ([]*Group, error)
 }
 
-// ImUseCase is a Im usecase.
-type ImUseCase struct {
+// GroupUseCase is a group usecase.
+type GroupUseCase struct {
 	log *log.Helper
 
-	repo ImRepo
+	repo GroupRepo
 }
 
-// NewImUseCase new a im usecase.
-func NewImUseCase(repo ImRepo, logger log.Logger) *ImUseCase {
-	return &ImUseCase{repo: repo, log: log.NewHelper(logger)}
+// NewGroupUseCase new a im usecase.
+func NewGroupUseCase(repo GroupRepo, logger log.Logger) *GroupUseCase {
+	return &GroupUseCase{repo: repo, log: log.NewHelper(logger)}
 }
 
-func (ic *ImUseCase) Connect(ctx context.Context, req *http.Request, resp *http.ResponseWriter) error {
+func (ic *GroupUseCase) Connect(ctx context.Context, req *http.Request, resp *http.ResponseWriter) error {
 	token, ok := jwt2.FromContext(ctx)
 	if !ok {
 		return pb2.ErrorAuthFailure("auth fail")
@@ -59,11 +58,7 @@ func (ic *ImUseCase) Connect(ctx context.Context, req *http.Request, resp *http.
 	return nil
 }
 
-func (ic *ImUseCase) Save() {
-
-}
-
-func (ic *ImUseCase) GetGroups(ctx context.Context, userID int) ([]*Group, error) {
+func (ic *GroupUseCase) GetGroups(ctx context.Context, userID int) ([]*Group, error) {
 	groups, err := ic.repo.ListByUserID(ctx, userID)
 	if err != nil {
 		ic.log.WithContext(ctx).Errorf("list groups error: %s", err)

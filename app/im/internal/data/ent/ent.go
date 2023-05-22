@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"beetle/app/im/internal/data/ent/chatmessage"
 	"beetle/app/im/internal/data/ent/group"
 	"context"
 	"errors"
@@ -65,7 +66,8 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		group.Table: group.ValidColumn,
+		chatmessage.Table: chatmessage.ValidColumn,
+		group.Table:       group.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

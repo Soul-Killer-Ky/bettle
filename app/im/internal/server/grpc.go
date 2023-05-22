@@ -4,6 +4,7 @@ import (
 	pb "beetle/api/im/service/v1"
 	"beetle/app/im/internal/conf"
 	"beetle/app/im/internal/service"
+	jwt2 "beetle/internal/pkg/jwt"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"
@@ -17,9 +18,16 @@ func NewGRPCServer(c *conf.Server, ac *conf.Auth, im *service.ImService, logger 
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
-			jwt.Server(func(token *jwtv4.Token) (interface{}, error) {
-				return []byte(ac.JwtKey), nil
-			}, jwt.WithSigningMethod(jwtv4.SigningMethodHS256)),
+			jwt.Server(
+				func(token *jwtv4.Token) (interface{}, error) {
+					return []byte(ac.JwtKey), nil
+				},
+				jwt.WithSigningMethod(jwtv4.SigningMethodHS256),
+				jwt.WithClaims(func() jwtv4.Claims {
+					return &jwt2.CustomUserClaims{}
+				}),
+			),
+			jwt2.Auth(),
 		),
 	}
 	if c.Grpc.Network != "" {

@@ -25,7 +25,7 @@ func init() {
 func main() {
 	flag.Parse()
 	cli := websocket.NewClient(
-		websocket.WithEndpoint("ws://localhost:8000/chat"),
+		websocket.WithEndpoint("ws://localhost:10000/ws"),
 		websocket.WithClientCodec("json"),
 		websocket.WithRequestHeader("Authorization", fmt.Sprintf("Bearer %s", token)),
 	)
@@ -33,7 +33,7 @@ func main() {
 
 	testClient = cli
 
-	cli.RegisterMessageHandler(websocket.MessageType(pb.ProtocolType_Chat),
+	cli.RegisterMessageHandler(websocket.MessageType(pb.MessageType_Chat),
 		func(payload websocket.MessagePayload) error {
 			switch t := payload.(type) {
 			case *pb.ChatMessage:
@@ -57,12 +57,12 @@ func main() {
 		if msg == "break" {
 			break
 		}
-		cli.SendMessage(0, pb.ChatMessage{
-			Message: &pb.Message{
-				Type: pb.MessageType_Text,
+		cli.SendMessage(1, pb.ChatMessage{
+			Content: &pb.Content{
+				Type: pb.ContentType_Text,
 				Body: msg,
 			},
-			Sender: 1,
+			Sender: 2,
 		})
 	}
 }

@@ -1,14 +1,16 @@
 package server
 
 import (
-	pb "beetle/api/im/service/v1"
-	"beetle/app/im/internal/conf"
-	"beetle/app/im/internal/service"
-	jwt2 "beetle/internal/pkg/jwt"
 	"context"
 	"errors"
 
+	pb "beetle/api/im/service/v1"
+	"beetle/app/im/internal/conf"
+	"beetle/app/im/internal/service/ws"
+	jwt2 "beetle/internal/pkg/jwt"
+
 	"github.com/Soul-Killer-Ky/kratos/websocket"
+	"github.com/go-kratos/kratos/v2/encoding/json"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
@@ -18,7 +20,10 @@ import (
 )
 
 // NewWebsocketServer create a websocket server.
-func NewWebsocketServer(c *conf.Server, ac *conf.Auth, logger log.Logger, svc *service.ImService) *websocket.Server {
+func NewWebsocketServer(c *conf.Server, ac *conf.Auth, logger log.Logger, svc *ws.Service) *websocket.Server {
+	//l := log.NewHelper(logger)
+	json.MarshalOptions.UseEnumNumbers = true
+
 	srv := websocket.NewServer(
 		websocket.WithAddress(c.Websocket.Addr),
 		websocket.WithPath(c.Websocket.Path),
@@ -38,23 +43,22 @@ func NewWebsocketServer(c *conf.Server, ac *conf.Auth, logger log.Logger, svc *s
 				),
 			).Match(NewWhiteListMatcher()).Build(),
 		)),
-		websocket.WithBusinessIDFunc(func(ctx context.Context) interface{} {
+		websocket.WithBusinessIDFunc(func(ctx context.Context) websocket.BusinessID {
 			token, ok := jwt.FromContext(ctx)
 			if !ok {
 				return nil
 			}
 			claims := token.(*jwt2.CustomUserClaims)
-			return uint64(claims.ID)
+			return claims.ID
 		}),
 	)
 
 	svc.SetWebsocketServer(srv)
 
-	srv.RegisterMessageHandler(websocket.MessageType(pb.ProtocolType_Chat),
+	srv.RegisterMessageHandler(websocket.MessageType(pb.MessageType_Chat),
 		func(session *websocket.Session, payload websocket.MessagePayload) error {
 			switch t := payload.(type) {
 			case *pb.ChatMessage:
-				t.From = session.BusinessID().(uint64)
 				return svc.OnChatMessage(session, t)
 			default:
 				return errors.New("invalid payload type")
@@ -62,7 +66,7 @@ func NewWebsocketServer(c *conf.Server, ac *conf.Auth, logger log.Logger, svc *s
 		},
 		func() websocket.Any { return &pb.ChatMessage{} },
 	)
-	srv.RegisterMessageHandler(websocket.MessageType(pb.ProtocolType_Group),
+	srv.RegisterMessageHandler(websocket.MessageType(pb.MessageType_Group),
 		func(session *websocket.Session, payload websocket.MessagePayload) error {
 			switch t := payload.(type) {
 			case *pb.GroupMessage:

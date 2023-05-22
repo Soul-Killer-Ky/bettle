@@ -1079,42 +1079,53 @@ var _ interface {
 	ErrorName() string
 } = LoginUserReplyValidationError{}
 
-// Validate checks the field values on GetFriendRequest with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *GetFriendRequest) Validate() error {
+// Validate checks the field values on GetUserRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *GetUserRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on GetFriendRequest with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// GetFriendRequestMultiError, or nil if none found.
-func (m *GetFriendRequest) ValidateAll() error {
+// ValidateAll checks the field values on GetUserRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetUserRequestMultiError,
+// or nil if none found.
+func (m *GetUserRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *GetFriendRequest) validate(all bool) error {
+func (m *GetUserRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
+	if m.GetId() <= 0 {
+		err := GetUserRequestValidationError{
+			field:  "Id",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
-		return GetFriendRequestMultiError(errors)
+		return GetUserRequestMultiError(errors)
 	}
 
 	return nil
 }
 
-// GetFriendRequestMultiError is an error wrapping multiple validation errors
-// returned by GetFriendRequest.ValidateAll() if the designated constraints
+// GetUserRequestMultiError is an error wrapping multiple validation errors
+// returned by GetUserRequest.ValidateAll() if the designated constraints
 // aren't met.
-type GetFriendRequestMultiError []error
+type GetUserRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m GetFriendRequestMultiError) Error() string {
+func (m GetUserRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1123,11 +1134,11 @@ func (m GetFriendRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m GetFriendRequestMultiError) AllErrors() []error { return m }
+func (m GetUserRequestMultiError) AllErrors() []error { return m }
 
-// GetFriendRequestValidationError is the validation error returned by
-// GetFriendRequest.Validate if the designated constraints aren't met.
-type GetFriendRequestValidationError struct {
+// GetUserRequestValidationError is the validation error returned by
+// GetUserRequest.Validate if the designated constraints aren't met.
+type GetUserRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1135,22 +1146,22 @@ type GetFriendRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e GetFriendRequestValidationError) Field() string { return e.field }
+func (e GetUserRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GetFriendRequestValidationError) Reason() string { return e.reason }
+func (e GetUserRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GetFriendRequestValidationError) Cause() error { return e.cause }
+func (e GetUserRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GetFriendRequestValidationError) Key() bool { return e.key }
+func (e GetUserRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GetFriendRequestValidationError) ErrorName() string { return "GetFriendRequestValidationError" }
+func (e GetUserRequestValidationError) ErrorName() string { return "GetUserRequestValidationError" }
 
 // Error satisfies the builtin error interface
-func (e GetFriendRequestValidationError) Error() string {
+func (e GetUserRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1162,14 +1173,14 @@ func (e GetFriendRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGetFriendRequest.%s: %s%s",
+		"invalid %sGetUserRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GetFriendRequestValidationError{}
+var _ error = GetUserRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -1177,24 +1188,235 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GetFriendRequestValidationError{}
+} = GetUserRequestValidationError{}
 
-// Validate checks the field values on GetFriendReply with the rules defined in
+// Validate checks the field values on GetUserReply with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *GetFriendReply) Validate() error {
+func (m *GetUserReply) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on GetFriendReply with the rules defined
+// ValidateAll checks the field values on GetUserReply with the rules defined
 // in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in GetFriendReplyMultiError,
-// or nil if none found.
-func (m *GetFriendReply) ValidateAll() error {
+// result is a list of violation errors wrapped in GetUserReplyMultiError, or
+// nil if none found.
+func (m *GetUserReply) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *GetFriendReply) validate(all bool) error {
+func (m *GetUserReply) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for UserId
+
+	// no validation rules for Username
+
+	// no validation rules for Nickname
+
+	// no validation rules for Avatar
+
+	// no validation rules for Memo
+
+	if len(errors) > 0 {
+		return GetUserReplyMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetUserReplyMultiError is an error wrapping multiple validation errors
+// returned by GetUserReply.ValidateAll() if the designated constraints aren't met.
+type GetUserReplyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetUserReplyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetUserReplyMultiError) AllErrors() []error { return m }
+
+// GetUserReplyValidationError is the validation error returned by
+// GetUserReply.Validate if the designated constraints aren't met.
+type GetUserReplyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetUserReplyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetUserReplyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetUserReplyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetUserReplyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetUserReplyValidationError) ErrorName() string { return "GetUserReplyValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetUserReplyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetUserReply.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetUserReplyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetUserReplyValidationError{}
+
+// Validate checks the field values on ListFriendRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ListFriendRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListFriendRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListFriendRequestMultiError, or nil if none found.
+func (m *ListFriendRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListFriendRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return ListFriendRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListFriendRequestMultiError is an error wrapping multiple validation errors
+// returned by ListFriendRequest.ValidateAll() if the designated constraints
+// aren't met.
+type ListFriendRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListFriendRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListFriendRequestMultiError) AllErrors() []error { return m }
+
+// ListFriendRequestValidationError is the validation error returned by
+// ListFriendRequest.Validate if the designated constraints aren't met.
+type ListFriendRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListFriendRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListFriendRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListFriendRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListFriendRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListFriendRequestValidationError) ErrorName() string {
+	return "ListFriendRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListFriendRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListFriendRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListFriendRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListFriendRequestValidationError{}
+
+// Validate checks the field values on ListFriendReply with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ListFriendReply) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListFriendReply with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListFriendReplyMultiError, or nil if none found.
+func (m *ListFriendReply) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListFriendReply) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1208,7 +1430,7 @@ func (m *GetFriendReply) validate(all bool) error {
 			switch v := interface{}(item).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, GetFriendReplyValidationError{
+					errors = append(errors, ListFriendReplyValidationError{
 						field:  fmt.Sprintf("Friends[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -1216,7 +1438,7 @@ func (m *GetFriendReply) validate(all bool) error {
 				}
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
-					errors = append(errors, GetFriendReplyValidationError{
+					errors = append(errors, ListFriendReplyValidationError{
 						field:  fmt.Sprintf("Friends[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -1225,7 +1447,7 @@ func (m *GetFriendReply) validate(all bool) error {
 			}
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return GetFriendReplyValidationError{
+				return ListFriendReplyValidationError{
 					field:  fmt.Sprintf("Friends[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -1236,19 +1458,19 @@ func (m *GetFriendReply) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return GetFriendReplyMultiError(errors)
+		return ListFriendReplyMultiError(errors)
 	}
 
 	return nil
 }
 
-// GetFriendReplyMultiError is an error wrapping multiple validation errors
-// returned by GetFriendReply.ValidateAll() if the designated constraints
+// ListFriendReplyMultiError is an error wrapping multiple validation errors
+// returned by ListFriendReply.ValidateAll() if the designated constraints
 // aren't met.
-type GetFriendReplyMultiError []error
+type ListFriendReplyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m GetFriendReplyMultiError) Error() string {
+func (m ListFriendReplyMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1257,11 +1479,11 @@ func (m GetFriendReplyMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m GetFriendReplyMultiError) AllErrors() []error { return m }
+func (m ListFriendReplyMultiError) AllErrors() []error { return m }
 
-// GetFriendReplyValidationError is the validation error returned by
-// GetFriendReply.Validate if the designated constraints aren't met.
-type GetFriendReplyValidationError struct {
+// ListFriendReplyValidationError is the validation error returned by
+// ListFriendReply.Validate if the designated constraints aren't met.
+type ListFriendReplyValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1269,22 +1491,22 @@ type GetFriendReplyValidationError struct {
 }
 
 // Field function returns field value.
-func (e GetFriendReplyValidationError) Field() string { return e.field }
+func (e ListFriendReplyValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GetFriendReplyValidationError) Reason() string { return e.reason }
+func (e ListFriendReplyValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GetFriendReplyValidationError) Cause() error { return e.cause }
+func (e ListFriendReplyValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GetFriendReplyValidationError) Key() bool { return e.key }
+func (e ListFriendReplyValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GetFriendReplyValidationError) ErrorName() string { return "GetFriendReplyValidationError" }
+func (e ListFriendReplyValidationError) ErrorName() string { return "ListFriendReplyValidationError" }
 
 // Error satisfies the builtin error interface
-func (e GetFriendReplyValidationError) Error() string {
+func (e ListFriendReplyValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1296,14 +1518,14 @@ func (e GetFriendReplyValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGetFriendReply.%s: %s%s",
+		"invalid %sListFriendReply.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GetFriendReplyValidationError{}
+var _ error = ListFriendReplyValidationError{}
 
 var _ interface {
 	Field() string
@@ -1311,24 +1533,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GetFriendReplyValidationError{}
+} = ListFriendReplyValidationError{}
 
-// Validate checks the field values on GetFriendReply_Friend with the rules
+// Validate checks the field values on ListFriendReply_Friend with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *GetFriendReply_Friend) Validate() error {
+func (m *ListFriendReply_Friend) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on GetFriendReply_Friend with the rules
+// ValidateAll checks the field values on ListFriendReply_Friend with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// GetFriendReply_FriendMultiError, or nil if none found.
-func (m *GetFriendReply_Friend) ValidateAll() error {
+// ListFriendReply_FriendMultiError, or nil if none found.
+func (m *ListFriendReply_Friend) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *GetFriendReply_Friend) validate(all bool) error {
+func (m *ListFriendReply_Friend) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1345,20 +1567,22 @@ func (m *GetFriendReply_Friend) validate(all bool) error {
 
 	// no validation rules for Avatar
 
+	// no validation rules for Memo
+
 	if len(errors) > 0 {
-		return GetFriendReply_FriendMultiError(errors)
+		return ListFriendReply_FriendMultiError(errors)
 	}
 
 	return nil
 }
 
-// GetFriendReply_FriendMultiError is an error wrapping multiple validation
-// errors returned by GetFriendReply_Friend.ValidateAll() if the designated
+// ListFriendReply_FriendMultiError is an error wrapping multiple validation
+// errors returned by ListFriendReply_Friend.ValidateAll() if the designated
 // constraints aren't met.
-type GetFriendReply_FriendMultiError []error
+type ListFriendReply_FriendMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m GetFriendReply_FriendMultiError) Error() string {
+func (m ListFriendReply_FriendMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1367,11 +1591,11 @@ func (m GetFriendReply_FriendMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m GetFriendReply_FriendMultiError) AllErrors() []error { return m }
+func (m ListFriendReply_FriendMultiError) AllErrors() []error { return m }
 
-// GetFriendReply_FriendValidationError is the validation error returned by
-// GetFriendReply_Friend.Validate if the designated constraints aren't met.
-type GetFriendReply_FriendValidationError struct {
+// ListFriendReply_FriendValidationError is the validation error returned by
+// ListFriendReply_Friend.Validate if the designated constraints aren't met.
+type ListFriendReply_FriendValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1379,24 +1603,24 @@ type GetFriendReply_FriendValidationError struct {
 }
 
 // Field function returns field value.
-func (e GetFriendReply_FriendValidationError) Field() string { return e.field }
+func (e ListFriendReply_FriendValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GetFriendReply_FriendValidationError) Reason() string { return e.reason }
+func (e ListFriendReply_FriendValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GetFriendReply_FriendValidationError) Cause() error { return e.cause }
+func (e ListFriendReply_FriendValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GetFriendReply_FriendValidationError) Key() bool { return e.key }
+func (e ListFriendReply_FriendValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GetFriendReply_FriendValidationError) ErrorName() string {
-	return "GetFriendReply_FriendValidationError"
+func (e ListFriendReply_FriendValidationError) ErrorName() string {
+	return "ListFriendReply_FriendValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e GetFriendReply_FriendValidationError) Error() string {
+func (e ListFriendReply_FriendValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1408,14 +1632,14 @@ func (e GetFriendReply_FriendValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGetFriendReply_Friend.%s: %s%s",
+		"invalid %sListFriendReply_Friend.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GetFriendReply_FriendValidationError{}
+var _ error = ListFriendReply_FriendValidationError{}
 
 var _ interface {
 	Field() string
@@ -1423,4 +1647,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GetFriendReply_FriendValidationError{}
+} = ListFriendReply_FriendValidationError{}

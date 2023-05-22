@@ -1,5 +1,6 @@
 .idea
 bin/
-deploy/docker/**/data
+deploy/docker/im/redis/data
 deploy/**/tmp
 app/demo/
+third_party/local

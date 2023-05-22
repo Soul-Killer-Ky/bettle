@@ -21,7 +21,7 @@ service Im {
 	}
 	rpc GetGroup (GetGroupRequest) returns (GetGroupReply) {
 		option (google.api.http) = {
-			post: "/user/v1/friend/get"
+			post: "/im/v1/group/get"
 			body: "*"
 		};
 	}

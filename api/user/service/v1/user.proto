@@ -40,9 +40,15 @@ service User {
 			body: "*"
 		};
 	}
-	rpc GetFriend (GetFriendRequest) returns (GetFriendReply) {
+	rpc GetUser (GetUserRequest) returns (GetUserReply) {
 		option (google.api.http) = {
-			post: "/user/v1/friend/get"
+			post: "/user/v1/get"
+			body: "*"
+		};
+	}
+	rpc ListFriend (ListFriendRequest) returns (ListFriendReply) {
+		option (google.api.http) = {
+			post: "/user/v1/friend/list"
 			body: "*"
 		};
 	}
@@ -73,8 +79,19 @@ message LoginUserReply {
 	string avatar = 6;
 }
 
-message GetFriendRequest {}
-message GetFriendReply {
+message GetUserRequest {
+	int64 id = 1 [(validate.rules).int64.gt = 0];
+}
+message GetUserReply {
+	int64 user_id = 1;
+	string username = 2;
+	string nickname = 3;
+	string avatar = 4;
+	string memo = 5;
+}
+
+message ListFriendRequest {}
+message ListFriendReply {
 	message Friend {
 		int64 id = 1;
 		int64 user_id = 2;

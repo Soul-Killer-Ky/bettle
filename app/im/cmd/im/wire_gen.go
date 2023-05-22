@@ -12,6 +12,7 @@ import (
 	"beetle/app/im/internal/data"
 	"beetle/app/im/internal/server"
 	"beetle/app/im/internal/service"
+	"beetle/app/im/internal/service/ws"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -28,12 +29,15 @@ func wireApp(confServer *conf.Server, confData *conf.Data, auth *conf.Auth, logg
 	if err != nil {
 		return nil, nil, err
 	}
-	imRepo := data.NewImRepo(dataData, logger)
-	imUseCase := biz.NewImUseCase(imRepo, logger)
-	imService := service.NewImService(imUseCase, logger)
+	groupRepo := data.NewGroupRepo(dataData, logger)
+	groupUseCase := biz.NewGroupUseCase(groupRepo, logger)
+	imService := service.NewImService(groupUseCase, logger)
 	grpcServer := server.NewGRPCServer(confServer, auth, imService, logger)
 	httpServer := server.NewHTTPServer(confServer, auth, imService, logger)
-	websocketServer := server.NewWebsocketServer(confServer, auth, logger, imService)
+	messageRepo := data.NewMessageRepo(dataData, logger)
+	messageUseCase := biz.NewMessageUseCase(messageRepo, logger)
+	wsService := ws.NewService(messageUseCase, logger)
+	websocketServer := server.NewWebsocketServer(confServer, auth, logger, wsService)
 	app := newApp(logger, grpcServer, httpServer, websocketServer)
 	return app, func() {
 		cleanup()

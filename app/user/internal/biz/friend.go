@@ -30,7 +30,7 @@ func NewFriendUseCase(authConf *conf.Auth, friendRepo FriendRepo, logger log.Log
 	return &FriendUseCase{authConf: authConf, friendRepo: friendRepo, log: log.NewHelper(logger)}
 }
 
-func (uc *FriendUseCase) GetFriends(ctx context.Context, userID int) ([]*Friend, error) {
+func (uc *FriendUseCase) ListFriend(ctx context.Context, userID int) ([]*Friend, error) {
 	friends, err := uc.friendRepo.ListByUserID(ctx, userID)
 	if err != nil {
 		uc.log.WithContext(ctx).Errorf("list friends error: %s", err)

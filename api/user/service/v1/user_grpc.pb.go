@@ -24,7 +24,8 @@ const (
 	User_DeleteUser_FullMethodName = "/api.user.service.v1.User/DeleteUser"
 	User_ListUser_FullMethodName   = "/api.user.service.v1.User/ListUser"
 	User_LoginUser_FullMethodName  = "/api.user.service.v1.User/LoginUser"
-	User_GetFriend_FullMethodName  = "/api.user.service.v1.User/GetFriend"
+	User_GetUser_FullMethodName    = "/api.user.service.v1.User/GetUser"
+	User_ListFriend_FullMethodName = "/api.user.service.v1.User/ListFriend"
 )
 
 // UserClient is the client API for User service.
@@ -36,7 +37,8 @@ type UserClient interface {
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserReply, error)
 	ListUser(ctx context.Context, in *ListUserRequest, opts ...grpc.CallOption) (*ListUserReply, error)
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserReply, error)
-	GetFriend(ctx context.Context, in *GetFriendRequest, opts ...grpc.CallOption) (*GetFriendReply, error)
+	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserReply, error)
+	ListFriend(ctx context.Context, in *ListFriendRequest, opts ...grpc.CallOption) (*ListFriendReply, error)
 }
 
 type userClient struct {
@@ -92,9 +94,18 @@ func (c *userClient) LoginUser(ctx context.Context, in *LoginUserRequest, opts .
 	return out, nil
 }
 
-func (c *userClient) GetFriend(ctx context.Context, in *GetFriendRequest, opts ...grpc.CallOption) (*GetFriendReply, error) {
-	out := new(GetFriendReply)
-	err := c.cc.Invoke(ctx, User_GetFriend_FullMethodName, in, out, opts...)
+func (c *userClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserReply, error) {
+	out := new(GetUserReply)
+	err := c.cc.Invoke(ctx, User_GetUser_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) ListFriend(ctx context.Context, in *ListFriendRequest, opts ...grpc.CallOption) (*ListFriendReply, error) {
+	out := new(ListFriendReply)
+	err := c.cc.Invoke(ctx, User_ListFriend_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +121,8 @@ type UserServer interface {
 	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserReply, error)
 	ListUser(context.Context, *ListUserRequest) (*ListUserReply, error)
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserReply, error)
-	GetFriend(context.Context, *GetFriendRequest) (*GetFriendReply, error)
+	GetUser(context.Context, *GetUserRequest) (*GetUserReply, error)
+	ListFriend(context.Context, *ListFriendRequest) (*ListFriendReply, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -133,8 +145,11 @@ func (UnimplementedUserServer) ListUser(context.Context, *ListUserRequest) (*Lis
 func (UnimplementedUserServer) LoginUser(context.Context, *LoginUserRequest) (*LoginUserReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginUser not implemented")
 }
-func (UnimplementedUserServer) GetFriend(context.Context, *GetFriendRequest) (*GetFriendReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFriend not implemented")
+func (UnimplementedUserServer) GetUser(context.Context, *GetUserRequest) (*GetUserReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+}
+func (UnimplementedUserServer) ListFriend(context.Context, *ListFriendRequest) (*ListFriendReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListFriend not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -239,20 +254,38 @@ func _User_LoginUser_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_GetFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFriendRequest)
+func _User_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).GetFriend(ctx, in)
+		return srv.(UserServer).GetUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_GetFriend_FullMethodName,
+		FullMethod: User_GetUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetFriend(ctx, req.(*GetFriendRequest))
+		return srv.(UserServer).GetUser(ctx, req.(*GetUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_ListFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListFriendRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).ListFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_ListFriend_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).ListFriend(ctx, req.(*ListFriendRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -285,8 +318,12 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _User_LoginUser_Handler,
 		},
 		{
-			MethodName: "GetFriend",
-			Handler:    _User_GetFriend_Handler,
+			MethodName: "GetUser",
+			Handler:    _User_GetUser_Handler,
+		},
+		{
+			MethodName: "ListFriend",
+			Handler:    _User_ListFriend_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

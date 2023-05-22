@@ -14,18 +14,18 @@ import (
 type ImService struct {
 	pb.UnimplementedImServer
 
-	ic  *biz.ImUseCase
+	gc  *biz.GroupUseCase
 	log *log.Helper
 
 	ws *websocket.Server
 }
 
-func NewImService(ic *biz.ImUseCase, logger log.Logger) *ImService {
-	return &ImService{ic: ic, log: log.NewHelper(logger)}
+func NewImService(gc *biz.GroupUseCase, logger log.Logger) *ImService {
+	return &ImService{gc: gc, log: log.NewHelper(logger)}
 }
 
 func (s *ImService) OnWebsocketConnect(sessionID websocket.SessionID, conn bool) {
-	s.log.Infof("on websocket conn, sid: %s, conn: %v", sessionID, conn)
+	s.log.Infof("on websocket conn, session id: %s, conn: %v", sessionID, conn)
 }
 
 func (s *ImService) SetWebsocketServer(ws *websocket.Server) {
@@ -64,7 +64,7 @@ func (s *ImService) GetGroup(ctx context.Context, req *pb.GetGroupRequest) (*pb.
 	if err != nil {
 		return nil, err
 	}
-	ps, err := s.ic.GetGroups(ctx, userID)
+	ps, err := s.gc.GetGroups(ctx, userID)
 	groups := make([]*pb.GetGroupReply_Group, 0)
 	for _, p := range ps {
 		groups = append(groups, &pb.GetGroupReply_Group{

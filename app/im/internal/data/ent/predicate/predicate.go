@@ -6,5 +6,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// ChatMessage is the predicate function for chatmessage builders.
+type ChatMessage func(*sql.Selector)
+
 // Group is the predicate function for group builders.
 type Group func(*sql.Selector)

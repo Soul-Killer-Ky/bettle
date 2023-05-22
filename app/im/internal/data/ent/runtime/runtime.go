@@ -2,7 +2,45 @@
 
 package runtime
 
-// The schema-stitching logic is generated in beetle/app/im/internal/data/ent/runtime.go
+import (
+	"beetle/app/im/internal/data/ent/chatmessage"
+	"beetle/app/im/internal/data/ent/group"
+	"beetle/app/im/internal/data/ent/schema"
+	"time"
+)
+
+// The init function reads all schema descriptors with runtime code
+// (default values, validators, hooks and policies) and stitches it
+// to their package variables.
+func init() {
+	chatmessageMixin := schema.ChatMessage{}.Mixin()
+	chatmessageMixinHooks1 := chatmessageMixin[1].Hooks()
+	chatmessage.Hooks[0] = chatmessageMixinHooks1[0]
+	chatmessageMixinInters1 := chatmessageMixin[1].Interceptors()
+	chatmessage.Interceptors[0] = chatmessageMixinInters1[0]
+	chatmessageMixinFields0 := chatmessageMixin[0].Fields()
+	_ = chatmessageMixinFields0
+	chatmessageFields := schema.ChatMessage{}.Fields()
+	_ = chatmessageFields
+	// chatmessageDescCreatedAt is the schema descriptor for created_at field.
+	chatmessageDescCreatedAt := chatmessageMixinFields0[0].Descriptor()
+	// chatmessage.DefaultCreatedAt holds the default value on creation for the created_at field.
+	chatmessage.DefaultCreatedAt = chatmessageDescCreatedAt.Default.(func() time.Time)
+	groupFields := schema.Group{}.Fields()
+	_ = groupFields
+	// groupDescName is the schema descriptor for name field.
+	groupDescName := groupFields[0].Descriptor()
+	// group.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	group.NameValidator = groupDescName.Validators[0].(func(string) error)
+	// groupDescIcon is the schema descriptor for icon field.
+	groupDescIcon := groupFields[1].Descriptor()
+	// group.IconValidator is a validator for the "icon" field. It is called by the builders before save.
+	group.IconValidator = groupDescIcon.Validators[0].(func(string) error)
+	// groupDescMemo is the schema descriptor for memo field.
+	groupDescMemo := groupFields[2].Descriptor()
+	// group.MemoValidator is a validator for the "memo" field. It is called by the builders before save.
+	group.MemoValidator = groupDescMemo.Validators[0].(func(string) error)
+}
 
 const (
 	Version = "v0.11.9"                                         // Version of ent codegen.

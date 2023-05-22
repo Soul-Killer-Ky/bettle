@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"beetle/app/im/internal/conf"
 	"beetle/app/im/internal/data/ent"
@@ -23,7 +24,7 @@ import (
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewImRepo)
+var ProviderSet = wire.NewSet(NewData, NewGroupRepo, NewMessageRepo)
 
 // Data .
 type Data struct {
@@ -72,6 +73,12 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 		ReadTimeout:  c.Redis.ReadTimeout.AsDuration(),
 	})
 	rdb.AddHook(redisotel.TracingHook{})
+	timeout, cancelFunc := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancelFunc()
+	err = rdb.Ping(timeout).Err()
+	if err != nil {
+		log.Fatalf("redis connect error: %v", err)
+	}
 
 	d := &Data{
 		db:  client,

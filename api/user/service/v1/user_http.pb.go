@@ -21,7 +21,8 @@ const _ = http.SupportPackageIsVersion1
 
 const OperationUserCreateUser = "/api.user.service.v1.User/CreateUser"
 const OperationUserDeleteUser = "/api.user.service.v1.User/DeleteUser"
-const OperationUserGetFriend = "/api.user.service.v1.User/GetFriend"
+const OperationUserGetUser = "/api.user.service.v1.User/GetUser"
+const OperationUserListFriend = "/api.user.service.v1.User/ListFriend"
 const OperationUserListUser = "/api.user.service.v1.User/ListUser"
 const OperationUserLoginUser = "/api.user.service.v1.User/LoginUser"
 const OperationUserUpdateUser = "/api.user.service.v1.User/UpdateUser"
@@ -29,7 +30,8 @@ const OperationUserUpdateUser = "/api.user.service.v1.User/UpdateUser"
 type UserHTTPServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserReply, error)
 	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserReply, error)
-	GetFriend(context.Context, *GetFriendRequest) (*GetFriendReply, error)
+	GetUser(context.Context, *GetUserRequest) (*GetUserReply, error)
+	ListFriend(context.Context, *ListFriendRequest) (*ListFriendReply, error)
 	ListUser(context.Context, *ListUserRequest) (*ListUserReply, error)
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserReply, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserReply, error)
@@ -42,7 +44,8 @@ func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r.POST("/user/v1/delete", _User_DeleteUser0_HTTP_Handler(srv))
 	r.POST("/user/v1/list", _User_ListUser0_HTTP_Handler(srv))
 	r.POST("/user/v1/login", _User_LoginUser0_HTTP_Handler(srv))
-	r.POST("/user/v1/friend/get", _User_GetFriend0_HTTP_Handler(srv))
+	r.POST("/user/v1/get", _User_GetUser0_HTTP_Handler(srv))
+	r.POST("/user/v1/friend/list", _User_ListFriend0_HTTP_Handler(srv))
 }
 
 func _User_CreateUser0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
@@ -140,21 +143,40 @@ func _User_LoginUser0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) er
 	}
 }
 
-func _User_GetFriend0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _User_GetUser0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in GetFriendRequest
+		var in GetUserRequest
 		if err := ctx.Bind(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserGetFriend)
+		http.SetOperation(ctx, OperationUserGetUser)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.GetFriend(ctx, req.(*GetFriendRequest))
+			return srv.GetUser(ctx, req.(*GetUserRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
 			return err
 		}
-		reply := out.(*GetFriendReply)
+		reply := out.(*GetUserReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _User_ListFriend0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListFriendRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserListFriend)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListFriend(ctx, req.(*ListFriendRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListFriendReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -162,7 +184,8 @@ func _User_GetFriend0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) er
 type UserHTTPClient interface {
 	CreateUser(ctx context.Context, req *CreateUserRequest, opts ...http.CallOption) (rsp *CreateUserReply, err error)
 	DeleteUser(ctx context.Context, req *DeleteUserRequest, opts ...http.CallOption) (rsp *DeleteUserReply, err error)
-	GetFriend(ctx context.Context, req *GetFriendRequest, opts ...http.CallOption) (rsp *GetFriendReply, err error)
+	GetUser(ctx context.Context, req *GetUserRequest, opts ...http.CallOption) (rsp *GetUserReply, err error)
+	ListFriend(ctx context.Context, req *ListFriendRequest, opts ...http.CallOption) (rsp *ListFriendReply, err error)
 	ListUser(ctx context.Context, req *ListUserRequest, opts ...http.CallOption) (rsp *ListUserReply, err error)
 	LoginUser(ctx context.Context, req *LoginUserRequest, opts ...http.CallOption) (rsp *LoginUserReply, err error)
 	UpdateUser(ctx context.Context, req *UpdateUserRequest, opts ...http.CallOption) (rsp *UpdateUserReply, err error)
@@ -202,11 +225,24 @@ func (c *UserHTTPClientImpl) DeleteUser(ctx context.Context, in *DeleteUserReque
 	return &out, err
 }
 
-func (c *UserHTTPClientImpl) GetFriend(ctx context.Context, in *GetFriendRequest, opts ...http.CallOption) (*GetFriendReply, error) {
-	var out GetFriendReply
-	pattern := "/user/v1/friend/get"
+func (c *UserHTTPClientImpl) GetUser(ctx context.Context, in *GetUserRequest, opts ...http.CallOption) (*GetUserReply, error) {
+	var out GetUserReply
+	pattern := "/user/v1/get"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserGetFriend))
+	opts = append(opts, http.Operation(OperationUserGetUser))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) ListFriend(ctx context.Context, in *ListFriendRequest, opts ...http.CallOption) (*ListFriendReply, error) {
+	var out ListFriendReply
+	pattern := "/user/v1/friend/list"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserListFriend))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

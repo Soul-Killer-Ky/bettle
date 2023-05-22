@@ -53,15 +53,29 @@ func (s *UserService) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 	}, nil
 }
 
-func (s *UserService) GetFriend(ctx context.Context, req *pb.GetFriendRequest) (*pb.GetFriendReply, error) {
+func (s *UserService) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.GetUserReply, error) {
+	u, err := s.uc.GetUser(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.GetUserReply{
+		UserId:   int64(u.ID),
+		Username: u.Username,
+		Nickname: u.Nickname,
+		Avatar:   u.Avatar,
+		Memo:     u.Memo,
+	}, nil
+}
+
+func (s *UserService) ListFriend(ctx context.Context, req *pb.ListFriendRequest) (*pb.ListFriendReply, error) {
 	userID, err := jwt.GetUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
-	ps, err := s.fc.GetFriends(ctx, userID)
-	friends := make([]*pb.GetFriendReply_Friend, 0)
+	ps, err := s.fc.ListFriend(ctx, userID)
+	friends := make([]*pb.ListFriendReply_Friend, 0)
 	for _, p := range ps {
-		friends = append(friends, &pb.GetFriendReply_Friend{
+		friends = append(friends, &pb.ListFriendReply_Friend{
 			Id:       int64(p.ID),
 			UserId:   int64(p.UserID),
 			Username: p.Username,
@@ -70,7 +84,7 @@ func (s *UserService) GetFriend(ctx context.Context, req *pb.GetFriendRequest) (
 			Memo:     p.Memo,
 		})
 	}
-	return &pb.GetFriendReply{
+	return &pb.ListFriendReply{
 		Friends: friends,
 	}, nil
 }

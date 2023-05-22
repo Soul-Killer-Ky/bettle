@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -o deploy/tmp/
+    kompose.service.type: loadbalancer
+    kompose.version: 1.28.0 (c4137012e)
+    kompose.volume.type: persistentVolumeClaim
+  creationTimestamp: null
+  labels:
+    io.kompose.service: im-redis
+  name: im-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: im-redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -o deploy/tmp/
+        kompose.service.type: loadbalancer
+        kompose.version: 1.28.0 (c4137012e)
+        kompose.volume.type: persistentVolumeClaim
+      creationTimestamp: null
+      labels:
+        io.kompose.network/beetle-beetle-network: "true"
+        io.kompose.service: im-redis
+    spec:
+      containers:
+        - image: redis:4.0.1
+          name: im-redis
+          ports:
+            - containerPort: 6379
+          resources: {}
+          volumeMounts:
+            - mountPath: /data
+              name: im-redis-claim0
+            - mountPath: /usr/local/etc/redis/redis.conf
+              name: im-redis-cm1
+            - mountPath: /logs
+              name: im-redis-claim2
+      hostname: im-redis
+      restartPolicy: Always
+      volumes:
+        - name: im-redis-claim0
+          persistentVolumeClaim:
+            claimName: im-redis-claim0
+        - name: im-redis-cm1
+          configMap:
+           name: im-redis-cm1
+        - name: im-redis-claim2
+          persistentVolumeClaim:
+            claimName: im-redis-claim2
+status: {}

@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	entgo.io/ent v0.11.9
-	github.com/Soul-Killer-Ky/kratos/websocket v0.0.0-20230216082513-f841057a2c92
+	github.com/Soul-Killer-Ky/kratos/websocket v0.0.0-20230517101042-dac4ea47e53b
 	github.com/envoyproxy/protoc-gen-validate v0.9.1
 	github.com/go-kratos/kratos/v2 v2.5.4
 	github.com/go-redis/redis/extra/redisotel v0.3.0
@@ -67,4 +67,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-//replace github.com/Soul-Killer-Ky/kratos/websocket => ../kratos/websocket
+replace github.com/Soul-Killer-Ky/kratos/websocket => ./third_party/local/kratos/websocket

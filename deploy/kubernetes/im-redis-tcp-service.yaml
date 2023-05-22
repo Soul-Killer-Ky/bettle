@@ -8,15 +8,15 @@ metadata:
     kompose.volume.type: persistentVolumeClaim
   creationTimestamp: null
   labels:
-    io.kompose.service: user-db-tcp
-  name: user-db-tcp
+    io.kompose.service: im-redis-tcp
+  name: im-redis-tcp
 spec:
   ports:
-    - name: "3306"
-      port: 3306
-      targetPort: 3306
+    - name: "6379"
+      port: 6379
+      targetPort: 6379
   selector:
-    io.kompose.service: user-db
+    io.kompose.service: im-redis
   type: LoadBalancer
 status:
   loadBalancer: {}

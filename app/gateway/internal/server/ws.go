@@ -11,11 +11,11 @@ import (
 var (
 	// command-line options:
 	// websocket server endpoint
-	imServerEndpoint = flag.String("im-server-endpoint", "ws://im-svc:10000/ws", "websocket server endpoint")
+	imWsEndpoint = flag.String("im-ws-endpoint", "ws://im-svc:10000/ws", "websocket server endpoint")
 )
 
 func NewWebsocketServer() http.HandlerFunc {
-	wp, err := websocketproxy.NewProxy(*imServerEndpoint, func(r *http.Request) error {
+	wp, err := websocketproxy.NewProxy(*imWsEndpoint, func(r *http.Request) error {
 		token := r.FormValue("tt")
 		if token != "" {
 			r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))

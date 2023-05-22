@@ -17,7 +17,7 @@ data:
     data:
       database:
         driver: mysql
-        source: root:123456@tcp(user-db-tcp:3306)/beetle_user?parseTime=true
+        source: root:123456@tcp(user-db:3306)/beetle_user?parseTime=true
       redis:
         addr: 127.0.0.1:6379
         read_timeout: 0.2s

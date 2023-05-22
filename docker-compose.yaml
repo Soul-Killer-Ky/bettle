@@ -11,12 +11,11 @@ services:
     image: mysql:8
     labels:
       kompose.volume.type: persistentVolumeClaim
-      kompose.service.type: loadbalancer
     hostname: user-db
     environment:
       MYSQL_ROOT_PASSWORD: 123456
-    ports:
-      - "3306:3306"
+    expose:
+      - "3306"
     volumes:
       - /data/docker/mount/beetle_user_db:/var/lib/mysql
     networks:
@@ -72,6 +71,21 @@ services:
       - "10000"
     depends_on:
       - im-db
+    networks:
+      beetle_network:
+        ipv4_address: 192.168.16.103
+  im-redis:
+    image: redis:4.0.1
+    labels:
+      kompose.volume.type: persistentVolumeClaim
+      kompose.service.type: loadbalancer
+    hostname: im-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./deploy/docker/im/redis/data:/data
+      - ./deploy/docker/im/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./deploy/docker/im/redis/logs:/logs
     networks:
       beetle_network:
         ipv4_address: 192.168.16.103

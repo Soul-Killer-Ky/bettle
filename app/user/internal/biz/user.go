@@ -61,3 +61,13 @@ func (uc *UserUseCase) CreateToken(ctx context.Context, u *User) (string, error)
 
 	return signedToken, nil
 }
+
+func (uc *UserUseCase) GetUser(ctx context.Context, uid int64) (*User, error) {
+	u, err := uc.userRepo.FindByID(ctx, int(uid))
+	if err != nil {
+		uc.log.WithContext(ctx).Errorf("user not found: %s", err)
+		return nil, pb.ErrorUserNotFound("user not found")
+	}
+
+	return u, nil
+}

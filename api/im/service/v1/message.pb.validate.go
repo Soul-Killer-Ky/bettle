@@ -35,21 +35,21 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on Message with the rules defined in the
+// Validate checks the field values on Content with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *Message) Validate() error {
+func (m *Content) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on Message with the rules defined in the
+// ValidateAll checks the field values on Content with the rules defined in the
 // proto definition for this message. If any rules are violated, the result is
-// a list of violation errors wrapped in MessageMultiError, or nil if none found.
-func (m *Message) ValidateAll() error {
+// a list of violation errors wrapped in ContentMultiError, or nil if none found.
+func (m *Content) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *Message) validate(all bool) error {
+func (m *Content) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -61,18 +61,18 @@ func (m *Message) validate(all bool) error {
 	// no validation rules for Body
 
 	if len(errors) > 0 {
-		return MessageMultiError(errors)
+		return ContentMultiError(errors)
 	}
 
 	return nil
 }
 
-// MessageMultiError is an error wrapping multiple validation errors returned
-// by Message.ValidateAll() if the designated constraints aren't met.
-type MessageMultiError []error
+// ContentMultiError is an error wrapping multiple validation errors returned
+// by Content.ValidateAll() if the designated constraints aren't met.
+type ContentMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m MessageMultiError) Error() string {
+func (m ContentMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -81,11 +81,11 @@ func (m MessageMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m MessageMultiError) AllErrors() []error { return m }
+func (m ContentMultiError) AllErrors() []error { return m }
 
-// MessageValidationError is the validation error returned by Message.Validate
+// ContentValidationError is the validation error returned by Content.Validate
 // if the designated constraints aren't met.
-type MessageValidationError struct {
+type ContentValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -93,22 +93,22 @@ type MessageValidationError struct {
 }
 
 // Field function returns field value.
-func (e MessageValidationError) Field() string { return e.field }
+func (e ContentValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e MessageValidationError) Reason() string { return e.reason }
+func (e ContentValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e MessageValidationError) Cause() error { return e.cause }
+func (e ContentValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e MessageValidationError) Key() bool { return e.key }
+func (e ContentValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e MessageValidationError) ErrorName() string { return "MessageValidationError" }
+func (e ContentValidationError) ErrorName() string { return "ContentValidationError" }
 
 // Error satisfies the builtin error interface
-func (e MessageValidationError) Error() string {
+func (e ContentValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -120,14 +120,14 @@ func (e MessageValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sMessage.%s: %s%s",
+		"invalid %sContent.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = MessageValidationError{}
+var _ error = ContentValidationError{}
 
 var _ interface {
 	Field() string
@@ -135,7 +135,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = MessageValidationError{}
+} = ContentValidationError{}
 
 // Validate checks the field values on ChatMessage with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
@@ -160,11 +160,11 @@ func (m *ChatMessage) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetMessage()).(type) {
+		switch v := interface{}(m.GetContent()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, ChatMessageValidationError{
-					field:  "Message",
+					field:  "Content",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -172,16 +172,16 @@ func (m *ChatMessage) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, ChatMessageValidationError{
-					field:  "Message",
+					field:  "Content",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetMessage()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetContent()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ChatMessageValidationError{
-				field:  "Message",
+				field:  "Content",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -321,11 +321,11 @@ func (m *GroupMessage) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetMessage()).(type) {
+		switch v := interface{}(m.GetContent()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, GroupMessageValidationError{
-					field:  "Message",
+					field:  "Content",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -333,16 +333,16 @@ func (m *GroupMessage) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, GroupMessageValidationError{
-					field:  "Message",
+					field:  "Content",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetMessage()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetContent()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return GroupMessageValidationError{
-				field:  "Message",
+				field:  "Content",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -482,11 +482,11 @@ func (m *BroadcastMessage) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetMessage()).(type) {
+		switch v := interface{}(m.GetContent()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, BroadcastMessageValidationError{
-					field:  "Message",
+					field:  "Content",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -494,16 +494,16 @@ func (m *BroadcastMessage) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, BroadcastMessageValidationError{
-					field:  "Message",
+					field:  "Content",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetMessage()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetContent()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BroadcastMessageValidationError{
-				field:  "Message",
+				field:  "Content",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

@@ -1,6 +1,10 @@
 package service
 
-import "github.com/google/wire"
+import (
+	"beetle/app/im/internal/service/ws"
+
+	"github.com/google/wire"
+)
 
 // ProviderSet is service providers.
-var ProviderSet = wire.NewSet(NewImService)
+var ProviderSet = wire.NewSet(NewImService, ws.NewService)
