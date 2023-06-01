@@ -2,6 +2,10 @@
 
 package group
 
+import (
+	"entgo.io/ent/dialect/sql"
+)
+
 const (
 	// Label holds the string label denoting the group type in the database.
 	Label = "group"
@@ -43,3 +47,26 @@ var (
 	// MemoValidator is a validator for the "memo" field. It is called by the builders before save.
 	MemoValidator func(string) error
 )
+
+// OrderOption defines the ordering options for the Group queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByIcon orders the results by the icon field.
+func ByIcon(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIcon, opts...).ToFunc()
+}
+
+// ByMemo orders the results by the memo field.
+func ByMemo(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMemo, opts...).ToFunc()
+}

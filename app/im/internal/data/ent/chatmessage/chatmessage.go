@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 )
 
 const (
@@ -59,3 +60,36 @@ var (
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 )
+
+// OrderOption defines the ordering options for the ChatMessage queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByDeletedAt orders the results by the deleted_at field.
+func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
+}
+
+// ByFrom orders the results by the from field.
+func ByFrom(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFrom, opts...).ToFunc()
+}
+
+// BySender orders the results by the sender field.
+func BySender(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSender, opts...).ToFunc()
+}
+
+// ByMessage orders the results by the message field.
+func ByMessage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMessage, opts...).ToFunc()
+}

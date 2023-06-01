@@ -36,10 +36,24 @@ var (
 		Columns:    GroupsColumns,
 		PrimaryKey: []*schema.Column{GroupsColumns[0]},
 	}
+	// LoadRecordsColumns holds the columns for the "load_records" table.
+	LoadRecordsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "user_id", Type: field.TypeInt},
+		{Name: "device_id", Type: field.TypeUUID},
+	}
+	// LoadRecordsTable holds the schema information for the "load_records" table.
+	LoadRecordsTable = &schema.Table{
+		Name:       "load_records",
+		Columns:    LoadRecordsColumns,
+		PrimaryKey: []*schema.Column{LoadRecordsColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ChatMessagesTable,
 		GroupsTable,
+		LoadRecordsTable,
 	}
 )
 

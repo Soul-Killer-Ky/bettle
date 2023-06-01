@@ -5,6 +5,13 @@ import (
 	"beetle/app/user/internal/data/ent"
 	"context"
 	"fmt"
+	kubernetes "github.com/go-kratos/kratos/contrib/registry/kubernetes/v2"
+	"github.com/go-kratos/kratos/v2/registry"
+	kubernetesAPI "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/util/homedir"
+	"path/filepath"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -20,7 +27,13 @@ import (
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewUserRepo, NewFriendRepo)
+var ProviderSet = wire.NewSet(
+	NewData,
+	NewRegistrar,
+	NewDiscovery,
+	NewUserRepo,
+	NewFriendRepo,
+)
 
 // Data .
 type Data struct {
@@ -66,4 +79,40 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 	}
 
 	return &Data{db: client}, cleanup, nil
+}
+
+func NewDiscovery() registry.Discovery {
+	restConfig, err := rest.InClusterConfig()
+	home := homedir.HomeDir()
+	if err != nil {
+		kubeConfig := filepath.Join(home, ".kube", "config")
+		restConfig, err = clientcmd.BuildConfigFromFlags("", kubeConfig)
+		if err != nil {
+			panic(err)
+		}
+	}
+	clientSet, err := kubernetesAPI.NewForConfig(restConfig)
+	if err != nil {
+		panic(err)
+	}
+	r := kubernetes.NewRegistry(clientSet)
+	return r
+}
+
+func NewRegistrar() registry.Registrar {
+	restConfig, err := rest.InClusterConfig()
+	home := homedir.HomeDir()
+	if err != nil {
+		kubeConfig := filepath.Join(home, ".kube", "config")
+		restConfig, err = clientcmd.BuildConfigFromFlags("", kubeConfig)
+		if err != nil {
+			panic(err)
+		}
+	}
+	clientSet, err := kubernetesAPI.NewForConfig(restConfig)
+	if err != nil {
+		panic(err)
+	}
+	r := kubernetes.NewRegistry(clientSet)
+	return r
 }

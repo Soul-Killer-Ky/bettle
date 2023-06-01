@@ -87,7 +87,7 @@ func (cmu *ChatMessageUpdate) Mutation() *ChatMessageMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cmu *ChatMessageUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, ChatMessageMutation](ctx, cmu.sqlSave, cmu.mutation, cmu.hooks)
+	return withHooks(ctx, cmu.sqlSave, cmu.mutation, cmu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -234,7 +234,7 @@ func (cmuo *ChatMessageUpdateOne) Select(field string, fields ...string) *ChatMe
 
 // Save executes the query and returns the updated ChatMessage entity.
 func (cmuo *ChatMessageUpdateOne) Save(ctx context.Context) (*ChatMessage, error) {
-	return withHooks[*ChatMessage, ChatMessageMutation](ctx, cmuo.sqlSave, cmuo.mutation, cmuo.hooks)
+	return withHooks(ctx, cmuo.sqlSave, cmuo.mutation, cmuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

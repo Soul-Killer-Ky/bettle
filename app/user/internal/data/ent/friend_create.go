@@ -111,7 +111,7 @@ func (fc *FriendCreate) Save(ctx context.Context) (*Friend, error) {
 	if err := fc.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks[*Friend, FriendMutation](ctx, fc.sqlSave, fc.mutation, fc.hooks)
+	return withHooks(ctx, fc.sqlSave, fc.mutation, fc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -209,10 +209,7 @@ func (fc *FriendCreate) createSpec() (*Friend, *sqlgraph.CreateSpec) {
 			Columns: []string{friend.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -229,10 +226,7 @@ func (fc *FriendCreate) createSpec() (*Friend, *sqlgraph.CreateSpec) {
 			Columns: []string{friend.FriendColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -268,8 +262,8 @@ func (fcb *FriendCreateBulk) Save(ctx context.Context) ([]*Friend, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, fcb.builders[i+1].mutation)
 				} else {

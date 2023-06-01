@@ -7,20 +7,78 @@ networks:
       config:
         - subnet: 192.168.16.0/24
 services:
-  user-db:
+  db:
     image: mysql:8
     labels:
       kompose.volume.type: persistentVolumeClaim
-    hostname: user-db
+      kompose.service.type: loadbalancer
+    hostname: db
     environment:
       MYSQL_ROOT_PASSWORD: 123456
-    expose:
-      - "3306"
+    ports:
+      - "3306:3306"
     volumes:
-      - /data/docker/mount/beetle_user_db:/var/lib/mysql
+      - /data/docker/mount/beetle_db:/var/lib/mysql
     networks:
       beetle_network:
-        ipv4_address: 192.168.16.100
+        ipv4_address: 192.168.16.80
+  redis:
+    image: redis:4.0.1
+    labels:
+      kompose.volume.type: persistentVolumeClaim
+      kompose.service.type: loadbalancer
+    hostname: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./deploy/docker/redis/data:/data
+      - ./deploy/docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./deploy/docker/redis/logs:/logs
+    networks:
+      beetle_network:
+        ipv4_address: 192.168.16.81
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    labels:
+      kompose.service.type: loadbalancer
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - LOG_LEVEL=debug
+    networks:
+      - beetle_network
+  jaeger-hotrod:
+    image: jaegertracing/example-hotrod:latest
+    # To run the latest trunk build, find the tag at Docker Hub and use the line below
+    # https://hub.docker.com/r/jaegertracing/example-hotrod-snapshot/tags
+    #image: jaegertracing/example-hotrod-snapshot:0ab8f2fcb12ff0d10830c1ee3bb52b745522db6c
+    labels:
+      kompose.service.type: loadbalancer
+    ports:
+      - "8080:8081"
+    command: ["all"]
+    environment:
+      - OTEL_EXPORTER_JAEGER_ENDPOINT=http://jaeger:14268/api/traces
+    networks:
+      - beetle_network
+    depends_on:
+      - jaeger
+#  user-db:
+#    image: mysql:8
+#    labels:
+#      kompose.volume.type: persistentVolumeClaim
+#    hostname: user-db
+#    environment:
+#      MYSQL_ROOT_PASSWORD: 123456
+#    expose:
+#      - "3306"
+#    volumes:
+#      - /data/docker/mount/beetle_user_db:/var/lib/mysql
+#    networks:
+#      beetle_network:
+#        ipv4_address: 192.168.16.100
   user-svc:
     build:
       context: .
@@ -36,25 +94,41 @@ services:
       - "8000"
       - "9000"
     depends_on:
-      - user-db
+#      - user-db
+      - db
     networks:
       beetle_network:
         ipv4_address: 192.168.16.101
-  im-db:
-    image: mysql:8
-    labels:
-      kompose.volume.type: persistentVolumeClaim
-      kompose.service.type: loadbalancer
-    hostname: im-db
-    environment:
-      MYSQL_ROOT_PASSWORD: 123456
-    ports:
-      - "3306:3306"
-    volumes:
-      - /data/docker/mount/beetle_im_db:/var/lib/mysql
-    networks:
-      beetle_network:
-        ipv4_address: 192.168.16.102
+#  im-db:
+#    image: mysql:8
+#    labels:
+#      kompose.volume.type: persistentVolumeClaim
+#      kompose.service.type: loadbalancer
+#    hostname: im-db
+#    environment:
+#      MYSQL_ROOT_PASSWORD: 123456
+#    ports:
+#      - "3306:3306"
+#    volumes:
+#      - /data/docker/mount/beetle_im_db:/var/lib/mysql
+#    networks:
+#      beetle_network:
+#        ipv4_address: 192.168.16.102
+#  im-redis:
+#    image: redis:4.0.1
+#    labels:
+#      kompose.volume.type: persistentVolumeClaim
+#      kompose.service.type: loadbalancer
+#    hostname: im-redis
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - ./deploy/docker/im/redis/data:/data
+#      - ./deploy/docker/im/redis/redis.conf:/usr/local/etc/redis/redis.conf
+#      - ./deploy/docker/im/redis/logs:/logs
+#    networks:
+#      beetle_network:
+#        ipv4_address: 192.168.16.103
   im-svc:
     build:
       context: .
@@ -63,32 +137,20 @@ services:
     image: beetle/im:0.0.1
     labels:
       kompose.volume.type: configMap
-    hostname: im-svc
+#    hostname: im-svc
     volumes:
       - ./app/im/configs:/data/conf
     expose:
       - "9000"
       - "10000"
     depends_on:
-      - im-db
+#      - im-db
+#      - im-redis
+      - db
+      - redis
     networks:
       beetle_network:
-        ipv4_address: 192.168.16.103
-  im-redis:
-    image: redis:4.0.1
-    labels:
-      kompose.volume.type: persistentVolumeClaim
-      kompose.service.type: loadbalancer
-    hostname: im-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - ./deploy/docker/im/redis/data:/data
-      - ./deploy/docker/im/redis/redis.conf:/usr/local/etc/redis/redis.conf
-      - ./deploy/docker/im/redis/logs:/logs
-    networks:
-      beetle_network:
-        ipv4_address: 192.168.16.103
+        ipv4_address: 192.168.16.104
   gateway:
     build:
       context: .

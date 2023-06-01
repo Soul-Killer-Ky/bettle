@@ -53,7 +53,7 @@ func (uc *UserUseCase) VerifyUser(ctx context.Context, req *pb.LoginUserRequest)
 	return u, nil
 }
 
-func (uc *UserUseCase) CreateToken(ctx context.Context, u *User) (string, error) {
+func (uc *UserUseCase) CreateToken(_ context.Context, u *User) (string, error) {
 	signedToken, err := jwt.CreateToken(uc.authConf.JwtKey, jwt.WithCustomUserClaims(u.ID, uc.authConf.JwtExp))
 	if err != nil {
 		return "", err

@@ -76,7 +76,7 @@ func (cmc *ChatMessageCreate) Save(ctx context.Context) (*ChatMessage, error) {
 	if err := cmc.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks[*ChatMessage, ChatMessageMutation](ctx, cmc.sqlSave, cmc.mutation, cmc.hooks)
+	return withHooks(ctx, cmc.sqlSave, cmc.mutation, cmc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -200,8 +200,8 @@ func (cmcb *ChatMessageCreateBulk) Save(ctx context.Context) ([]*ChatMessage, er
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, cmcb.builders[i+1].mutation)
 				} else {

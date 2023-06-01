@@ -12,6 +12,7 @@ import (
 
 	"beetle/app/im/internal/data/ent/chatmessage"
 	"beetle/app/im/internal/data/ent/group"
+	"beetle/app/im/internal/data/ent/loadrecord"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -27,6 +28,8 @@ type Client struct {
 	ChatMessage *ChatMessageClient
 	// Group is the client for interacting with the Group builders.
 	Group *GroupClient
+	// LoadRecord is the client for interacting with the LoadRecord builders.
+	LoadRecord *LoadRecordClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -42,6 +45,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.ChatMessage = NewChatMessageClient(c.config)
 	c.Group = NewGroupClient(c.config)
+	c.LoadRecord = NewLoadRecordClient(c.config)
 }
 
 type (
@@ -126,6 +130,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:      cfg,
 		ChatMessage: NewChatMessageClient(cfg),
 		Group:       NewGroupClient(cfg),
+		LoadRecord:  NewLoadRecordClient(cfg),
 	}, nil
 }
 
@@ -147,6 +152,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:      cfg,
 		ChatMessage: NewChatMessageClient(cfg),
 		Group:       NewGroupClient(cfg),
+		LoadRecord:  NewLoadRecordClient(cfg),
 	}, nil
 }
 
@@ -178,6 +184,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.ChatMessage.Use(hooks...)
 	c.Group.Use(hooks...)
+	c.LoadRecord.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
@@ -185,6 +192,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.ChatMessage.Intercept(interceptors...)
 	c.Group.Intercept(interceptors...)
+	c.LoadRecord.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -194,6 +202,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ChatMessage.mutate(ctx, m)
 	case *GroupMutation:
 		return c.Group.mutate(ctx, m)
+	case *LoadRecordMutation:
+		return c.LoadRecord.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -437,12 +447,130 @@ func (c *GroupClient) mutate(ctx context.Context, m *GroupMutation) (Value, erro
 	}
 }
 
+// LoadRecordClient is a client for the LoadRecord schema.
+type LoadRecordClient struct {
+	config
+}
+
+// NewLoadRecordClient returns a client for the LoadRecord from the given config.
+func NewLoadRecordClient(c config) *LoadRecordClient {
+	return &LoadRecordClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `loadrecord.Hooks(f(g(h())))`.
+func (c *LoadRecordClient) Use(hooks ...Hook) {
+	c.hooks.LoadRecord = append(c.hooks.LoadRecord, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `loadrecord.Intercept(f(g(h())))`.
+func (c *LoadRecordClient) Intercept(interceptors ...Interceptor) {
+	c.inters.LoadRecord = append(c.inters.LoadRecord, interceptors...)
+}
+
+// Create returns a builder for creating a LoadRecord entity.
+func (c *LoadRecordClient) Create() *LoadRecordCreate {
+	mutation := newLoadRecordMutation(c.config, OpCreate)
+	return &LoadRecordCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of LoadRecord entities.
+func (c *LoadRecordClient) CreateBulk(builders ...*LoadRecordCreate) *LoadRecordCreateBulk {
+	return &LoadRecordCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for LoadRecord.
+func (c *LoadRecordClient) Update() *LoadRecordUpdate {
+	mutation := newLoadRecordMutation(c.config, OpUpdate)
+	return &LoadRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *LoadRecordClient) UpdateOne(lr *LoadRecord) *LoadRecordUpdateOne {
+	mutation := newLoadRecordMutation(c.config, OpUpdateOne, withLoadRecord(lr))
+	return &LoadRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *LoadRecordClient) UpdateOneID(id int) *LoadRecordUpdateOne {
+	mutation := newLoadRecordMutation(c.config, OpUpdateOne, withLoadRecordID(id))
+	return &LoadRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for LoadRecord.
+func (c *LoadRecordClient) Delete() *LoadRecordDelete {
+	mutation := newLoadRecordMutation(c.config, OpDelete)
+	return &LoadRecordDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *LoadRecordClient) DeleteOne(lr *LoadRecord) *LoadRecordDeleteOne {
+	return c.DeleteOneID(lr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *LoadRecordClient) DeleteOneID(id int) *LoadRecordDeleteOne {
+	builder := c.Delete().Where(loadrecord.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &LoadRecordDeleteOne{builder}
+}
+
+// Query returns a query builder for LoadRecord.
+func (c *LoadRecordClient) Query() *LoadRecordQuery {
+	return &LoadRecordQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeLoadRecord},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a LoadRecord entity by its id.
+func (c *LoadRecordClient) Get(ctx context.Context, id int) (*LoadRecord, error) {
+	return c.Query().Where(loadrecord.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *LoadRecordClient) GetX(ctx context.Context, id int) *LoadRecord {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *LoadRecordClient) Hooks() []Hook {
+	return c.hooks.LoadRecord
+}
+
+// Interceptors returns the client interceptors.
+func (c *LoadRecordClient) Interceptors() []Interceptor {
+	return c.inters.LoadRecord
+}
+
+func (c *LoadRecordClient) mutate(ctx context.Context, m *LoadRecordMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&LoadRecordCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&LoadRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&LoadRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&LoadRecordDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown LoadRecord mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		ChatMessage, Group []ent.Hook
+		ChatMessage, Group, LoadRecord []ent.Hook
 	}
 	inters struct {
-		ChatMessage, Group []ent.Interceptor
+		ChatMessage, Group, LoadRecord []ent.Interceptor
 	}
 )

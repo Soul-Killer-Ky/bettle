@@ -15,6 +15,7 @@ import (
 	"beetle/app/im/internal/service/ws"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
+	"go.opentelemetry.io/otel/sdk/trace"
 )
 
 import (
@@ -24,8 +25,11 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, confData *conf.Data, auth *conf.Auth, logger log.Logger) (*kratos.App, func(), error) {
-	dataData, cleanup, err := data.NewData(confData, logger)
+func wireApp(confServer *conf.Server, confData *conf.Data, auth *conf.Auth, logger log.Logger, tracerProvider *trace.TracerProvider) (*kratos.App, func(), error) {
+	registry := data.NewK8sRegistry()
+	discovery := data.NewDiscovery(registry)
+	userClient := data.NewUserServiceClient(discovery, tracerProvider, auth)
+	dataData, cleanup, err := data.NewData(confData, logger, userClient, registry)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -36,9 +40,12 @@ func wireApp(confServer *conf.Server, confData *conf.Data, auth *conf.Auth, logg
 	httpServer := server.NewHTTPServer(confServer, auth, imService, logger)
 	messageRepo := data.NewMessageRepo(dataData, logger)
 	messageUseCase := biz.NewMessageUseCase(messageRepo, logger)
-	wsService := ws.NewService(messageUseCase, logger)
+	loadRecordRepo := data.NewLoadRecordRepo(dataData, logger)
+	loadRecordUseCase := biz.NewLoadRecordUseCase(loadRecordRepo, logger)
+	wsService := ws.NewService(messageUseCase, loadRecordUseCase, logger)
 	websocketServer := server.NewWebsocketServer(confServer, auth, logger, wsService)
-	app := newApp(logger, grpcServer, httpServer, websocketServer)
+	registrar := data.NewRegistrar(registry)
+	app := newApp(logger, grpcServer, httpServer, websocketServer, registrar)
 	return app, func() {
 		cleanup()
 	}, nil

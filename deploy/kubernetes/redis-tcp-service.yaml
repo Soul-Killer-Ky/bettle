@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -o deploy/tmp/
+    kompose.service.type: loadbalancer
+    kompose.version: 1.28.0 (c4137012e)
+    kompose.volume.type: configMap
+  creationTimestamp: null
+  labels:
+    io.kompose.service: redis-tcp
+  name: redis-tcp
+spec:
+  ports:
+    - name: "6379"
+      port: 6379
+      targetPort: 6379
+  selector:
+    io.kompose.service: redis
+  type: LoadBalancer
+status:
+  loadBalancer: {}

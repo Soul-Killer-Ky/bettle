@@ -20,7 +20,7 @@ import (
 type UserQuery struct {
 	config
 	ctx         *QueryContext
-	order       []OrderFunc
+	order       []user.OrderOption
 	inters      []Interceptor
 	predicates  []predicate.User
 	withUsers   *FriendQuery
@@ -56,7 +56,7 @@ func (uq *UserQuery) Unique(unique bool) *UserQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (uq *UserQuery) Order(o ...OrderFunc) *UserQuery {
+func (uq *UserQuery) Order(o ...user.OrderOption) *UserQuery {
 	uq.order = append(uq.order, o...)
 	return uq
 }
@@ -294,7 +294,7 @@ func (uq *UserQuery) Clone() *UserQuery {
 	return &UserQuery{
 		config:      uq.config,
 		ctx:         uq.ctx.Clone(),
-		order:       append([]OrderFunc{}, uq.order...),
+		order:       append([]user.OrderOption{}, uq.order...),
 		inters:      append([]Interceptor{}, uq.inters...),
 		predicates:  append([]predicate.User{}, uq.predicates...),
 		withUsers:   uq.withUsers.Clone(),
@@ -459,7 +459,7 @@ func (uq *UserQuery) loadUsers(ctx context.Context, query *FriendQuery, nodes []
 	}
 	query.withFKs = true
 	query.Where(predicate.Friend(func(s *sql.Selector) {
-		s.Where(sql.InValues(user.UsersColumn, fks...))
+		s.Where(sql.InValues(s.C(user.UsersColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -472,7 +472,7 @@ func (uq *UserQuery) loadUsers(ctx context.Context, query *FriendQuery, nodes []
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_users" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_users" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -490,7 +490,7 @@ func (uq *UserQuery) loadFriends(ctx context.Context, query *FriendQuery, nodes 
 	}
 	query.withFKs = true
 	query.Where(predicate.Friend(func(s *sql.Selector) {
-		s.Where(sql.InValues(user.FriendsColumn, fks...))
+		s.Where(sql.InValues(s.C(user.FriendsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -503,7 +503,7 @@ func (uq *UserQuery) loadFriends(ctx context.Context, query *FriendQuery, nodes 
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_friends" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_friends" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

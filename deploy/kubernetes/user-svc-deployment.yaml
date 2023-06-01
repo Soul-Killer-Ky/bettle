@@ -37,7 +37,7 @@ spec:
           volumeMounts:
             - mountPath: /data/conf
               name: user-svc-cm0
-      hostname: user-svc
+#      hostname: user-svc
       restartPolicy: Always
       volumes:
         - configMap:

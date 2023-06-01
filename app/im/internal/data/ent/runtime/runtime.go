@@ -5,6 +5,7 @@ package runtime
 import (
 	"beetle/app/im/internal/data/ent/chatmessage"
 	"beetle/app/im/internal/data/ent/group"
+	"beetle/app/im/internal/data/ent/loadrecord"
 	"beetle/app/im/internal/data/ent/schema"
 	"time"
 )
@@ -40,9 +41,18 @@ func init() {
 	groupDescMemo := groupFields[2].Descriptor()
 	// group.MemoValidator is a validator for the "memo" field. It is called by the builders before save.
 	group.MemoValidator = groupDescMemo.Validators[0].(func(string) error)
+	loadrecordMixin := schema.LoadRecord{}.Mixin()
+	loadrecordMixinFields0 := loadrecordMixin[0].Fields()
+	_ = loadrecordMixinFields0
+	loadrecordFields := schema.LoadRecord{}.Fields()
+	_ = loadrecordFields
+	// loadrecordDescCreatedAt is the schema descriptor for created_at field.
+	loadrecordDescCreatedAt := loadrecordMixinFields0[0].Descriptor()
+	// loadrecord.DefaultCreatedAt holds the default value on creation for the created_at field.
+	loadrecord.DefaultCreatedAt = loadrecordDescCreatedAt.Default.(func() time.Time)
 }
 
 const (
-	Version = "v0.11.9"                                         // Version of ent codegen.
-	Sum     = "h1:dbbCkAiPVTRBIJwoZctiSYjB7zxQIBOzVSU5H9VYIQI=" // Sum of ent codegen.
+	Version = "v0.12.3"                                         // Version of ent codegen.
+	Sum     = "h1:N5lO2EOrHpCH5HYfiMOCHYbo+oh5M8GjT0/cx5x6xkk=" // Sum of ent codegen.
 )

@@ -4,6 +4,9 @@ package intercept
 
 import (
 	"beetle/app/im/internal/data/ent"
+	"beetle/app/im/internal/data/ent/chatmessage"
+	"beetle/app/im/internal/data/ent/group"
+	"beetle/app/im/internal/data/ent/loadrecord"
 	"beetle/app/im/internal/data/ent/predicate"
 	"context"
 	"fmt"
@@ -24,7 +27,7 @@ type Query interface {
 	// Unique configures the query builder to filter duplicate records.
 	Unique(bool)
 	// Order specifies how the records should be ordered.
-	Order(...ent.OrderFunc)
+	Order(...func(*sql.Selector))
 	// WhereP appends storage-level predicates to the query builder. Using this method, users
 	// can use type-assertion to append predicates that do not depend on any generated package.
 	WhereP(...func(*sql.Selector))
@@ -121,50 +124,83 @@ func (f TraverseGroup) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.GroupQuery", q)
 }
 
+// The LoadRecordFunc type is an adapter to allow the use of ordinary function as a Querier.
+type LoadRecordFunc func(context.Context, *ent.LoadRecordQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f LoadRecordFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.LoadRecordQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.LoadRecordQuery", q)
+}
+
+// The TraverseLoadRecord type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseLoadRecord func(context.Context, *ent.LoadRecordQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseLoadRecord) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseLoadRecord) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.LoadRecordQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.LoadRecordQuery", q)
+}
+
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
 	case *ent.ChatMessageQuery:
-		return &query[*ent.ChatMessageQuery, predicate.ChatMessage]{typ: ent.TypeChatMessage, tq: q}, nil
+		return &query[*ent.ChatMessageQuery, predicate.ChatMessage, chatmessage.OrderOption]{typ: ent.TypeChatMessage, tq: q}, nil
 	case *ent.GroupQuery:
-		return &query[*ent.GroupQuery, predicate.Group]{typ: ent.TypeGroup, tq: q}, nil
+		return &query[*ent.GroupQuery, predicate.Group, group.OrderOption]{typ: ent.TypeGroup, tq: q}, nil
+	case *ent.LoadRecordQuery:
+		return &query[*ent.LoadRecordQuery, predicate.LoadRecord, loadrecord.OrderOption]{typ: ent.TypeLoadRecord, tq: q}, nil
 	default:
 		return nil, fmt.Errorf("unknown query type %T", q)
 	}
 }
 
-type query[T any, P ~func(*sql.Selector)] struct {
+type query[T any, P ~func(*sql.Selector), R ~func(*sql.Selector)] struct {
 	typ string
 	tq  interface {
 		Limit(int) T
 		Offset(int) T
 		Unique(bool) T
-		Order(...ent.OrderFunc) T
+		Order(...R) T
 		Where(...P) T
 	}
 }
 
-func (q query[T, P]) Type() string {
+func (q query[T, P, R]) Type() string {
 	return q.typ
 }
 
-func (q query[T, P]) Limit(limit int) {
+func (q query[T, P, R]) Limit(limit int) {
 	q.tq.Limit(limit)
 }
 
-func (q query[T, P]) Offset(offset int) {
+func (q query[T, P, R]) Offset(offset int) {
 	q.tq.Offset(offset)
 }
 
-func (q query[T, P]) Unique(unique bool) {
+func (q query[T, P, R]) Unique(unique bool) {
 	q.tq.Unique(unique)
 }
 
-func (q query[T, P]) Order(orders ...ent.OrderFunc) {
-	q.tq.Order(orders...)
+func (q query[T, P, R]) Order(orders ...func(*sql.Selector)) {
+	rs := make([]R, len(orders))
+	for i := range orders {
+		rs[i] = orders[i]
+	}
+	q.tq.Order(rs...)
 }
 
-func (q query[T, P]) WhereP(ps ...func(*sql.Selector)) {
+func (q query[T, P, R]) WhereP(ps ...func(*sql.Selector)) {
 	p := make([]P, len(ps))
 	for i := range ps {
 		p[i] = ps[i]

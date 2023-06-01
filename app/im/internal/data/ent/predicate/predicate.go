@@ -11,3 +11,6 @@ type ChatMessage func(*sql.Selector)
 
 // Group is the predicate function for group builders.
 type Group func(*sql.Selector)
+
+// LoadRecord is the predicate function for loadrecord builders.
+type LoadRecord func(*sql.Selector)

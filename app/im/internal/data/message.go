@@ -5,6 +5,7 @@ import (
 	"beetle/app/im/internal/biz"
 	"beetle/app/im/internal/data/ent/chatmessage"
 	"context"
+	"time"
 
 	"github.com/go-kratos/kratos/v2/encoding"
 	"github.com/go-kratos/kratos/v2/log"
@@ -28,8 +29,9 @@ func (r *messageRepo) SaveChatMessage(ctx context.Context, from int, sender int,
 	return err
 }
 
-func (r *messageRepo) GetChatMessages(ctx context.Context, sender int) ([]*pb.ChatMessage, error) {
-	ps, err := r.data.db.ChatMessage.Query().Where(chatmessage.Sender(sender)).All(ctx)
+func (r *messageRepo) GetChatMessages(ctx context.Context, sender int, lastTime time.Time) ([]*pb.ChatMessage, error) {
+	ps, err := r.data.db.ChatMessage.Query().
+		Where(chatmessage.Sender(sender), chatmessage.CreatedAtGT(lastTime)).All(ctx)
 	if err != nil {
 		return nil, err
 	}

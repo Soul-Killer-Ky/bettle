@@ -9,6 +9,7 @@ message Bootstrap {
   Server server = 1;
   Data data = 2;
   Auth auth = 3;
+  Trace trace = 4;
 }
 
 message Server {
@@ -51,4 +52,16 @@ message Data {
 
 message Auth {
   string jwt_key = 1;
+}
+
+message Trace {
+  string endpoint = 1;
+}
+
+message Registry {
+  message Consul {
+    string address = 1;
+    string scheme = 2;
+  }
+  Consul consul = 1;
 }

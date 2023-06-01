@@ -5,6 +5,7 @@ import (
 	"context"
 	"github.com/go-kratos/kratos/v2/errors"
 	"strconv"
+	"time"
 
 	"github.com/go-kratos/kratos/v2/encoding"
 	"github.com/go-kratos/kratos/v2/log"
@@ -12,7 +13,7 @@ import (
 
 type MessageRepo interface {
 	SaveChatMessage(context.Context, int, int, string) error
-	GetChatMessages(context.Context, int) ([]*pb.ChatMessage, error)
+	GetChatMessages(context.Context, int, time.Time) ([]*pb.ChatMessage, error)
 	CacheMessage(context.Context, string, interface{}) error
 }
 
@@ -54,8 +55,8 @@ func (mc *MessageUseCase) SaveMessage(ctx context.Context, messageType pb.Messag
 	return err
 }
 
-func (mc *MessageUseCase) LoadChatMessage(ctx context.Context, uid int) ([]*pb.ChatMessage, error) {
-	messages, err := mc.repo.GetChatMessages(ctx, uid)
+func (mc *MessageUseCase) LoadChatMessage(ctx context.Context, uid int, lastTime time.Time) ([]*pb.ChatMessage, error) {
+	messages, err := mc.repo.GetChatMessages(ctx, uid, lastTime)
 	if err != nil {
 		mc.log.WithContext(ctx).Errorf("load chat message error: %s", err)
 		return nil, err

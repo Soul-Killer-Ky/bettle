@@ -16,7 +16,7 @@ var (
 
 func NewWebsocketServer() http.HandlerFunc {
 	wp, err := websocketproxy.NewProxy(*imWsEndpoint, func(r *http.Request) error {
-		token := r.FormValue("tt")
+		token := r.FormValue("t")
 		if token != "" {
 			r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 		}

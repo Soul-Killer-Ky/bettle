@@ -18,7 +18,7 @@ import (
 type ChatMessageQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []chatmessage.OrderOption
 	inters     []Interceptor
 	predicates []predicate.ChatMessage
 	// intermediate query (i.e. traversal path).
@@ -52,7 +52,7 @@ func (cmq *ChatMessageQuery) Unique(unique bool) *ChatMessageQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (cmq *ChatMessageQuery) Order(o ...OrderFunc) *ChatMessageQuery {
+func (cmq *ChatMessageQuery) Order(o ...chatmessage.OrderOption) *ChatMessageQuery {
 	cmq.order = append(cmq.order, o...)
 	return cmq
 }
@@ -246,7 +246,7 @@ func (cmq *ChatMessageQuery) Clone() *ChatMessageQuery {
 	return &ChatMessageQuery{
 		config:     cmq.config,
 		ctx:        cmq.ctx.Clone(),
-		order:      append([]OrderFunc{}, cmq.order...),
+		order:      append([]chatmessage.OrderOption{}, cmq.order...),
 		inters:     append([]Interceptor{}, cmq.inters...),
 		predicates: append([]predicate.ChatMessage{}, cmq.predicates...),
 		// clone intermediate query.

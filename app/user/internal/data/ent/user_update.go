@@ -167,7 +167,7 @@ func (uu *UserUpdate) Save(ctx context.Context) (int, error) {
 	if err := uu.defaults(); err != nil {
 		return 0, err
 	}
-	return withHooks[int, UserMutation](ctx, uu.sqlSave, uu.mutation, uu.hooks)
+	return withHooks(ctx, uu.sqlSave, uu.mutation, uu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -278,10 +278,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.UsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: friend.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -294,10 +291,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.UsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: friend.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -313,10 +307,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.UsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: friend.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -332,10 +323,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.FriendsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: friend.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -348,10 +336,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.FriendsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: friend.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -367,10 +352,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{user.FriendsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: friend.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -549,7 +531,7 @@ func (uuo *UserUpdateOne) Save(ctx context.Context) (*User, error) {
 	if err := uuo.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks[*User, UserMutation](ctx, uuo.sqlSave, uuo.mutation, uuo.hooks)
+	return withHooks(ctx, uuo.sqlSave, uuo.mutation, uuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -677,10 +659,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.UsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: friend.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -693,10 +672,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.UsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: friend.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -712,10 +688,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.UsersColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: friend.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -731,10 +704,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.FriendsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: friend.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -747,10 +717,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.FriendsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: friend.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -766,10 +733,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Columns: []string{user.FriendsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
-					Column: friend.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

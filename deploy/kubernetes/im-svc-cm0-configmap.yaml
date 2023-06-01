@@ -20,10 +20,12 @@ data:
     data:
       database:
         driver: mysql
-        source: root:123456@tcp(im-db-tcp:3306)/beetle_im?parseTime=true
+        source: root:123456@tcp(db-tcp:3306)/beetle_im?parseTime=true
       redis:
-        addr: im-redis-tcp:6379
+        addr: redis-tcp:6379
         read_timeout: 0.2s
         write_timeout: 0.2s
     auth:
       jwt_key: testkey
+    trace:
+      endpoint: http://jaeger-tcp:14268/api/traces

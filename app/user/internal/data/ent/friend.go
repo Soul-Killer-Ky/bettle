@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -28,6 +29,7 @@ type Friend struct {
 	Edges        FriendEdges `json:"edges"`
 	user_users   *int
 	user_friends *int
+	selectValues sql.SelectValues
 }
 
 // FriendEdges holds the relations/edges for other nodes in the graph.
@@ -81,7 +83,7 @@ func (*Friend) scanValues(columns []string) ([]any, error) {
 		case friend.ForeignKeys[1]: // user_friends
 			values[i] = new(sql.NullInt64)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Friend", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -134,9 +136,17 @@ func (f *Friend) assignValues(columns []string, values []any) error {
 				f.user_friends = new(int)
 				*f.user_friends = int(value.Int64)
 			}
+		default:
+			f.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Friend.
+// This includes values selected through modifiers, order, etc.
+func (f *Friend) Value(name string) (ent.Value, error) {
+	return f.selectValues.Get(name)
 }
 
 // QueryUser queries the "user" edge of the Friend entity.
