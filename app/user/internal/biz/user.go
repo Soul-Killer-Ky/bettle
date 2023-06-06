@@ -13,7 +13,8 @@ import (
 
 type User struct {
 	ID       int
-	Username string
+	Phone    string
+	Username *string
 	Password string
 	Nickname string
 	Avatar   string
@@ -24,6 +25,7 @@ type UserRepo interface {
 	Save(context.Context, *User) (*User, error)
 	Update(context.Context, *User) (*User, error)
 	FindByID(context.Context, int) (*User, error)
+	FindByPhone(context.Context, string) (*User, error)
 	FindByName(context.Context, string) (*User, error)
 	ListByHello(context.Context, string) ([]*User, error)
 	ListAll(context.Context) ([]*User, error)
@@ -64,6 +66,16 @@ func (uc *UserUseCase) CreateToken(_ context.Context, u *User) (string, error) {
 
 func (uc *UserUseCase) GetUser(ctx context.Context, uid int64) (*User, error) {
 	u, err := uc.userRepo.FindByID(ctx, int(uid))
+	if err != nil {
+		uc.log.WithContext(ctx).Errorf("user not found: %s", err)
+		return nil, pb.ErrorUserNotFound("user not found")
+	}
+
+	return u, nil
+}
+
+func (uc *UserUseCase) GetUserByPhone(ctx context.Context, phone string) (*User, error) {
+	u, err := uc.userRepo.FindByPhone(ctx, phone)
 	if err != nil {
 		uc.log.WithContext(ctx).Errorf("user not found: %s", err)
 		return nil, pb.ErrorUserNotFound("user not found")

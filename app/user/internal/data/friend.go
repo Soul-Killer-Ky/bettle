@@ -1,6 +1,7 @@
 package data
 
 import (
+	"beetle/app/user/internal/data/ent"
 	"beetle/app/user/internal/data/ent/user"
 	"context"
 
@@ -25,23 +26,63 @@ func (r *friendRepo) ListByUserID(ctx context.Context, userID int) ([]*biz.Frien
 	if err != nil {
 		return nil, err
 	}
-	ps, err := u.QueryUsers().All(ctx)
+	ps, err := u.QueryFriends().All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	r.log.Warn(ps)
 	rv := make([]*biz.Friend, 0)
 	for _, p := range ps {
-		fu := p.QueryFriend().OnlyX(ctx)
-		r.log.Info(fu)
 		rv = append(rv, &biz.Friend{
-			ID:       p.ID,
-			UserID:   fu.ID,
-			Username: fu.Username,
-			Nickname: fu.Nickname,
-			Avatar:   fu.Avatar,
-			Memo:     fu.Memo,
+			UserID:   p.ID,
+			Phone:    p.Phone,
+			Username: p.Username,
+			Nickname: p.Nickname,
+			Avatar:   p.Avatar,
+			Memo:     p.Memo,
 		})
 	}
 	return rv, nil
+}
+
+func (r *friendRepo) Get(ctx context.Context, userID, friendUserID int) (*biz.Friend, error) {
+	u, err := r.data.db.User.Query().Where(user.ID(userID)).First(ctx)
+	if err != nil {
+		return nil, err
+	}
+	u2, err := u.QueryFriends().Where(user.ID(friendUserID)).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &biz.Friend{
+		UserID:   u2.ID,
+		Phone:    u2.Phone,
+		Username: u2.Username,
+		Nickname: u2.Nickname,
+		Avatar:   u2.Avatar,
+		Memo:     u2.Memo,
+	}, nil
+}
+
+func (r *friendRepo) Add(ctx context.Context, userID, friendUserID int) error {
+	err := WithTx(ctx, r.data.db, func(tx *ent.Tx) error {
+		u, err := tx.User.Query().Where(user.ID(userID)).First(ctx)
+		if err != nil {
+			return err
+		}
+		u2, err := tx.User.Query().Where(user.ID(friendUserID)).First(ctx)
+		if err != nil {
+			return err
+		}
+		_, err = u.Update().AddFriends(u2).Save(ctx)
+		if err != nil {
+			return err
+		}
+		_, err = u2.Update().AddFriends(u).Save(ctx)
+		if err != nil {
+			return err
+		}
+		return err
+	})
+	return err
 }

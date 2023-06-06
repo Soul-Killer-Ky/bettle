@@ -26,6 +26,9 @@ import (
 
 // wireApp init kratos application.
 func wireApp(confServer *conf.Server, confData *conf.Data, auth *conf.Auth, logger log.Logger, tracerProvider *trace.TracerProvider) (*kratos.App, func(), error) {
+	imService := service.NewImService(logger)
+	grpcServer := server.NewGRPCServer(confServer, auth, imService, logger)
+	httpServer := server.NewHTTPServer(confServer, auth, imService, logger)
 	registry := data.NewK8sRegistry()
 	discovery := data.NewDiscovery(registry)
 	userClient := data.NewUserServiceClient(discovery, tracerProvider, auth)
@@ -33,11 +36,6 @@ func wireApp(confServer *conf.Server, confData *conf.Data, auth *conf.Auth, logg
 	if err != nil {
 		return nil, nil, err
 	}
-	groupRepo := data.NewGroupRepo(dataData, logger)
-	groupUseCase := biz.NewGroupUseCase(groupRepo, logger)
-	imService := service.NewImService(groupUseCase, logger)
-	grpcServer := server.NewGRPCServer(confServer, auth, imService, logger)
-	httpServer := server.NewHTTPServer(confServer, auth, imService, logger)
 	messageRepo := data.NewMessageRepo(dataData, logger)
 	messageUseCase := biz.NewMessageUseCase(messageRepo, logger)
 	loadRecordRepo := data.NewLoadRecordRepo(dataData, logger)

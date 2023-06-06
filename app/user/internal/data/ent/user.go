@@ -23,9 +23,11 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	// 手机号
+	Phone string `json:"phone,omitempty"`
 	// 唯一用户标识
-	Username string `json:"username,omitempty"`
-	// Password holds the value of the "password" field.
+	Username *string `json:"username,omitempty"`
+	// 密码
 	Password string `json:"password,omitempty"`
 	// 昵称
 	Nickname string `json:"nickname,omitempty"`
@@ -41,31 +43,53 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// Users holds the value of the users edge.
-	Users []*Friend `json:"users,omitempty"`
 	// Friends holds the value of the friends edge.
-	Friends []*Friend `json:"friends,omitempty"`
+	Friends []*User `json:"friends,omitempty"`
+	// JoinedGroups holds the value of the joined_groups edge.
+	JoinedGroups []*Group `json:"joined_groups,omitempty"`
+	// CreatedGroups holds the value of the created_groups edge.
+	CreatedGroups []*Group `json:"created_groups,omitempty"`
+	// GroupMembers holds the value of the group_members edge.
+	GroupMembers []*GroupMember `json:"group_members,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
-}
-
-// UsersOrErr returns the Users value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) UsersOrErr() ([]*Friend, error) {
-	if e.loadedTypes[0] {
-		return e.Users, nil
-	}
-	return nil, &NotLoadedError{edge: "users"}
+	loadedTypes [4]bool
 }
 
 // FriendsOrErr returns the Friends value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) FriendsOrErr() ([]*Friend, error) {
-	if e.loadedTypes[1] {
+func (e UserEdges) FriendsOrErr() ([]*User, error) {
+	if e.loadedTypes[0] {
 		return e.Friends, nil
 	}
 	return nil, &NotLoadedError{edge: "friends"}
+}
+
+// JoinedGroupsOrErr returns the JoinedGroups value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) JoinedGroupsOrErr() ([]*Group, error) {
+	if e.loadedTypes[1] {
+		return e.JoinedGroups, nil
+	}
+	return nil, &NotLoadedError{edge: "joined_groups"}
+}
+
+// CreatedGroupsOrErr returns the CreatedGroups value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) CreatedGroupsOrErr() ([]*Group, error) {
+	if e.loadedTypes[2] {
+		return e.CreatedGroups, nil
+	}
+	return nil, &NotLoadedError{edge: "created_groups"}
+}
+
+// GroupMembersOrErr returns the GroupMembers value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) GroupMembersOrErr() ([]*GroupMember, error) {
+	if e.loadedTypes[3] {
+		return e.GroupMembers, nil
+	}
+	return nil, &NotLoadedError{edge: "group_members"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -75,7 +99,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUsername, user.FieldPassword, user.FieldNickname, user.FieldAvatar, user.FieldMemo:
+		case user.FieldPhone, user.FieldUsername, user.FieldPassword, user.FieldNickname, user.FieldAvatar, user.FieldMemo:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt, user.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -119,11 +143,18 @@ func (u *User) assignValues(columns []string, values []any) error {
 				u.DeletedAt = new(time.Time)
 				*u.DeletedAt = value.Time
 			}
+		case user.FieldPhone:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field phone", values[i])
+			} else if value.Valid {
+				u.Phone = value.String
+			}
 		case user.FieldUsername:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field username", values[i])
 			} else if value.Valid {
-				u.Username = value.String
+				u.Username = new(string)
+				*u.Username = value.String
 			}
 		case user.FieldPassword:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -162,14 +193,24 @@ func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
 }
 
-// QueryUsers queries the "users" edge of the User entity.
-func (u *User) QueryUsers() *FriendQuery {
-	return NewUserClient(u.config).QueryUsers(u)
+// QueryFriends queries the "friends" edge of the User entity.
+func (u *User) QueryFriends() *UserQuery {
+	return NewUserClient(u.config).QueryFriends(u)
 }
 
-// QueryFriends queries the "friends" edge of the User entity.
-func (u *User) QueryFriends() *FriendQuery {
-	return NewUserClient(u.config).QueryFriends(u)
+// QueryJoinedGroups queries the "joined_groups" edge of the User entity.
+func (u *User) QueryJoinedGroups() *GroupQuery {
+	return NewUserClient(u.config).QueryJoinedGroups(u)
+}
+
+// QueryCreatedGroups queries the "created_groups" edge of the User entity.
+func (u *User) QueryCreatedGroups() *GroupQuery {
+	return NewUserClient(u.config).QueryCreatedGroups(u)
+}
+
+// QueryGroupMembers queries the "group_members" edge of the User entity.
+func (u *User) QueryGroupMembers() *GroupMemberQuery {
+	return NewUserClient(u.config).QueryGroupMembers(u)
 }
 
 // Update returns a builder for updating this User.
@@ -206,8 +247,13 @@ func (u *User) String() string {
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("username=")
-	builder.WriteString(u.Username)
+	builder.WriteString("phone=")
+	builder.WriteString(u.Phone)
+	builder.WriteString(", ")
+	if v := u.Username; v != nil {
+		builder.WriteString("username=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("password=")
 	builder.WriteString(u.Password)

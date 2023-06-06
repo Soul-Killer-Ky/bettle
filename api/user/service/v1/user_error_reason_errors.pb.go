@@ -58,3 +58,15 @@ func IsUserPasswordError(err error) bool {
 func ErrorUserPasswordError(format string, args ...interface{}) *errors.Error {
 	return errors.New(403, ErrorReason_USER_PASSWORD_ERROR.String(), fmt.Sprintf(format, args...))
 }
+
+func IsItemExists(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_ITEM_EXISTS.String() && e.Code == 403
+}
+
+func ErrorItemExists(format string, args ...interface{}) *errors.Error {
+	return errors.New(403, ErrorReason_ITEM_EXISTS.String(), fmt.Sprintf(format, args...))
+}

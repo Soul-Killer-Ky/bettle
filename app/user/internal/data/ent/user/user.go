@@ -21,6 +21,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
+	// FieldPhone holds the string denoting the phone field in the database.
+	FieldPhone = "phone"
 	// FieldUsername holds the string denoting the username field in the database.
 	FieldUsername = "username"
 	// FieldPassword holds the string denoting the password field in the database.
@@ -31,26 +33,37 @@ const (
 	FieldAvatar = "avatar"
 	// FieldMemo holds the string denoting the memo field in the database.
 	FieldMemo = "memo"
-	// EdgeUsers holds the string denoting the users edge name in mutations.
-	EdgeUsers = "users"
 	// EdgeFriends holds the string denoting the friends edge name in mutations.
 	EdgeFriends = "friends"
+	// EdgeJoinedGroups holds the string denoting the joined_groups edge name in mutations.
+	EdgeJoinedGroups = "joined_groups"
+	// EdgeCreatedGroups holds the string denoting the created_groups edge name in mutations.
+	EdgeCreatedGroups = "created_groups"
+	// EdgeGroupMembers holds the string denoting the group_members edge name in mutations.
+	EdgeGroupMembers = "group_members"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// UsersTable is the table that holds the users relation/edge.
-	UsersTable = "friends"
-	// UsersInverseTable is the table name for the Friend entity.
-	// It exists in this package in order to avoid circular dependency with the "friend" package.
-	UsersInverseTable = "friends"
-	// UsersColumn is the table column denoting the users relation/edge.
-	UsersColumn = "user_users"
-	// FriendsTable is the table that holds the friends relation/edge.
-	FriendsTable = "friends"
-	// FriendsInverseTable is the table name for the Friend entity.
-	// It exists in this package in order to avoid circular dependency with the "friend" package.
-	FriendsInverseTable = "friends"
-	// FriendsColumn is the table column denoting the friends relation/edge.
-	FriendsColumn = "user_friends"
+	// FriendsTable is the table that holds the friends relation/edge. The primary key declared below.
+	FriendsTable = "user_friends"
+	// JoinedGroupsTable is the table that holds the joined_groups relation/edge. The primary key declared below.
+	JoinedGroupsTable = "group_members"
+	// JoinedGroupsInverseTable is the table name for the Group entity.
+	// It exists in this package in order to avoid circular dependency with the "group" package.
+	JoinedGroupsInverseTable = "groups"
+	// CreatedGroupsTable is the table that holds the created_groups relation/edge.
+	CreatedGroupsTable = "groups"
+	// CreatedGroupsInverseTable is the table name for the Group entity.
+	// It exists in this package in order to avoid circular dependency with the "group" package.
+	CreatedGroupsInverseTable = "groups"
+	// CreatedGroupsColumn is the table column denoting the created_groups relation/edge.
+	CreatedGroupsColumn = "user_created_groups"
+	// GroupMembersTable is the table that holds the group_members relation/edge.
+	GroupMembersTable = "group_members"
+	// GroupMembersInverseTable is the table name for the GroupMember entity.
+	// It exists in this package in order to avoid circular dependency with the "groupmember" package.
+	GroupMembersInverseTable = "group_members"
+	// GroupMembersColumn is the table column denoting the group_members relation/edge.
+	GroupMembersColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -59,12 +72,22 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
+	FieldPhone,
 	FieldUsername,
 	FieldPassword,
 	FieldNickname,
 	FieldAvatar,
 	FieldMemo,
 }
+
+var (
+	// FriendsPrimaryKey and FriendsColumn2 are the table columns denoting the
+	// primary key for the friends relation (M2M).
+	FriendsPrimaryKey = []string{"user_id", "friend_id"}
+	// JoinedGroupsPrimaryKey and JoinedGroupsColumn2 are the table columns denoting the
+	// primary key for the joined_groups relation (M2M).
+	JoinedGroupsPrimaryKey = []string{"group_id", "user_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -91,6 +114,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
+	PhoneValidator func(string) error
 	// UsernameValidator is a validator for the "username" field. It is called by the builders before save.
 	UsernameValidator func(string) error
 	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
@@ -126,6 +151,11 @@ func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
 }
 
+// ByPhone orders the results by the phone field.
+func ByPhone(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPhone, opts...).ToFunc()
+}
+
 // ByUsername orders the results by the username field.
 func ByUsername(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUsername, opts...).ToFunc()
@@ -151,20 +181,6 @@ func ByMemo(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMemo, opts...).ToFunc()
 }
 
-// ByUsersCount orders the results by users count.
-func ByUsersCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newUsersStep(), opts...)
-	}
-}
-
-// ByUsers orders the results by users terms.
-func ByUsers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUsersStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByFriendsCount orders the results by friends count.
 func ByFriendsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -178,17 +194,73 @@ func ByFriends(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newFriendsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newUsersStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UsersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, UsersTable, UsersColumn),
-	)
+
+// ByJoinedGroupsCount orders the results by joined_groups count.
+func ByJoinedGroupsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newJoinedGroupsStep(), opts...)
+	}
+}
+
+// ByJoinedGroups orders the results by joined_groups terms.
+func ByJoinedGroups(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newJoinedGroupsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByCreatedGroupsCount orders the results by created_groups count.
+func ByCreatedGroupsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCreatedGroupsStep(), opts...)
+	}
+}
+
+// ByCreatedGroups orders the results by created_groups terms.
+func ByCreatedGroups(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCreatedGroupsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByGroupMembersCount orders the results by group_members count.
+func ByGroupMembersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newGroupMembersStep(), opts...)
+	}
+}
+
+// ByGroupMembers orders the results by group_members terms.
+func ByGroupMembers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGroupMembersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
 }
 func newFriendsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(FriendsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, FriendsTable, FriendsColumn),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, FriendsTable, FriendsPrimaryKey...),
+	)
+}
+func newJoinedGroupsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(JoinedGroupsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, JoinedGroupsTable, JoinedGroupsPrimaryKey...),
+	)
+}
+func newCreatedGroupsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CreatedGroupsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CreatedGroupsTable, CreatedGroupsColumn),
+	)
+}
+func newGroupMembersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GroupMembersInverseTable, GroupMembersColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, GroupMembersTable, GroupMembersColumn),
 	)
 }

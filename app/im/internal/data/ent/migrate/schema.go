@@ -23,19 +23,6 @@ var (
 		Columns:    ChatMessagesColumns,
 		PrimaryKey: []*schema.Column{ChatMessagesColumns[0]},
 	}
-	// GroupsColumns holds the columns for the "groups" table.
-	GroupsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString, Size: 30},
-		{Name: "icon", Type: field.TypeString, Size: 50},
-		{Name: "memo", Type: field.TypeString, Size: 50},
-	}
-	// GroupsTable holds the schema information for the "groups" table.
-	GroupsTable = &schema.Table{
-		Name:       "groups",
-		Columns:    GroupsColumns,
-		PrimaryKey: []*schema.Column{GroupsColumns[0]},
-	}
 	// LoadRecordsColumns holds the columns for the "load_records" table.
 	LoadRecordsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -52,7 +39,6 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ChatMessagesTable,
-		GroupsTable,
 		LoadRecordsTable,
 	}
 )

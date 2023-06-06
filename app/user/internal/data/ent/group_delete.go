@@ -3,8 +3,8 @@
 package ent
 
 import (
-	"beetle/app/im/internal/data/ent/group"
-	"beetle/app/im/internal/data/ent/predicate"
+	"beetle/app/user/internal/data/ent/group"
+	"beetle/app/user/internal/data/ent/predicate"
 	"context"
 
 	"entgo.io/ent/dialect/sql"

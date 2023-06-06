@@ -29,16 +29,16 @@ func (r *messageRepo) SaveChatMessage(ctx context.Context, from int, sender int,
 	return err
 }
 
-func (r *messageRepo) GetChatMessages(ctx context.Context, sender int, lastTime time.Time) ([]*pb.ChatMessage, error) {
+func (r *messageRepo) GetChatMessages(ctx context.Context, sender int, lastTime time.Time) ([]*pb.PersonalChatMessage, error) {
 	ps, err := r.data.db.ChatMessage.Query().
 		Where(chatmessage.Sender(sender), chatmessage.CreatedAtGT(lastTime)).All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	rv := make([]*pb.ChatMessage, 0)
+	rv := make([]*pb.PersonalChatMessage, 0)
 	jsonCodec := encoding.GetCodec("json")
 	for _, p := range ps {
-		t := &pb.ChatMessage{}
+		t := &pb.PersonalChatMessage{}
 		err := jsonCodec.Unmarshal([]byte(p.Message), t)
 		if err != nil {
 			return nil, err

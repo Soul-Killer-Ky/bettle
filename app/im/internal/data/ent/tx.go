@@ -14,8 +14,6 @@ type Tx struct {
 	config
 	// ChatMessage is the client for interacting with the ChatMessage builders.
 	ChatMessage *ChatMessageClient
-	// Group is the client for interacting with the Group builders.
-	Group *GroupClient
 	// LoadRecord is the client for interacting with the LoadRecord builders.
 	LoadRecord *LoadRecordClient
 
@@ -150,7 +148,6 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.ChatMessage = NewChatMessageClient(tx.config)
-	tx.Group = NewGroupClient(tx.config)
 	tx.LoadRecord = NewLoadRecordClient(tx.config)
 }
 

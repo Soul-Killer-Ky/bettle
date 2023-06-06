@@ -4,7 +4,6 @@ package runtime
 
 import (
 	"beetle/app/im/internal/data/ent/chatmessage"
-	"beetle/app/im/internal/data/ent/group"
 	"beetle/app/im/internal/data/ent/loadrecord"
 	"beetle/app/im/internal/data/ent/schema"
 	"time"
@@ -27,20 +26,6 @@ func init() {
 	chatmessageDescCreatedAt := chatmessageMixinFields0[0].Descriptor()
 	// chatmessage.DefaultCreatedAt holds the default value on creation for the created_at field.
 	chatmessage.DefaultCreatedAt = chatmessageDescCreatedAt.Default.(func() time.Time)
-	groupFields := schema.Group{}.Fields()
-	_ = groupFields
-	// groupDescName is the schema descriptor for name field.
-	groupDescName := groupFields[0].Descriptor()
-	// group.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	group.NameValidator = groupDescName.Validators[0].(func(string) error)
-	// groupDescIcon is the schema descriptor for icon field.
-	groupDescIcon := groupFields[1].Descriptor()
-	// group.IconValidator is a validator for the "icon" field. It is called by the builders before save.
-	group.IconValidator = groupDescIcon.Validators[0].(func(string) error)
-	// groupDescMemo is the schema descriptor for memo field.
-	groupDescMemo := groupFields[2].Descriptor()
-	// group.MemoValidator is a validator for the "memo" field. It is called by the builders before save.
-	group.MemoValidator = groupDescMemo.Validators[0].(func(string) error)
 	loadrecordMixin := schema.LoadRecord{}.Mixin()
 	loadrecordMixinFields0 := loadrecordMixin[0].Fields()
 	_ = loadrecordMixinFields0

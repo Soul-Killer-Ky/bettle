@@ -6,6 +6,7 @@ import (
 	"beetle/app/user/internal/conf"
 	"beetle/internal/pkg/jwt"
 	"context"
+	"github.com/go-kratos/kratos/v2/errors"
 )
 
 type UserService struct {
@@ -14,10 +15,11 @@ type UserService struct {
 	authc *conf.Auth
 	uc    *biz.UserUseCase
 	fc    *biz.FriendUseCase
+	gc    *biz.GroupUseCase
 }
 
-func NewUserService(c *conf.Auth, uc *biz.UserUseCase, fc *biz.FriendUseCase) *UserService {
-	return &UserService{authc: c, uc: uc, fc: fc}
+func NewUserService(c *conf.Auth, uc *biz.UserUseCase, fc *biz.FriendUseCase, gc *biz.GroupUseCase) *UserService {
+	return &UserService{authc: c, uc: uc, fc: fc, gc: gc}
 }
 
 func (s *UserService) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserReply, error) {
@@ -47,7 +49,8 @@ func (s *UserService) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		Token:       token,
 		ExpiredTime: s.authc.JwtExp,
 		Id:          int64(user.ID),
-		Username:    user.Username,
+		Phone:       user.Phone,
+		Username:    *user.Username,
 		Nickname:    user.Nickname,
 		Avatar:      user.Avatar,
 	}, nil
@@ -60,31 +63,116 @@ func (s *UserService) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.
 	}
 	return &pb.GetUserReply{
 		UserId:   int64(u.ID),
-		Username: u.Username,
+		Phone:    u.Phone,
+		Username: *u.Username,
 		Nickname: u.Nickname,
 		Avatar:   u.Avatar,
 		Memo:     u.Memo,
 	}, nil
 }
 
-func (s *UserService) ListFriend(ctx context.Context, req *pb.ListFriendRequest) (*pb.ListFriendReply, error) {
+func (s *UserService) ListFriend(ctx context.Context, _ *pb.ListFriendRequest) (*pb.ListFriendReply, error) {
 	userID, err := jwt.GetUserID(ctx)
 	if err != nil {
 		return nil, err
 	}
 	ps, err := s.fc.ListFriend(ctx, userID)
-	friends := make([]*pb.ListFriendReply_Friend, 0)
+	friends := make([]*pb.Friend, 0)
 	for _, p := range ps {
-		friends = append(friends, &pb.ListFriendReply_Friend{
-			Id:       int64(p.ID),
+		friends = append(friends, &pb.Friend{
 			UserId:   int64(p.UserID),
-			Username: p.Username,
+			Phone:    p.Phone,
+			Username: *p.Username,
 			Nickname: p.Nickname,
 			Avatar:   p.Avatar,
 			Memo:     p.Memo,
 		})
 	}
+
 	return &pb.ListFriendReply{
 		Friends: friends,
+	}, nil
+}
+
+func (s *UserService) AddFriend(ctx context.Context, req *pb.AddFriendRequest) (*pb.AddFriendReply, error) {
+	userID, err := jwt.GetUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	u, err := s.uc.GetUserByPhone(ctx, req.GetPhone())
+	if err != nil {
+		return nil, err
+	}
+	if u.ID == userID {
+		return nil, errors.Forbidden("FORBIDDEN", "Prohibit adding yourself")
+	}
+	friendUserID := u.ID
+	p, err := s.fc.AddFriend(ctx, userID, friendUserID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.AddFriendReply{
+		Friend: &pb.Friend{
+			UserId:   int64(p.UserID),
+			Phone:    p.Phone,
+			Username: *p.Username,
+			Nickname: p.Nickname,
+			Avatar:   p.Avatar,
+			Memo:     p.Memo,
+		},
+	}, nil
+}
+
+func (s *UserService) ListGroup(ctx context.Context, req *pb.ListGroupRequest) (*pb.ListGroupReply, error) {
+	userID, err := jwt.GetUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ps, err := s.gc.ListGroup(ctx, userID)
+	groups := make([]*pb.Group, 0)
+	for _, p := range ps {
+		groups = append(groups, &pb.Group{
+			Id:   int64(p.ID),
+			Type: p.Type,
+			Name: p.Name,
+			Icon: p.Icon,
+			Memo: p.Memo,
+		})
+	}
+	return &pb.ListGroupReply{
+		Groups: groups,
+	}, nil
+}
+
+func (s *UserService) JoinGroup(ctx context.Context, req *pb.JoinGroupRequest) (*pb.JoinGroupReply, error) {
+	userID, err := jwt.GetUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	_, err = s.gc.JoinGroup(ctx, userID, req.GroupName)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.JoinGroupReply{}, nil
+}
+
+func (s *UserService) CreateGroup(ctx context.Context, req *pb.CreateGroupRequest) (*pb.CreateGroupReply, error) {
+	userID, err := jwt.GetUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	gp, err := s.gc.CreateGroup(ctx, userID, req)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.CreateGroupReply{
+		Group: &pb.Group{
+			Id:   int64(gp.ID),
+			Type: gp.Type,
+			Name: gp.Name,
+			Icon: gp.Icon,
+			Memo: gp.Memo,
+		},
 	}, nil
 }

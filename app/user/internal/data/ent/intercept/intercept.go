@@ -4,7 +4,8 @@ package intercept
 
 import (
 	"beetle/app/user/internal/data/ent"
-	"beetle/app/user/internal/data/ent/friend"
+	"beetle/app/user/internal/data/ent/group"
+	"beetle/app/user/internal/data/ent/groupmember"
 	"beetle/app/user/internal/data/ent/predicate"
 	"beetle/app/user/internal/data/ent/user"
 	"context"
@@ -69,31 +70,58 @@ func (f TraverseFunc) Traverse(ctx context.Context, q ent.Query) error {
 	return f(ctx, query)
 }
 
-// The FriendFunc type is an adapter to allow the use of ordinary function as a Querier.
-type FriendFunc func(context.Context, *ent.FriendQuery) (ent.Value, error)
+// The GroupFunc type is an adapter to allow the use of ordinary function as a Querier.
+type GroupFunc func(context.Context, *ent.GroupQuery) (ent.Value, error)
 
 // Query calls f(ctx, q).
-func (f FriendFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
-	if q, ok := q.(*ent.FriendQuery); ok {
+func (f GroupFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.GroupQuery); ok {
 		return f(ctx, q)
 	}
-	return nil, fmt.Errorf("unexpected query type %T. expect *ent.FriendQuery", q)
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.GroupQuery", q)
 }
 
-// The TraverseFriend type is an adapter to allow the use of ordinary function as Traverser.
-type TraverseFriend func(context.Context, *ent.FriendQuery) error
+// The TraverseGroup type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseGroup func(context.Context, *ent.GroupQuery) error
 
 // Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
-func (f TraverseFriend) Intercept(next ent.Querier) ent.Querier {
+func (f TraverseGroup) Intercept(next ent.Querier) ent.Querier {
 	return next
 }
 
 // Traverse calls f(ctx, q).
-func (f TraverseFriend) Traverse(ctx context.Context, q ent.Query) error {
-	if q, ok := q.(*ent.FriendQuery); ok {
+func (f TraverseGroup) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.GroupQuery); ok {
 		return f(ctx, q)
 	}
-	return fmt.Errorf("unexpected query type %T. expect *ent.FriendQuery", q)
+	return fmt.Errorf("unexpected query type %T. expect *ent.GroupQuery", q)
+}
+
+// The GroupMemberFunc type is an adapter to allow the use of ordinary function as a Querier.
+type GroupMemberFunc func(context.Context, *ent.GroupMemberQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f GroupMemberFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.GroupMemberQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.GroupMemberQuery", q)
+}
+
+// The TraverseGroupMember type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseGroupMember func(context.Context, *ent.GroupMemberQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseGroupMember) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseGroupMember) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.GroupMemberQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.GroupMemberQuery", q)
 }
 
 // The UserFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -126,8 +154,10 @@ func (f TraverseUser) Traverse(ctx context.Context, q ent.Query) error {
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
-	case *ent.FriendQuery:
-		return &query[*ent.FriendQuery, predicate.Friend, friend.OrderOption]{typ: ent.TypeFriend, tq: q}, nil
+	case *ent.GroupQuery:
+		return &query[*ent.GroupQuery, predicate.Group, group.OrderOption]{typ: ent.TypeGroup, tq: q}, nil
+	case *ent.GroupMemberQuery:
+		return &query[*ent.GroupMemberQuery, predicate.GroupMember, groupmember.OrderOption]{typ: ent.TypeGroupMember, tq: q}, nil
 	case *ent.UserQuery:
 		return &query[*ent.UserQuery, predicate.User, user.OrderOption]{typ: ent.TypeUser, tq: q}, nil
 	default:

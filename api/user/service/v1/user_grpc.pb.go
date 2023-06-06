@@ -19,13 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	User_CreateUser_FullMethodName = "/api.user.service.v1.User/CreateUser"
-	User_UpdateUser_FullMethodName = "/api.user.service.v1.User/UpdateUser"
-	User_DeleteUser_FullMethodName = "/api.user.service.v1.User/DeleteUser"
-	User_ListUser_FullMethodName   = "/api.user.service.v1.User/ListUser"
-	User_LoginUser_FullMethodName  = "/api.user.service.v1.User/LoginUser"
-	User_GetUser_FullMethodName    = "/api.user.service.v1.User/GetUser"
-	User_ListFriend_FullMethodName = "/api.user.service.v1.User/ListFriend"
+	User_CreateUser_FullMethodName  = "/api.user.service.v1.User/CreateUser"
+	User_UpdateUser_FullMethodName  = "/api.user.service.v1.User/UpdateUser"
+	User_DeleteUser_FullMethodName  = "/api.user.service.v1.User/DeleteUser"
+	User_ListUser_FullMethodName    = "/api.user.service.v1.User/ListUser"
+	User_LoginUser_FullMethodName   = "/api.user.service.v1.User/LoginUser"
+	User_GetUser_FullMethodName     = "/api.user.service.v1.User/GetUser"
+	User_ListFriend_FullMethodName  = "/api.user.service.v1.User/ListFriend"
+	User_AddFriend_FullMethodName   = "/api.user.service.v1.User/AddFriend"
+	User_ListGroup_FullMethodName   = "/api.user.service.v1.User/ListGroup"
+	User_JoinGroup_FullMethodName   = "/api.user.service.v1.User/JoinGroup"
+	User_CreateGroup_FullMethodName = "/api.user.service.v1.User/CreateGroup"
 )
 
 // UserClient is the client API for User service.
@@ -39,6 +43,10 @@ type UserClient interface {
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserReply, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserReply, error)
 	ListFriend(ctx context.Context, in *ListFriendRequest, opts ...grpc.CallOption) (*ListFriendReply, error)
+	AddFriend(ctx context.Context, in *AddFriendRequest, opts ...grpc.CallOption) (*AddFriendReply, error)
+	ListGroup(ctx context.Context, in *ListGroupRequest, opts ...grpc.CallOption) (*ListGroupReply, error)
+	JoinGroup(ctx context.Context, in *JoinGroupRequest, opts ...grpc.CallOption) (*JoinGroupReply, error)
+	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...grpc.CallOption) (*CreateGroupReply, error)
 }
 
 type userClient struct {
@@ -112,6 +120,42 @@ func (c *userClient) ListFriend(ctx context.Context, in *ListFriendRequest, opts
 	return out, nil
 }
 
+func (c *userClient) AddFriend(ctx context.Context, in *AddFriendRequest, opts ...grpc.CallOption) (*AddFriendReply, error) {
+	out := new(AddFriendReply)
+	err := c.cc.Invoke(ctx, User_AddFriend_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) ListGroup(ctx context.Context, in *ListGroupRequest, opts ...grpc.CallOption) (*ListGroupReply, error) {
+	out := new(ListGroupReply)
+	err := c.cc.Invoke(ctx, User_ListGroup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) JoinGroup(ctx context.Context, in *JoinGroupRequest, opts ...grpc.CallOption) (*JoinGroupReply, error) {
+	out := new(JoinGroupReply)
+	err := c.cc.Invoke(ctx, User_JoinGroup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...grpc.CallOption) (*CreateGroupReply, error) {
+	out := new(CreateGroupReply)
+	err := c.cc.Invoke(ctx, User_CreateGroup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
@@ -123,6 +167,10 @@ type UserServer interface {
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserReply, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserReply, error)
 	ListFriend(context.Context, *ListFriendRequest) (*ListFriendReply, error)
+	AddFriend(context.Context, *AddFriendRequest) (*AddFriendReply, error)
+	ListGroup(context.Context, *ListGroupRequest) (*ListGroupReply, error)
+	JoinGroup(context.Context, *JoinGroupRequest) (*JoinGroupReply, error)
+	CreateGroup(context.Context, *CreateGroupRequest) (*CreateGroupReply, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -150,6 +198,18 @@ func (UnimplementedUserServer) GetUser(context.Context, *GetUserRequest) (*GetUs
 }
 func (UnimplementedUserServer) ListFriend(context.Context, *ListFriendRequest) (*ListFriendReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListFriend not implemented")
+}
+func (UnimplementedUserServer) AddFriend(context.Context, *AddFriendRequest) (*AddFriendReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddFriend not implemented")
+}
+func (UnimplementedUserServer) ListGroup(context.Context, *ListGroupRequest) (*ListGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListGroup not implemented")
+}
+func (UnimplementedUserServer) JoinGroup(context.Context, *JoinGroupRequest) (*JoinGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method JoinGroup not implemented")
+}
+func (UnimplementedUserServer) CreateGroup(context.Context, *CreateGroupRequest) (*CreateGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateGroup not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -290,6 +350,78 @@ func _User_ListFriend_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_AddFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddFriendRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).AddFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_AddFriend_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).AddFriend(ctx, req.(*AddFriendRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_ListGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).ListGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_ListGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).ListGroup(ctx, req.(*ListGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_JoinGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JoinGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).JoinGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_JoinGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).JoinGroup(ctx, req.(*JoinGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_CreateGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).CreateGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_CreateGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).CreateGroup(ctx, req.(*CreateGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -324,6 +456,22 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListFriend",
 			Handler:    _User_ListFriend_Handler,
+		},
+		{
+			MethodName: "AddFriend",
+			Handler:    _User_AddFriend_Handler,
+		},
+		{
+			MethodName: "ListGroup",
+			Handler:    _User_ListGroup_Handler,
+		},
+		{
+			MethodName: "JoinGroup",
+			Handler:    _User_JoinGroup_Handler,
+		},
+		{
+			MethodName: "CreateGroup",
+			Handler:    _User_CreateGroup_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

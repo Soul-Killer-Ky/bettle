@@ -14,10 +14,12 @@ type User struct {
 // Fields of the User.
 func (User) Fields() []ent.Field {
 	return []ent.Field{
+		field.String("phone").
+			MaxLen(20).Unique().Comment("手机号"),
 		field.String("username").
-			MaxLen(30).Unique().Comment("唯一用户标识"),
+			MaxLen(30).Nillable().Unique().Comment("唯一用户标识"),
 		field.String("password").
-			MaxLen(100),
+			MaxLen(100).Comment("密码"),
 		field.String("nickname").
 			MaxLen(20).Comment("昵称"),
 		field.String("avatar").
@@ -38,7 +40,12 @@ func (User) Mixin() []ent.Mixin {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("users", Friend.Type),
-		edge.To("friends", Friend.Type),
+		// friends
+		edge.To("friends", User.Type),
+
+		// groups
+		edge.From("joined_groups", Group.Type).Ref("users").
+			Through("group_members", GroupMember.Type),
+		edge.To("created_groups", Group.Type),
 	}
 }

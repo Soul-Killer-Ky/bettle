@@ -5,21 +5,21 @@ import (
 	"beetle/app/user/internal/data/ent"
 	"context"
 	"fmt"
-	kubernetes "github.com/go-kratos/kratos/contrib/registry/kubernetes/v2"
-	"github.com/go-kratos/kratos/v2/registry"
-	kubernetesAPI "k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
 	"path/filepath"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	kubernetes "github.com/go-kratos/kratos/contrib/registry/kubernetes/v2"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/google/wire"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	kubernetesAPI "k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/util/homedir"
 
 	_ "beetle/app/user/internal/data/ent/runtime"
 	// init mysql driver
@@ -33,6 +33,7 @@ var ProviderSet = wire.NewSet(
 	NewDiscovery,
 	NewUserRepo,
 	NewFriendRepo,
+	NewGroupRepo,
 )
 
 // Data .
@@ -115,4 +116,27 @@ func NewRegistrar() registry.Registrar {
 	}
 	r := kubernetes.NewRegistry(clientSet)
 	return r
+}
+
+func WithTx(ctx context.Context, client *ent.Client, fn func(tx *ent.Tx) error) error {
+	tx, err := client.Tx(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if v := recover(); v != nil {
+			tx.Rollback()
+			panic(v)
+		}
+	}()
+	if err := fn(tx); err != nil {
+		if rerr := tx.Rollback(); rerr != nil {
+			err = fmt.Errorf("%w: rolling back transaction: %v", err, rerr)
+		}
+		return err
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("committing transaction: %w", err)
+	}
+	return nil
 }

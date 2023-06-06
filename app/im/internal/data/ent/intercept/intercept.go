@@ -5,7 +5,6 @@ package intercept
 import (
 	"beetle/app/im/internal/data/ent"
 	"beetle/app/im/internal/data/ent/chatmessage"
-	"beetle/app/im/internal/data/ent/group"
 	"beetle/app/im/internal/data/ent/loadrecord"
 	"beetle/app/im/internal/data/ent/predicate"
 	"context"
@@ -97,33 +96,6 @@ func (f TraverseChatMessage) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.ChatMessageQuery", q)
 }
 
-// The GroupFunc type is an adapter to allow the use of ordinary function as a Querier.
-type GroupFunc func(context.Context, *ent.GroupQuery) (ent.Value, error)
-
-// Query calls f(ctx, q).
-func (f GroupFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
-	if q, ok := q.(*ent.GroupQuery); ok {
-		return f(ctx, q)
-	}
-	return nil, fmt.Errorf("unexpected query type %T. expect *ent.GroupQuery", q)
-}
-
-// The TraverseGroup type is an adapter to allow the use of ordinary function as Traverser.
-type TraverseGroup func(context.Context, *ent.GroupQuery) error
-
-// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
-func (f TraverseGroup) Intercept(next ent.Querier) ent.Querier {
-	return next
-}
-
-// Traverse calls f(ctx, q).
-func (f TraverseGroup) Traverse(ctx context.Context, q ent.Query) error {
-	if q, ok := q.(*ent.GroupQuery); ok {
-		return f(ctx, q)
-	}
-	return fmt.Errorf("unexpected query type %T. expect *ent.GroupQuery", q)
-}
-
 // The LoadRecordFunc type is an adapter to allow the use of ordinary function as a Querier.
 type LoadRecordFunc func(context.Context, *ent.LoadRecordQuery) (ent.Value, error)
 
@@ -156,8 +128,6 @@ func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
 	case *ent.ChatMessageQuery:
 		return &query[*ent.ChatMessageQuery, predicate.ChatMessage, chatmessage.OrderOption]{typ: ent.TypeChatMessage, tq: q}, nil
-	case *ent.GroupQuery:
-		return &query[*ent.GroupQuery, predicate.Group, group.OrderOption]{typ: ent.TypeGroup, tq: q}, nil
 	case *ent.LoadRecordQuery:
 		return &query[*ent.LoadRecordQuery, predicate.LoadRecord, loadrecord.OrderOption]{typ: ent.TypeLoadRecord, tq: q}, nil
 	default:

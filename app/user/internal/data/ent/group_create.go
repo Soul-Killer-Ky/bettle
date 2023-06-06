@@ -3,10 +3,12 @@
 package ent
 
 import (
-	"beetle/app/im/internal/data/ent/group"
+	"beetle/app/user/internal/data/ent/group"
+	"beetle/app/user/internal/data/ent/user"
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -17,6 +19,54 @@ type GroupCreate struct {
 	config
 	mutation *GroupMutation
 	hooks    []Hook
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (gc *GroupCreate) SetCreatedAt(t time.Time) *GroupCreate {
+	gc.mutation.SetCreatedAt(t)
+	return gc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (gc *GroupCreate) SetNillableCreatedAt(t *time.Time) *GroupCreate {
+	if t != nil {
+		gc.SetCreatedAt(*t)
+	}
+	return gc
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (gc *GroupCreate) SetUpdatedAt(t time.Time) *GroupCreate {
+	gc.mutation.SetUpdatedAt(t)
+	return gc
+}
+
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (gc *GroupCreate) SetNillableUpdatedAt(t *time.Time) *GroupCreate {
+	if t != nil {
+		gc.SetUpdatedAt(*t)
+	}
+	return gc
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (gc *GroupCreate) SetDeletedAt(t time.Time) *GroupCreate {
+	gc.mutation.SetDeletedAt(t)
+	return gc
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (gc *GroupCreate) SetNillableDeletedAt(t *time.Time) *GroupCreate {
+	if t != nil {
+		gc.SetDeletedAt(*t)
+	}
+	return gc
+}
+
+// SetType sets the "type" field.
+func (gc *GroupCreate) SetType(i int32) *GroupCreate {
+	gc.mutation.SetType(i)
+	return gc
 }
 
 // SetName sets the "name" field.
@@ -37,6 +87,40 @@ func (gc *GroupCreate) SetMemo(s string) *GroupCreate {
 	return gc
 }
 
+// AddUserIDs adds the "users" edge to the User entity by IDs.
+func (gc *GroupCreate) AddUserIDs(ids ...int) *GroupCreate {
+	gc.mutation.AddUserIDs(ids...)
+	return gc
+}
+
+// AddUsers adds the "users" edges to the User entity.
+func (gc *GroupCreate) AddUsers(u ...*User) *GroupCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return gc.AddUserIDs(ids...)
+}
+
+// SetCreatedByID sets the "created_by" edge to the User entity by ID.
+func (gc *GroupCreate) SetCreatedByID(id int) *GroupCreate {
+	gc.mutation.SetCreatedByID(id)
+	return gc
+}
+
+// SetNillableCreatedByID sets the "created_by" edge to the User entity by ID if the given value is not nil.
+func (gc *GroupCreate) SetNillableCreatedByID(id *int) *GroupCreate {
+	if id != nil {
+		gc = gc.SetCreatedByID(*id)
+	}
+	return gc
+}
+
+// SetCreatedBy sets the "created_by" edge to the User entity.
+func (gc *GroupCreate) SetCreatedBy(u *User) *GroupCreate {
+	return gc.SetCreatedByID(u.ID)
+}
+
 // Mutation returns the GroupMutation object of the builder.
 func (gc *GroupCreate) Mutation() *GroupMutation {
 	return gc.mutation
@@ -44,6 +128,9 @@ func (gc *GroupCreate) Mutation() *GroupMutation {
 
 // Save creates the Group in the database.
 func (gc *GroupCreate) Save(ctx context.Context) (*Group, error) {
+	if err := gc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, gc.sqlSave, gc.mutation, gc.hooks)
 }
 
@@ -69,8 +156,36 @@ func (gc *GroupCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (gc *GroupCreate) defaults() error {
+	if _, ok := gc.mutation.CreatedAt(); !ok {
+		if group.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized group.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
+		v := group.DefaultCreatedAt()
+		gc.mutation.SetCreatedAt(v)
+	}
+	if _, ok := gc.mutation.UpdatedAt(); !ok {
+		if group.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized group.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
+		v := group.DefaultUpdatedAt()
+		gc.mutation.SetUpdatedAt(v)
+	}
+	return nil
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (gc *GroupCreate) check() error {
+	if _, ok := gc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Group.created_at"`)}
+	}
+	if _, ok := gc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Group.updated_at"`)}
+	}
+	if _, ok := gc.mutation.GetType(); !ok {
+		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Group.type"`)}
+	}
 	if _, ok := gc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Group.name"`)}
 	}
@@ -121,6 +236,22 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 		_node = &Group{config: gc.config}
 		_spec = sqlgraph.NewCreateSpec(group.Table, sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt))
 	)
+	if value, ok := gc.mutation.CreatedAt(); ok {
+		_spec.SetField(group.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
+	}
+	if value, ok := gc.mutation.UpdatedAt(); ok {
+		_spec.SetField(group.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
+	}
+	if value, ok := gc.mutation.DeletedAt(); ok {
+		_spec.SetField(group.FieldDeletedAt, field.TypeTime, value)
+		_node.DeletedAt = &value
+	}
+	if value, ok := gc.mutation.GetType(); ok {
+		_spec.SetField(group.FieldType, field.TypeInt32, value)
+		_node.Type = value
+	}
 	if value, ok := gc.mutation.Name(); ok {
 		_spec.SetField(group.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -132,6 +263,43 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 	if value, ok := gc.mutation.Memo(); ok {
 		_spec.SetField(group.FieldMemo, field.TypeString, value)
 		_node.Memo = value
+	}
+	if nodes := gc.mutation.UsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   group.UsersTable,
+			Columns: group.UsersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &GroupMemberCreate{config: gc.config, mutation: newGroupMemberMutation(gc.config, OpCreate)}
+		_ = createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := gc.mutation.CreatedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   group.CreatedByTable,
+			Columns: []string{group.CreatedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.user_created_groups = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
@@ -150,6 +318,7 @@ func (gcb *GroupCreateBulk) Save(ctx context.Context) ([]*Group, error) {
 	for i := range gcb.builders {
 		func(i int, root context.Context) {
 			builder := gcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*GroupMutation)
 				if !ok {

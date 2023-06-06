@@ -13,7 +13,7 @@ import (
 
 type MessageRepo interface {
 	SaveChatMessage(context.Context, int, int, string) error
-	GetChatMessages(context.Context, int, time.Time) ([]*pb.ChatMessage, error)
+	GetChatMessages(context.Context, int, time.Time) ([]*pb.PersonalChatMessage, error)
 	CacheMessage(context.Context, string, interface{}) error
 }
 
@@ -30,8 +30,8 @@ func NewMessageUseCase(repo MessageRepo, logger log.Logger) *MessageUseCase {
 func (mc *MessageUseCase) SaveMessage(ctx context.Context, messageType pb.MessageType, payload interface{}) (err error) {
 	jsonCodec := encoding.GetCodec("json")
 	switch messageType {
-	case pb.MessageType_Chat:
-		t := payload.(*pb.ChatMessage)
+	case pb.MessageType_PersonalChat:
+		t := payload.(*pb.PersonalChatMessage)
 		messageKey := messageType.String() + "-" + strconv.FormatUint(t.Sender, 10)
 		buf, err := jsonCodec.Marshal(t)
 		if err != nil {
@@ -42,8 +42,8 @@ func (mc *MessageUseCase) SaveMessage(ctx context.Context, messageType pb.Messag
 			return err
 		}
 		err = mc.repo.CacheMessage(ctx, messageKey, buf)
-	case pb.MessageType_Group:
-		t := payload.(*pb.GroupMessage)
+	case pb.MessageType_GroupChat:
+		t := payload.(*pb.GroupChatMessage)
 		messageKey := messageType.String() + "-" + t.GroupId
 		buf, err := jsonCodec.Marshal(t)
 		if err == nil {
@@ -55,7 +55,7 @@ func (mc *MessageUseCase) SaveMessage(ctx context.Context, messageType pb.Messag
 	return err
 }
 
-func (mc *MessageUseCase) LoadChatMessage(ctx context.Context, uid int, lastTime time.Time) ([]*pb.ChatMessage, error) {
+func (mc *MessageUseCase) LoadChatMessage(ctx context.Context, uid int, lastTime time.Time) ([]*pb.PersonalChatMessage, error) {
 	messages, err := mc.repo.GetChatMessages(ctx, uid, lastTime)
 	if err != nil {
 		mc.log.WithContext(ctx).Errorf("load chat message error: %s", err)

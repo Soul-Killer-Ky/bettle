@@ -19,4 +19,6 @@ enum ErrorReason {
   USER_NOT_FOUND = 2 [(errors.code) = 404];
   
   USER_PASSWORD_ERROR = 3 [(errors.code) = 403];
+
+  ITEM_EXISTS = 4 [(errors.code) = 403];
 }

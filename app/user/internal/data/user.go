@@ -45,6 +45,21 @@ func (r *userRepo) FindByID(ctx context.Context, id int) (*biz.User, error) {
 	}, nil
 }
 
+func (r *userRepo) FindByPhone(ctx context.Context, phone string) (*biz.User, error) {
+	u, err := r.data.db.User.Query().Where(user.Phone(phone)).First(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &biz.User{
+		ID:       u.ID,
+		Username: u.Username,
+		Password: u.Password,
+		Nickname: u.Nickname,
+		Avatar:   u.Avatar,
+		Memo:     u.Memo,
+	}, nil
+}
+
 func (r *userRepo) FindByName(ctx context.Context, name string) (*biz.User, error) {
 	u, err := r.data.db.User.Query().Where(user.Username(name)).First(ctx)
 	if err != nil {
@@ -52,6 +67,7 @@ func (r *userRepo) FindByName(ctx context.Context, name string) (*biz.User, erro
 	}
 	return &biz.User{
 		ID:       u.ID,
+		Phone:    u.Phone,
 		Username: u.Username,
 		Password: u.Password,
 		Nickname: u.Nickname,

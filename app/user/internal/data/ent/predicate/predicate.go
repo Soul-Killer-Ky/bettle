@@ -6,8 +6,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Friend is the predicate function for friend builders.
-type Friend func(*sql.Selector)
+// Group is the predicate function for group builders.
+type Group func(*sql.Selector)
+
+// GroupMember is the predicate function for groupmember builders.
+type GroupMember func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

@@ -60,7 +60,7 @@ func (s *Service) LoadMessage(uid int, deviceID uuid.UUID) {
 	if err == nil {
 		for _, message := range messages {
 			s.log.Infof("send message user id: %d, body: %s", message.Sender, message.Content.Body)
-			s.ws.SendMessageByBID(int(message.Sender), websocket.MessageType(pb.MessageType_Chat), message)
+			s.ws.SendMessageByBID(int(message.Sender), websocket.MessageType(pb.MessageType_PersonalChat), message)
 		}
 	}
 	_ = s.lrc.SaveLoadRecord(ctx, uid, deviceID)

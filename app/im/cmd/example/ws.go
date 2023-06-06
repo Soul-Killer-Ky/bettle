@@ -10,7 +10,7 @@ import (
 
 var testClient *websocket.Client
 
-func handleClientChatMessage(message *pb.ChatMessage) error {
+func handleClientChatMessage(message *pb.PersonalChatMessage) error {
 	fmt.Printf("Payload: %v\n", message)
 	//_ = testClient.SendMessage(api.MessageTypeChat, message)
 	return nil
@@ -33,16 +33,16 @@ func main() {
 
 	testClient = cli
 
-	cli.RegisterMessageHandler(websocket.MessageType(pb.MessageType_Chat),
+	cli.RegisterMessageHandler(websocket.MessageType(pb.MessageType_PersonalChat),
 		func(payload websocket.MessagePayload) error {
 			switch t := payload.(type) {
-			case *pb.ChatMessage:
+			case *pb.PersonalChatMessage:
 				return handleClientChatMessage(t)
 			default:
 				return errors.New("invalid payload type")
 			}
 		},
-		func() websocket.Any { return &pb.ChatMessage{} },
+		func() websocket.Any { return &pb.PersonalChatMessage{} },
 	)
 
 	err := cli.Connect()
@@ -57,7 +57,7 @@ func main() {
 		if msg == "break" {
 			break
 		}
-		cli.SendMessage(1, pb.ChatMessage{
+		cli.SendMessage(1, pb.PersonalChatMessage{
 			Content: &pb.Content{
 				Type: pb.ContentType_Text,
 				Body: msg,

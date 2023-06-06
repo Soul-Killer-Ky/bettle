@@ -55,27 +55,27 @@ func NewWebsocketServer(c *conf.Server, ac *conf.Auth, logger log.Logger, svc *w
 
 	svc.SetWebsocketServer(srv)
 
-	srv.RegisterMessageHandler(websocket.MessageType(pb.MessageType_Chat),
+	srv.RegisterMessageHandler(websocket.MessageType(pb.MessageType_PersonalChat),
 		func(session *websocket.Session, payload websocket.MessagePayload) error {
 			switch t := payload.(type) {
-			case *pb.ChatMessage:
+			case *pb.PersonalChatMessage:
 				return svc.OnChatMessage(session, t)
 			default:
 				return errors.New("invalid payload type")
 			}
 		},
-		func() websocket.Any { return &pb.ChatMessage{} },
+		func() websocket.Any { return &pb.PersonalChatMessage{} },
 	)
-	srv.RegisterMessageHandler(websocket.MessageType(pb.MessageType_Group),
+	srv.RegisterMessageHandler(websocket.MessageType(pb.MessageType_GroupChat),
 		func(session *websocket.Session, payload websocket.MessagePayload) error {
 			switch t := payload.(type) {
-			case *pb.GroupMessage:
+			case *pb.GroupChatMessage:
 				return svc.OnGroupMessage(session, t)
 			default:
 				return errors.New("invalid payload type")
 			}
 		},
-		func() websocket.Any { return &pb.GroupMessage{} },
+		func() websocket.Any { return &pb.GroupChatMessage{} },
 	)
 
 	return srv

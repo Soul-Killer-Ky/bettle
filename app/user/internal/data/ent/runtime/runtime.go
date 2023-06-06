@@ -3,7 +3,8 @@
 package runtime
 
 import (
-	"beetle/app/user/internal/data/ent/friend"
+	"beetle/app/user/internal/data/ent/group"
+	"beetle/app/user/internal/data/ent/groupmember"
 	"beetle/app/user/internal/data/ent/schema"
 	"beetle/app/user/internal/data/ent/user"
 	"time"
@@ -13,27 +14,52 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	friendMixin := schema.Friend{}.Mixin()
-	friendMixinHooks2 := friendMixin[2].Hooks()
-	friend.Hooks[0] = friendMixinHooks2[0]
-	friendMixinInters2 := friendMixin[2].Interceptors()
-	friend.Interceptors[0] = friendMixinInters2[0]
-	friendMixinFields0 := friendMixin[0].Fields()
-	_ = friendMixinFields0
-	friendMixinFields1 := friendMixin[1].Fields()
-	_ = friendMixinFields1
-	friendFields := schema.Friend{}.Fields()
-	_ = friendFields
-	// friendDescCreatedAt is the schema descriptor for created_at field.
-	friendDescCreatedAt := friendMixinFields0[0].Descriptor()
-	// friend.DefaultCreatedAt holds the default value on creation for the created_at field.
-	friend.DefaultCreatedAt = friendDescCreatedAt.Default.(func() time.Time)
-	// friendDescUpdatedAt is the schema descriptor for updated_at field.
-	friendDescUpdatedAt := friendMixinFields1[0].Descriptor()
-	// friend.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	friend.DefaultUpdatedAt = friendDescUpdatedAt.Default.(func() time.Time)
-	// friend.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	friend.UpdateDefaultUpdatedAt = friendDescUpdatedAt.UpdateDefault.(func() time.Time)
+	groupMixin := schema.Group{}.Mixin()
+	groupMixinHooks2 := groupMixin[2].Hooks()
+	group.Hooks[0] = groupMixinHooks2[0]
+	groupMixinInters2 := groupMixin[2].Interceptors()
+	group.Interceptors[0] = groupMixinInters2[0]
+	groupMixinFields0 := groupMixin[0].Fields()
+	_ = groupMixinFields0
+	groupMixinFields1 := groupMixin[1].Fields()
+	_ = groupMixinFields1
+	groupFields := schema.Group{}.Fields()
+	_ = groupFields
+	// groupDescCreatedAt is the schema descriptor for created_at field.
+	groupDescCreatedAt := groupMixinFields0[0].Descriptor()
+	// group.DefaultCreatedAt holds the default value on creation for the created_at field.
+	group.DefaultCreatedAt = groupDescCreatedAt.Default.(func() time.Time)
+	// groupDescUpdatedAt is the schema descriptor for updated_at field.
+	groupDescUpdatedAt := groupMixinFields1[0].Descriptor()
+	// group.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	group.DefaultUpdatedAt = groupDescUpdatedAt.Default.(func() time.Time)
+	// group.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	group.UpdateDefaultUpdatedAt = groupDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// groupDescName is the schema descriptor for name field.
+	groupDescName := groupFields[1].Descriptor()
+	// group.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	group.NameValidator = groupDescName.Validators[0].(func(string) error)
+	// groupDescIcon is the schema descriptor for icon field.
+	groupDescIcon := groupFields[2].Descriptor()
+	// group.IconValidator is a validator for the "icon" field. It is called by the builders before save.
+	group.IconValidator = groupDescIcon.Validators[0].(func(string) error)
+	// groupDescMemo is the schema descriptor for memo field.
+	groupDescMemo := groupFields[3].Descriptor()
+	// group.MemoValidator is a validator for the "memo" field. It is called by the builders before save.
+	group.MemoValidator = groupDescMemo.Validators[0].(func(string) error)
+	groupmemberMixin := schema.GroupMember{}.Mixin()
+	groupmemberMixinHooks1 := groupmemberMixin[1].Hooks()
+	groupmember.Hooks[0] = groupmemberMixinHooks1[0]
+	groupmemberMixinInters1 := groupmemberMixin[1].Interceptors()
+	groupmember.Interceptors[0] = groupmemberMixinInters1[0]
+	groupmemberMixinFields0 := groupmemberMixin[0].Fields()
+	_ = groupmemberMixinFields0
+	groupmemberFields := schema.GroupMember{}.Fields()
+	_ = groupmemberFields
+	// groupmemberDescCreatedAt is the schema descriptor for created_at field.
+	groupmemberDescCreatedAt := groupmemberMixinFields0[0].Descriptor()
+	// groupmember.DefaultCreatedAt holds the default value on creation for the created_at field.
+	groupmember.DefaultCreatedAt = groupmemberDescCreatedAt.Default.(func() time.Time)
 	userMixin := schema.User{}.Mixin()
 	userMixinHooks2 := userMixin[2].Hooks()
 	user.Hooks[0] = userMixinHooks2[0]
@@ -55,24 +81,28 @@ func init() {
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// userDescPhone is the schema descriptor for phone field.
+	userDescPhone := userFields[0].Descriptor()
+	// user.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
+	user.PhoneValidator = userDescPhone.Validators[0].(func(string) error)
 	// userDescUsername is the schema descriptor for username field.
-	userDescUsername := userFields[0].Descriptor()
+	userDescUsername := userFields[1].Descriptor()
 	// user.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
 	user.UsernameValidator = userDescUsername.Validators[0].(func(string) error)
 	// userDescPassword is the schema descriptor for password field.
-	userDescPassword := userFields[1].Descriptor()
+	userDescPassword := userFields[2].Descriptor()
 	// user.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	user.PasswordValidator = userDescPassword.Validators[0].(func(string) error)
 	// userDescNickname is the schema descriptor for nickname field.
-	userDescNickname := userFields[2].Descriptor()
+	userDescNickname := userFields[3].Descriptor()
 	// user.NicknameValidator is a validator for the "nickname" field. It is called by the builders before save.
 	user.NicknameValidator = userDescNickname.Validators[0].(func(string) error)
 	// userDescAvatar is the schema descriptor for avatar field.
-	userDescAvatar := userFields[3].Descriptor()
+	userDescAvatar := userFields[4].Descriptor()
 	// user.AvatarValidator is a validator for the "avatar" field. It is called by the builders before save.
 	user.AvatarValidator = userDescAvatar.Validators[0].(func(string) error)
 	// userDescMemo is the schema descriptor for memo field.
-	userDescMemo := userFields[4].Descriptor()
+	userDescMemo := userFields[5].Descriptor()
 	// user.MemoValidator is a validator for the "memo" field. It is called by the builders before save.
 	user.MemoValidator = userDescMemo.Validators[0].(func(string) error)
 }

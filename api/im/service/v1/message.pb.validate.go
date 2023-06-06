@@ -137,22 +137,22 @@ var _ interface {
 	ErrorName() string
 } = ContentValidationError{}
 
-// Validate checks the field values on ChatMessage with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *ChatMessage) Validate() error {
+// Validate checks the field values on PersonalChatMessage with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PersonalChatMessage) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on ChatMessage with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in ChatMessageMultiError, or
-// nil if none found.
-func (m *ChatMessage) ValidateAll() error {
+// ValidateAll checks the field values on PersonalChatMessage with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PersonalChatMessageMultiError, or nil if none found.
+func (m *PersonalChatMessage) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *ChatMessage) validate(all bool) error {
+func (m *PersonalChatMessage) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -163,7 +163,7 @@ func (m *ChatMessage) validate(all bool) error {
 		switch v := interface{}(m.GetContent()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, ChatMessageValidationError{
+				errors = append(errors, PersonalChatMessageValidationError{
 					field:  "Content",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -171,7 +171,7 @@ func (m *ChatMessage) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, ChatMessageValidationError{
+				errors = append(errors, PersonalChatMessageValidationError{
 					field:  "Content",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -180,7 +180,7 @@ func (m *ChatMessage) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetContent()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return ChatMessageValidationError{
+			return PersonalChatMessageValidationError{
 				field:  "Content",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -196,7 +196,7 @@ func (m *ChatMessage) validate(all bool) error {
 		switch v := interface{}(m.GetTimestamp()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, ChatMessageValidationError{
+				errors = append(errors, PersonalChatMessageValidationError{
 					field:  "Timestamp",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -204,7 +204,7 @@ func (m *ChatMessage) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, ChatMessageValidationError{
+				errors = append(errors, PersonalChatMessageValidationError{
 					field:  "Timestamp",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -213,7 +213,7 @@ func (m *ChatMessage) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetTimestamp()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return ChatMessageValidationError{
+			return PersonalChatMessageValidationError{
 				field:  "Timestamp",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -222,18 +222,19 @@ func (m *ChatMessage) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return ChatMessageMultiError(errors)
+		return PersonalChatMessageMultiError(errors)
 	}
 
 	return nil
 }
 
-// ChatMessageMultiError is an error wrapping multiple validation errors
-// returned by ChatMessage.ValidateAll() if the designated constraints aren't met.
-type ChatMessageMultiError []error
+// PersonalChatMessageMultiError is an error wrapping multiple validation
+// errors returned by PersonalChatMessage.ValidateAll() if the designated
+// constraints aren't met.
+type PersonalChatMessageMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m ChatMessageMultiError) Error() string {
+func (m PersonalChatMessageMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -242,11 +243,11 @@ func (m ChatMessageMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m ChatMessageMultiError) AllErrors() []error { return m }
+func (m PersonalChatMessageMultiError) AllErrors() []error { return m }
 
-// ChatMessageValidationError is the validation error returned by
-// ChatMessage.Validate if the designated constraints aren't met.
-type ChatMessageValidationError struct {
+// PersonalChatMessageValidationError is the validation error returned by
+// PersonalChatMessage.Validate if the designated constraints aren't met.
+type PersonalChatMessageValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -254,22 +255,24 @@ type ChatMessageValidationError struct {
 }
 
 // Field function returns field value.
-func (e ChatMessageValidationError) Field() string { return e.field }
+func (e PersonalChatMessageValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ChatMessageValidationError) Reason() string { return e.reason }
+func (e PersonalChatMessageValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ChatMessageValidationError) Cause() error { return e.cause }
+func (e PersonalChatMessageValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ChatMessageValidationError) Key() bool { return e.key }
+func (e PersonalChatMessageValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ChatMessageValidationError) ErrorName() string { return "ChatMessageValidationError" }
+func (e PersonalChatMessageValidationError) ErrorName() string {
+	return "PersonalChatMessageValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e ChatMessageValidationError) Error() string {
+func (e PersonalChatMessageValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -281,14 +284,14 @@ func (e ChatMessageValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sChatMessage.%s: %s%s",
+		"invalid %sPersonalChatMessage.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ChatMessageValidationError{}
+var _ error = PersonalChatMessageValidationError{}
 
 var _ interface {
 	Field() string
@@ -296,24 +299,24 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ChatMessageValidationError{}
+} = PersonalChatMessageValidationError{}
 
-// Validate checks the field values on GroupMessage with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *GroupMessage) Validate() error {
+// Validate checks the field values on GroupChatMessage with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *GroupChatMessage) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on GroupMessage with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in GroupMessageMultiError, or
-// nil if none found.
-func (m *GroupMessage) ValidateAll() error {
+// ValidateAll checks the field values on GroupChatMessage with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GroupChatMessageMultiError, or nil if none found.
+func (m *GroupChatMessage) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *GroupMessage) validate(all bool) error {
+func (m *GroupChatMessage) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -324,7 +327,7 @@ func (m *GroupMessage) validate(all bool) error {
 		switch v := interface{}(m.GetContent()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GroupMessageValidationError{
+				errors = append(errors, GroupChatMessageValidationError{
 					field:  "Content",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -332,7 +335,7 @@ func (m *GroupMessage) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, GroupMessageValidationError{
+				errors = append(errors, GroupChatMessageValidationError{
 					field:  "Content",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -341,7 +344,7 @@ func (m *GroupMessage) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetContent()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return GroupMessageValidationError{
+			return GroupChatMessageValidationError{
 				field:  "Content",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -357,7 +360,7 @@ func (m *GroupMessage) validate(all bool) error {
 		switch v := interface{}(m.GetTimestamp()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, GroupMessageValidationError{
+				errors = append(errors, GroupChatMessageValidationError{
 					field:  "Timestamp",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -365,7 +368,7 @@ func (m *GroupMessage) validate(all bool) error {
 			}
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
-				errors = append(errors, GroupMessageValidationError{
+				errors = append(errors, GroupChatMessageValidationError{
 					field:  "Timestamp",
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -374,7 +377,7 @@ func (m *GroupMessage) validate(all bool) error {
 		}
 	} else if v, ok := interface{}(m.GetTimestamp()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return GroupMessageValidationError{
+			return GroupChatMessageValidationError{
 				field:  "Timestamp",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -383,18 +386,19 @@ func (m *GroupMessage) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return GroupMessageMultiError(errors)
+		return GroupChatMessageMultiError(errors)
 	}
 
 	return nil
 }
 
-// GroupMessageMultiError is an error wrapping multiple validation errors
-// returned by GroupMessage.ValidateAll() if the designated constraints aren't met.
-type GroupMessageMultiError []error
+// GroupChatMessageMultiError is an error wrapping multiple validation errors
+// returned by GroupChatMessage.ValidateAll() if the designated constraints
+// aren't met.
+type GroupChatMessageMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m GroupMessageMultiError) Error() string {
+func (m GroupChatMessageMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -403,11 +407,11 @@ func (m GroupMessageMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m GroupMessageMultiError) AllErrors() []error { return m }
+func (m GroupChatMessageMultiError) AllErrors() []error { return m }
 
-// GroupMessageValidationError is the validation error returned by
-// GroupMessage.Validate if the designated constraints aren't met.
-type GroupMessageValidationError struct {
+// GroupChatMessageValidationError is the validation error returned by
+// GroupChatMessage.Validate if the designated constraints aren't met.
+type GroupChatMessageValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -415,22 +419,22 @@ type GroupMessageValidationError struct {
 }
 
 // Field function returns field value.
-func (e GroupMessageValidationError) Field() string { return e.field }
+func (e GroupChatMessageValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GroupMessageValidationError) Reason() string { return e.reason }
+func (e GroupChatMessageValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GroupMessageValidationError) Cause() error { return e.cause }
+func (e GroupChatMessageValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GroupMessageValidationError) Key() bool { return e.key }
+func (e GroupChatMessageValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GroupMessageValidationError) ErrorName() string { return "GroupMessageValidationError" }
+func (e GroupChatMessageValidationError) ErrorName() string { return "GroupChatMessageValidationError" }
 
 // Error satisfies the builtin error interface
-func (e GroupMessageValidationError) Error() string {
+func (e GroupChatMessageValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -442,14 +446,14 @@ func (e GroupMessageValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGroupMessage.%s: %s%s",
+		"invalid %sGroupChatMessage.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GroupMessageValidationError{}
+var _ error = GroupChatMessageValidationError{}
 
 var _ interface {
 	Field() string
@@ -457,7 +461,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GroupMessageValidationError{}
+} = GroupChatMessageValidationError{}
 
 // Validate checks the field values on BroadcastMessage with the rules defined
 // in the proto definition for this message. If any rules are violated, the

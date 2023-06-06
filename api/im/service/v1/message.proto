@@ -10,8 +10,8 @@ option java_package = "api.im.service.v1";
 
 enum MessageType {
 	HeartBeat = 0; // 心跳
-	Chat = 1; // 单聊
-	Group = 2; // 群聊
+	PersonalChat = 1; // 单聊
+	GroupChat = 2; // 群聊
 	Broadcast = 3; // 广播
 }
 
@@ -31,14 +31,14 @@ message Content {
 	string body = 2;
 }
 
-message ChatMessage {
+message PersonalChatMessage {
 	Content content = 1;
 	uint64 from = 2;
 	uint64 sender = 3;
 	google.protobuf.Timestamp timestamp = 4;
 }
 
-message GroupMessage {
+message GroupChatMessage {
 	Content content = 1;
 	uint64 from = 2;
 	string group_id = 3;

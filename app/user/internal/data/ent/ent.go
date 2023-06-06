@@ -3,7 +3,8 @@
 package ent
 
 import (
-	"beetle/app/user/internal/data/ent/friend"
+	"beetle/app/user/internal/data/ent/group"
+	"beetle/app/user/internal/data/ent/groupmember"
 	"beetle/app/user/internal/data/ent/user"
 	"context"
 	"errors"
@@ -74,8 +75,9 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			friend.Table: friend.ValidColumn,
-			user.Table:   user.ValidColumn,
+			group.Table:       group.ValidColumn,
+			groupmember.Table: groupmember.ValidColumn,
+			user.Table:        user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

@@ -25,7 +25,6 @@ const (
 	Im_GetIm_FullMethodName     = "/api.im.service.v1.Im/GetIm"
 	Im_ListIm_FullMethodName    = "/api.im.service.v1.Im/ListIm"
 	Im_ConnectIm_FullMethodName = "/api.im.service.v1.Im/ConnectIm"
-	Im_GetGroup_FullMethodName  = "/api.im.service.v1.Im/GetGroup"
 )
 
 // ImClient is the client API for Im service.
@@ -38,7 +37,6 @@ type ImClient interface {
 	GetIm(ctx context.Context, in *GetImRequest, opts ...grpc.CallOption) (*GetImReply, error)
 	ListIm(ctx context.Context, in *ListImRequest, opts ...grpc.CallOption) (*ListImReply, error)
 	ConnectIm(ctx context.Context, in *ConnectImRequest, opts ...grpc.CallOption) (*ConnectImReply, error)
-	GetGroup(ctx context.Context, in *GetGroupRequest, opts ...grpc.CallOption) (*GetGroupReply, error)
 }
 
 type imClient struct {
@@ -103,15 +101,6 @@ func (c *imClient) ConnectIm(ctx context.Context, in *ConnectImRequest, opts ...
 	return out, nil
 }
 
-func (c *imClient) GetGroup(ctx context.Context, in *GetGroupRequest, opts ...grpc.CallOption) (*GetGroupReply, error) {
-	out := new(GetGroupReply)
-	err := c.cc.Invoke(ctx, Im_GetGroup_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // ImServer is the server API for Im service.
 // All implementations must embed UnimplementedImServer
 // for forward compatibility
@@ -122,7 +111,6 @@ type ImServer interface {
 	GetIm(context.Context, *GetImRequest) (*GetImReply, error)
 	ListIm(context.Context, *ListImRequest) (*ListImReply, error)
 	ConnectIm(context.Context, *ConnectImRequest) (*ConnectImReply, error)
-	GetGroup(context.Context, *GetGroupRequest) (*GetGroupReply, error)
 	mustEmbedUnimplementedImServer()
 }
 
@@ -147,9 +135,6 @@ func (UnimplementedImServer) ListIm(context.Context, *ListImRequest) (*ListImRep
 }
 func (UnimplementedImServer) ConnectIm(context.Context, *ConnectImRequest) (*ConnectImReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConnectIm not implemented")
-}
-func (UnimplementedImServer) GetGroup(context.Context, *GetGroupRequest) (*GetGroupReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetGroup not implemented")
 }
 func (UnimplementedImServer) mustEmbedUnimplementedImServer() {}
 
@@ -272,24 +257,6 @@ func _Im_ConnectIm_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Im_GetGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetGroupRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ImServer).GetGroup(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Im_GetGroup_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ImServer).GetGroup(ctx, req.(*GetGroupRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Im_ServiceDesc is the grpc.ServiceDesc for Im service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -320,10 +287,6 @@ var Im_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ConnectIm",
 			Handler:    _Im_ConnectIm_Handler,
-		},
-		{
-			MethodName: "GetGroup",
-			Handler:    _Im_GetGroup_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

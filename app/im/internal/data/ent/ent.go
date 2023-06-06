@@ -4,7 +4,6 @@ package ent
 
 import (
 	"beetle/app/im/internal/data/ent/chatmessage"
-	"beetle/app/im/internal/data/ent/group"
 	"beetle/app/im/internal/data/ent/loadrecord"
 	"context"
 	"errors"
@@ -76,7 +75,6 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			chatmessage.Table: chatmessage.ValidColumn,
-			group.Table:       group.ValidColumn,
 			loadrecord.Table:  loadrecord.ValidColumn,
 		})
 	})

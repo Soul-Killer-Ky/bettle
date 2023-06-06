@@ -3,7 +3,7 @@
 package ent
 
 import (
-	"beetle/app/user/internal/data/ent/friend"
+	"beetle/app/user/internal/data/ent/group"
 	"beetle/app/user/internal/data/ent/user"
 	"context"
 	"errors"
@@ -63,6 +63,12 @@ func (uc *UserCreate) SetNillableDeletedAt(t *time.Time) *UserCreate {
 	return uc
 }
 
+// SetPhone sets the "phone" field.
+func (uc *UserCreate) SetPhone(s string) *UserCreate {
+	uc.mutation.SetPhone(s)
+	return uc
+}
+
 // SetUsername sets the "username" field.
 func (uc *UserCreate) SetUsername(s string) *UserCreate {
 	uc.mutation.SetUsername(s)
@@ -93,34 +99,49 @@ func (uc *UserCreate) SetMemo(s string) *UserCreate {
 	return uc
 }
 
-// AddUserIDs adds the "users" edge to the Friend entity by IDs.
-func (uc *UserCreate) AddUserIDs(ids ...int) *UserCreate {
-	uc.mutation.AddUserIDs(ids...)
-	return uc
-}
-
-// AddUsers adds the "users" edges to the Friend entity.
-func (uc *UserCreate) AddUsers(f ...*Friend) *UserCreate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
-	}
-	return uc.AddUserIDs(ids...)
-}
-
-// AddFriendIDs adds the "friends" edge to the Friend entity by IDs.
+// AddFriendIDs adds the "friends" edge to the User entity by IDs.
 func (uc *UserCreate) AddFriendIDs(ids ...int) *UserCreate {
 	uc.mutation.AddFriendIDs(ids...)
 	return uc
 }
 
-// AddFriends adds the "friends" edges to the Friend entity.
-func (uc *UserCreate) AddFriends(f ...*Friend) *UserCreate {
-	ids := make([]int, len(f))
-	for i := range f {
-		ids[i] = f[i].ID
+// AddFriends adds the "friends" edges to the User entity.
+func (uc *UserCreate) AddFriends(u ...*User) *UserCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
 	}
 	return uc.AddFriendIDs(ids...)
+}
+
+// AddJoinedGroupIDs adds the "joined_groups" edge to the Group entity by IDs.
+func (uc *UserCreate) AddJoinedGroupIDs(ids ...int) *UserCreate {
+	uc.mutation.AddJoinedGroupIDs(ids...)
+	return uc
+}
+
+// AddJoinedGroups adds the "joined_groups" edges to the Group entity.
+func (uc *UserCreate) AddJoinedGroups(g ...*Group) *UserCreate {
+	ids := make([]int, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
+	}
+	return uc.AddJoinedGroupIDs(ids...)
+}
+
+// AddCreatedGroupIDs adds the "created_groups" edge to the Group entity by IDs.
+func (uc *UserCreate) AddCreatedGroupIDs(ids ...int) *UserCreate {
+	uc.mutation.AddCreatedGroupIDs(ids...)
+	return uc
+}
+
+// AddCreatedGroups adds the "created_groups" edges to the Group entity.
+func (uc *UserCreate) AddCreatedGroups(g ...*Group) *UserCreate {
+	ids := make([]int, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
+	}
+	return uc.AddCreatedGroupIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -184,6 +205,14 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "User.updated_at"`)}
+	}
+	if _, ok := uc.mutation.Phone(); !ok {
+		return &ValidationError{Name: "phone", err: errors.New(`ent: missing required field "User.phone"`)}
+	}
+	if v, ok := uc.mutation.Phone(); ok {
+		if err := user.PhoneValidator(v); err != nil {
+			return &ValidationError{Name: "phone", err: fmt.Errorf(`ent: validator failed for field "User.phone": %w`, err)}
+		}
 	}
 	if _, ok := uc.mutation.Username(); !ok {
 		return &ValidationError{Name: "username", err: errors.New(`ent: missing required field "User.username"`)}
@@ -263,9 +292,13 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
+	if value, ok := uc.mutation.Phone(); ok {
+		_spec.SetField(user.FieldPhone, field.TypeString, value)
+		_node.Phone = value
+	}
 	if value, ok := uc.mutation.Username(); ok {
 		_spec.SetField(user.FieldUsername, field.TypeString, value)
-		_node.Username = value
+		_node.Username = &value
 	}
 	if value, ok := uc.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
@@ -283,15 +316,15 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldMemo, field.TypeString, value)
 		_node.Memo = value
 	}
-	if nodes := uc.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.FriendsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   user.UsersTable,
-			Columns: []string{user.UsersColumn},
-			Bidi:    false,
+			Table:   user.FriendsTable,
+			Columns: user.FriendsPrimaryKey,
+			Bidi:    true,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -299,15 +332,35 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := uc.mutation.FriendsIDs(); len(nodes) > 0 {
+	if nodes := uc.mutation.JoinedGroupsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   user.JoinedGroupsTable,
+			Columns: user.JoinedGroupsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &GroupMemberCreate{config: uc.config, mutation: newGroupMemberMutation(uc.config, OpCreate)}
+		_ = createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.CreatedGroupsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   user.FriendsTable,
-			Columns: []string{user.FriendsColumn},
+			Table:   user.CreatedGroupsTable,
+			Columns: []string{user.CreatedGroupsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(friend.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(group.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

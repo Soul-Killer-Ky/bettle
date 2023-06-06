@@ -20,17 +20,14 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationImConnectIm = "/api.im.service.v1.Im/ConnectIm"
-const OperationImGetGroup = "/api.im.service.v1.Im/GetGroup"
 
 type ImHTTPServer interface {
 	ConnectIm(context.Context, *ConnectImRequest) (*ConnectImReply, error)
-	GetGroup(context.Context, *GetGroupRequest) (*GetGroupReply, error)
 }
 
 func RegisterImHTTPServer(s *http.Server, srv ImHTTPServer) {
 	r := s.Route("/")
 	r.GET("/im/v1/connect", _Im_ConnectIm0_HTTP_Handler(srv))
-	r.POST("/im/v1/group/get", _Im_GetGroup0_HTTP_Handler(srv))
 }
 
 func _Im_ConnectIm0_HTTP_Handler(srv ImHTTPServer) func(ctx http.Context) error {
@@ -52,28 +49,8 @@ func _Im_ConnectIm0_HTTP_Handler(srv ImHTTPServer) func(ctx http.Context) error 
 	}
 }
 
-func _Im_GetGroup0_HTTP_Handler(srv ImHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in GetGroupRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationImGetGroup)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.GetGroup(ctx, req.(*GetGroupRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*GetGroupReply)
-		return ctx.Result(200, reply)
-	}
-}
-
 type ImHTTPClient interface {
 	ConnectIm(ctx context.Context, req *ConnectImRequest, opts ...http.CallOption) (rsp *ConnectImReply, err error)
-	GetGroup(ctx context.Context, req *GetGroupRequest, opts ...http.CallOption) (rsp *GetGroupReply, err error)
 }
 
 type ImHTTPClientImpl struct {
@@ -91,19 +68,6 @@ func (c *ImHTTPClientImpl) ConnectIm(ctx context.Context, in *ConnectImRequest, 
 	opts = append(opts, http.Operation(OperationImConnectIm))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, err
-}
-
-func (c *ImHTTPClientImpl) GetGroup(ctx context.Context, in *GetGroupRequest, opts ...http.CallOption) (*GetGroupReply, error) {
-	var out GetGroupReply
-	pattern := "/im/v1/group/get"
-	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationImGetGroup))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

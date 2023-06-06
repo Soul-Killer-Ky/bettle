@@ -3,6 +3,7 @@ syntax = "proto3";
 package api.im.service.v1;
 
 import "google/api/annotations.proto";
+import "validate/validate.proto";
 
 option go_package = "beetle/api/im/service/v1;v1";
 option java_multiple_files = true;
@@ -17,12 +18,6 @@ service Im {
 	rpc ConnectIm (ConnectImRequest) returns (ConnectImReply) {
 		option (google.api.http) = {
 			get: "/im/v1/connect"
-		};
-	}
-	rpc GetGroup (GetGroupRequest) returns (GetGroupReply) {
-		option (google.api.http) = {
-			post: "/im/v1/group/get"
-			body: "*"
 		};
 	}
 }
@@ -44,14 +39,3 @@ message ListImReply {}
 
 message ConnectImRequest {}
 message ConnectImReply {}
-
-message GetGroupRequest {}
-message GetGroupReply {
-	message Group {
-		int64 id = 1;
-		string name = 2;
-		string icon = 3;
-		string memo = 4;
-	}
-	repeated Group groups = 1;
-}
