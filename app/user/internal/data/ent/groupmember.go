@@ -21,12 +21,12 @@ type GroupMember struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	// 群身份
+	Role int32 `json:"role,omitempty"`
 	// GroupID holds the value of the "group_id" field.
 	GroupID int `json:"group_id,omitempty"`
 	// UserID holds the value of the "user_id" field.
 	UserID int `json:"user_id,omitempty"`
-	// 群身份
-	Role int32 `json:"role,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the GroupMemberQuery when eager-loading is set.
 	Edges        GroupMemberEdges `json:"edges"`
@@ -75,7 +75,7 @@ func (*GroupMember) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case groupmember.FieldGroupID, groupmember.FieldUserID, groupmember.FieldRole:
+		case groupmember.FieldRole, groupmember.FieldGroupID, groupmember.FieldUserID:
 			values[i] = new(sql.NullInt64)
 		case groupmember.FieldCreatedAt, groupmember.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -107,6 +107,12 @@ func (gm *GroupMember) assignValues(columns []string, values []any) error {
 				gm.DeletedAt = new(time.Time)
 				*gm.DeletedAt = value.Time
 			}
+		case groupmember.FieldRole:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field role", values[i])
+			} else if value.Valid {
+				gm.Role = int32(value.Int64)
+			}
 		case groupmember.FieldGroupID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field group_id", values[i])
@@ -118,12 +124,6 @@ func (gm *GroupMember) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
 				gm.UserID = int(value.Int64)
-			}
-		case groupmember.FieldRole:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field role", values[i])
-			} else if value.Valid {
-				gm.Role = int32(value.Int64)
 			}
 		default:
 			gm.selectValues.Set(columns[i], values[i])
@@ -178,14 +178,14 @@ func (gm *GroupMember) String() string {
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
+	builder.WriteString("role=")
+	builder.WriteString(fmt.Sprintf("%v", gm.Role))
+	builder.WriteString(", ")
 	builder.WriteString("group_id=")
 	builder.WriteString(fmt.Sprintf("%v", gm.GroupID))
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", gm.UserID))
-	builder.WriteString(", ")
-	builder.WriteString("role=")
-	builder.WriteString(fmt.Sprintf("%v", gm.Role))
 	builder.WriteByte(')')
 	return builder.String()
 }

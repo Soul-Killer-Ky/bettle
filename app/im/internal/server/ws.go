@@ -1,13 +1,10 @@
 package server
 
 import (
-	"context"
-	"errors"
-
-	pb "beetle/api/im/service/v1"
 	"beetle/app/im/internal/conf"
 	"beetle/app/im/internal/service/ws"
 	jwt2 "beetle/internal/pkg/jwt"
+	"context"
 
 	"github.com/Soul-Killer-Ky/kratos/websocket"
 	"github.com/go-kratos/kratos/v2/encoding/json"
@@ -22,6 +19,7 @@ import (
 // NewWebsocketServer create a websocket server.
 func NewWebsocketServer(c *conf.Server, ac *conf.Auth, logger log.Logger, svc *ws.Service) *websocket.Server {
 	//l := log.NewHelper(logger)
+	json.MarshalOptions.UseProtoNames = true
 	json.MarshalOptions.UseEnumNumbers = true
 
 	srv := websocket.NewServer(
@@ -55,28 +53,28 @@ func NewWebsocketServer(c *conf.Server, ac *conf.Auth, logger log.Logger, svc *w
 
 	svc.SetWebsocketServer(srv)
 
-	srv.RegisterMessageHandler(websocket.MessageType(pb.MessageType_PersonalChat),
-		func(session *websocket.Session, payload websocket.MessagePayload) error {
-			switch t := payload.(type) {
-			case *pb.PersonalChatMessage:
-				return svc.OnChatMessage(session, t)
-			default:
-				return errors.New("invalid payload type")
-			}
-		},
-		func() websocket.Any { return &pb.PersonalChatMessage{} },
-	)
-	srv.RegisterMessageHandler(websocket.MessageType(pb.MessageType_GroupChat),
-		func(session *websocket.Session, payload websocket.MessagePayload) error {
-			switch t := payload.(type) {
-			case *pb.GroupChatMessage:
-				return svc.OnGroupMessage(session, t)
-			default:
-				return errors.New("invalid payload type")
-			}
-		},
-		func() websocket.Any { return &pb.GroupChatMessage{} },
-	)
+	//srv.RegisterMessageHandler(websocket.MessageType(pb.MessageType_PersonalChat),
+	//	func(session *websocket.Session, payload websocket.MessagePayload) error {
+	//		switch t := payload.(type) {
+	//		case *pb.PersonalChatMessage:
+	//			return svc.OnPersonalChatMessage(session, t)
+	//		default:
+	//			return errors.New("invalid payload type")
+	//		}
+	//	},
+	//	func() websocket.Any { return &pb.PersonalChatMessage{} },
+	//)
+	//srv.RegisterMessageHandler(websocket.MessageType(pb.MessageType_GroupChat),
+	//	func(session *websocket.Session, payload websocket.MessagePayload) error {
+	//		switch t := payload.(type) {
+	//		case *pb.GroupChatMessage:
+	//			return svc.OnGroupChatMessage(session, t)
+	//		default:
+	//			return errors.New("invalid payload type")
+	//		}
+	//	},
+	//	func() websocket.Any { return &pb.GroupChatMessage{} },
+	//)
 
 	return srv
 }

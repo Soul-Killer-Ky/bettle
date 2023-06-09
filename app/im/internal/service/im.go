@@ -4,7 +4,6 @@ import (
 	"context"
 
 	pb "beetle/api/im/service/v1"
-	"github.com/Soul-Killer-Ky/kratos/websocket"
 	"github.com/go-kratos/kratos/v2/log"
 )
 
@@ -12,20 +11,10 @@ type ImService struct {
 	pb.UnimplementedImServer
 
 	log *log.Helper
-
-	ws *websocket.Server
 }
 
 func NewImService(logger log.Logger) *ImService {
 	return &ImService{log: log.NewHelper(logger)}
-}
-
-func (s *ImService) OnWebsocketConnect(sessionID websocket.SessionID, conn bool) {
-	s.log.Infof("on websocket conn, session id: %s, conn: %v", sessionID, conn)
-}
-
-func (s *ImService) SetWebsocketServer(ws *websocket.Server) {
-	s.ws = ws
 }
 
 func (s *ImService) CreateIm(ctx context.Context, req *pb.CreateImRequest) (*pb.CreateImReply, error) {

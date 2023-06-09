@@ -33,20 +33,20 @@ message Content {
 
 message PersonalChatMessage {
 	Content content = 1;
-	uint64 from = 2;
-	uint64 sender = 3;
+	int64 from = 2;
+	int64 sender = 3;
 	google.protobuf.Timestamp timestamp = 4;
 }
 
 message GroupChatMessage {
 	Content content = 1;
-	uint64 from = 2;
-	string group_id = 3;
+	int64 from = 2;
+	int64 group_id = 3;
 	google.protobuf.Timestamp timestamp = 4;
 }
 
 message BroadcastMessage {
 	Content content = 1;
-	uint64 from = 2;
+	int64 from = 2;
 	google.protobuf.Timestamp timestamp = 3;
 }

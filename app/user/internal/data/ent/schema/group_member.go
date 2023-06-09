@@ -19,7 +19,7 @@ func (GroupMember) Annotations() []schema.Annotation {
 
 func (GroupMember) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int32("role").Comment("群身份"),
+		field.Int32("role").Default(0).Comment("群身份"),
 
 		field.Int("group_id"),
 		field.Int("user_id"),

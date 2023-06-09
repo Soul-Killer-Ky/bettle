@@ -6,8 +6,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// ChatMessage is the predicate function for chatmessage builders.
-type ChatMessage func(*sql.Selector)
+// GroupChatMessage is the predicate function for groupchatmessage builders.
+type GroupChatMessage func(*sql.Selector)
 
-// LoadRecord is the predicate function for loadrecord builders.
-type LoadRecord func(*sql.Selector)
+// PersonalChatMessage is the predicate function for personalchatmessage builders.
+type PersonalChatMessage func(*sql.Selector)
+
+// SynchronizeRecord is the predicate function for synchronizerecord builders.
+type SynchronizeRecord func(*sql.Selector)

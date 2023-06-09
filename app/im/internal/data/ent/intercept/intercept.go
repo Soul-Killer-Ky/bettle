@@ -4,9 +4,10 @@ package intercept
 
 import (
 	"beetle/app/im/internal/data/ent"
-	"beetle/app/im/internal/data/ent/chatmessage"
-	"beetle/app/im/internal/data/ent/loadrecord"
+	"beetle/app/im/internal/data/ent/groupchatmessage"
+	"beetle/app/im/internal/data/ent/personalchatmessage"
 	"beetle/app/im/internal/data/ent/predicate"
+	"beetle/app/im/internal/data/ent/synchronizerecord"
 	"context"
 	"fmt"
 
@@ -69,67 +70,96 @@ func (f TraverseFunc) Traverse(ctx context.Context, q ent.Query) error {
 	return f(ctx, query)
 }
 
-// The ChatMessageFunc type is an adapter to allow the use of ordinary function as a Querier.
-type ChatMessageFunc func(context.Context, *ent.ChatMessageQuery) (ent.Value, error)
+// The GroupChatMessageFunc type is an adapter to allow the use of ordinary function as a Querier.
+type GroupChatMessageFunc func(context.Context, *ent.GroupChatMessageQuery) (ent.Value, error)
 
 // Query calls f(ctx, q).
-func (f ChatMessageFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
-	if q, ok := q.(*ent.ChatMessageQuery); ok {
+func (f GroupChatMessageFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.GroupChatMessageQuery); ok {
 		return f(ctx, q)
 	}
-	return nil, fmt.Errorf("unexpected query type %T. expect *ent.ChatMessageQuery", q)
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.GroupChatMessageQuery", q)
 }
 
-// The TraverseChatMessage type is an adapter to allow the use of ordinary function as Traverser.
-type TraverseChatMessage func(context.Context, *ent.ChatMessageQuery) error
+// The TraverseGroupChatMessage type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseGroupChatMessage func(context.Context, *ent.GroupChatMessageQuery) error
 
 // Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
-func (f TraverseChatMessage) Intercept(next ent.Querier) ent.Querier {
+func (f TraverseGroupChatMessage) Intercept(next ent.Querier) ent.Querier {
 	return next
 }
 
 // Traverse calls f(ctx, q).
-func (f TraverseChatMessage) Traverse(ctx context.Context, q ent.Query) error {
-	if q, ok := q.(*ent.ChatMessageQuery); ok {
+func (f TraverseGroupChatMessage) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.GroupChatMessageQuery); ok {
 		return f(ctx, q)
 	}
-	return fmt.Errorf("unexpected query type %T. expect *ent.ChatMessageQuery", q)
+	return fmt.Errorf("unexpected query type %T. expect *ent.GroupChatMessageQuery", q)
 }
 
-// The LoadRecordFunc type is an adapter to allow the use of ordinary function as a Querier.
-type LoadRecordFunc func(context.Context, *ent.LoadRecordQuery) (ent.Value, error)
+// The PersonalChatMessageFunc type is an adapter to allow the use of ordinary function as a Querier.
+type PersonalChatMessageFunc func(context.Context, *ent.PersonalChatMessageQuery) (ent.Value, error)
 
 // Query calls f(ctx, q).
-func (f LoadRecordFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
-	if q, ok := q.(*ent.LoadRecordQuery); ok {
+func (f PersonalChatMessageFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.PersonalChatMessageQuery); ok {
 		return f(ctx, q)
 	}
-	return nil, fmt.Errorf("unexpected query type %T. expect *ent.LoadRecordQuery", q)
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.PersonalChatMessageQuery", q)
 }
 
-// The TraverseLoadRecord type is an adapter to allow the use of ordinary function as Traverser.
-type TraverseLoadRecord func(context.Context, *ent.LoadRecordQuery) error
+// The TraversePersonalChatMessage type is an adapter to allow the use of ordinary function as Traverser.
+type TraversePersonalChatMessage func(context.Context, *ent.PersonalChatMessageQuery) error
 
 // Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
-func (f TraverseLoadRecord) Intercept(next ent.Querier) ent.Querier {
+func (f TraversePersonalChatMessage) Intercept(next ent.Querier) ent.Querier {
 	return next
 }
 
 // Traverse calls f(ctx, q).
-func (f TraverseLoadRecord) Traverse(ctx context.Context, q ent.Query) error {
-	if q, ok := q.(*ent.LoadRecordQuery); ok {
+func (f TraversePersonalChatMessage) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.PersonalChatMessageQuery); ok {
 		return f(ctx, q)
 	}
-	return fmt.Errorf("unexpected query type %T. expect *ent.LoadRecordQuery", q)
+	return fmt.Errorf("unexpected query type %T. expect *ent.PersonalChatMessageQuery", q)
+}
+
+// The SynchronizeRecordFunc type is an adapter to allow the use of ordinary function as a Querier.
+type SynchronizeRecordFunc func(context.Context, *ent.SynchronizeRecordQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f SynchronizeRecordFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.SynchronizeRecordQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.SynchronizeRecordQuery", q)
+}
+
+// The TraverseSynchronizeRecord type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseSynchronizeRecord func(context.Context, *ent.SynchronizeRecordQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseSynchronizeRecord) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseSynchronizeRecord) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.SynchronizeRecordQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.SynchronizeRecordQuery", q)
 }
 
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
-	case *ent.ChatMessageQuery:
-		return &query[*ent.ChatMessageQuery, predicate.ChatMessage, chatmessage.OrderOption]{typ: ent.TypeChatMessage, tq: q}, nil
-	case *ent.LoadRecordQuery:
-		return &query[*ent.LoadRecordQuery, predicate.LoadRecord, loadrecord.OrderOption]{typ: ent.TypeLoadRecord, tq: q}, nil
+	case *ent.GroupChatMessageQuery:
+		return &query[*ent.GroupChatMessageQuery, predicate.GroupChatMessage, groupchatmessage.OrderOption]{typ: ent.TypeGroupChatMessage, tq: q}, nil
+	case *ent.PersonalChatMessageQuery:
+		return &query[*ent.PersonalChatMessageQuery, predicate.PersonalChatMessage, personalchatmessage.OrderOption]{typ: ent.TypePersonalChatMessage, tq: q}, nil
+	case *ent.SynchronizeRecordQuery:
+		return &query[*ent.SynchronizeRecordQuery, predicate.SynchronizeRecord, synchronizerecord.OrderOption]{typ: ent.TypeSynchronizeRecord, tq: q}, nil
 	default:
 		return nil, fmt.Errorf("unknown query type %T", q)
 	}

@@ -50,6 +50,20 @@ func (gmc *GroupMemberCreate) SetNillableDeletedAt(t *time.Time) *GroupMemberCre
 	return gmc
 }
 
+// SetRole sets the "role" field.
+func (gmc *GroupMemberCreate) SetRole(i int32) *GroupMemberCreate {
+	gmc.mutation.SetRole(i)
+	return gmc
+}
+
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (gmc *GroupMemberCreate) SetNillableRole(i *int32) *GroupMemberCreate {
+	if i != nil {
+		gmc.SetRole(*i)
+	}
+	return gmc
+}
+
 // SetGroupID sets the "group_id" field.
 func (gmc *GroupMemberCreate) SetGroupID(i int) *GroupMemberCreate {
 	gmc.mutation.SetGroupID(i)
@@ -59,12 +73,6 @@ func (gmc *GroupMemberCreate) SetGroupID(i int) *GroupMemberCreate {
 // SetUserID sets the "user_id" field.
 func (gmc *GroupMemberCreate) SetUserID(i int) *GroupMemberCreate {
 	gmc.mutation.SetUserID(i)
-	return gmc
-}
-
-// SetRole sets the "role" field.
-func (gmc *GroupMemberCreate) SetRole(i int32) *GroupMemberCreate {
-	gmc.mutation.SetRole(i)
 	return gmc
 }
 
@@ -122,6 +130,10 @@ func (gmc *GroupMemberCreate) defaults() error {
 		v := groupmember.DefaultCreatedAt()
 		gmc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := gmc.mutation.Role(); !ok {
+		v := groupmember.DefaultRole
+		gmc.mutation.SetRole(v)
+	}
 	return nil
 }
 
@@ -130,14 +142,14 @@ func (gmc *GroupMemberCreate) check() error {
 	if _, ok := gmc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "GroupMember.created_at"`)}
 	}
+	if _, ok := gmc.mutation.Role(); !ok {
+		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "GroupMember.role"`)}
+	}
 	if _, ok := gmc.mutation.GroupID(); !ok {
 		return &ValidationError{Name: "group_id", err: errors.New(`ent: missing required field "GroupMember.group_id"`)}
 	}
 	if _, ok := gmc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "GroupMember.user_id"`)}
-	}
-	if _, ok := gmc.mutation.Role(); !ok {
-		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "GroupMember.role"`)}
 	}
 	if _, ok := gmc.mutation.GroupID(); !ok {
 		return &ValidationError{Name: "group", err: errors.New(`ent: missing required edge "GroupMember.group"`)}

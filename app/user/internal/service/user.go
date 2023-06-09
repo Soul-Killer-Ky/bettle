@@ -150,7 +150,7 @@ func (s *UserService) JoinGroup(ctx context.Context, req *pb.JoinGroupRequest) (
 	if err != nil {
 		return nil, err
 	}
-	_, err = s.gc.JoinGroup(ctx, userID, req.GroupName)
+	_, err = s.gc.JoinGroup(ctx, userID, req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -174,5 +174,27 @@ func (s *UserService) CreateGroup(ctx context.Context, req *pb.CreateGroupReques
 			Icon: gp.Icon,
 			Memo: gp.Memo,
 		},
+	}, nil
+}
+
+func (s *UserService) ListUserByGroup(ctx context.Context, req *pb.ListUserByGroupRequest) (*pb.ListUserByGroupReply, error) {
+	users, err := s.gc.ListUserByID(ctx, int(req.GroupId))
+	if err != nil {
+		return nil, err
+	}
+	rs := make([]*pb.ListUserByGroupReply_User, 0)
+	for _, p := range users {
+		rs = append(rs, &pb.ListUserByGroupReply_User{
+			Id:       int64(p.ID),
+			Phone:    p.Phone,
+			Username: *p.Username,
+			Nickname: p.Nickname,
+			Avatar:   p.Avatar,
+			Memo:     p.Memo,
+		})
+	}
+
+	return &pb.ListUserByGroupReply{
+		Users: rs,
 	}, nil
 }

@@ -10,8 +10,9 @@ import (
 
 	"beetle/app/im/internal/data/ent/migrate"
 
-	"beetle/app/im/internal/data/ent/chatmessage"
-	"beetle/app/im/internal/data/ent/loadrecord"
+	"beetle/app/im/internal/data/ent/groupchatmessage"
+	"beetle/app/im/internal/data/ent/personalchatmessage"
+	"beetle/app/im/internal/data/ent/synchronizerecord"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -23,10 +24,12 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// ChatMessage is the client for interacting with the ChatMessage builders.
-	ChatMessage *ChatMessageClient
-	// LoadRecord is the client for interacting with the LoadRecord builders.
-	LoadRecord *LoadRecordClient
+	// GroupChatMessage is the client for interacting with the GroupChatMessage builders.
+	GroupChatMessage *GroupChatMessageClient
+	// PersonalChatMessage is the client for interacting with the PersonalChatMessage builders.
+	PersonalChatMessage *PersonalChatMessageClient
+	// SynchronizeRecord is the client for interacting with the SynchronizeRecord builders.
+	SynchronizeRecord *SynchronizeRecordClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -40,8 +43,9 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.ChatMessage = NewChatMessageClient(c.config)
-	c.LoadRecord = NewLoadRecordClient(c.config)
+	c.GroupChatMessage = NewGroupChatMessageClient(c.config)
+	c.PersonalChatMessage = NewPersonalChatMessageClient(c.config)
+	c.SynchronizeRecord = NewSynchronizeRecordClient(c.config)
 }
 
 type (
@@ -122,10 +126,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:         ctx,
-		config:      cfg,
-		ChatMessage: NewChatMessageClient(cfg),
-		LoadRecord:  NewLoadRecordClient(cfg),
+		ctx:                 ctx,
+		config:              cfg,
+		GroupChatMessage:    NewGroupChatMessageClient(cfg),
+		PersonalChatMessage: NewPersonalChatMessageClient(cfg),
+		SynchronizeRecord:   NewSynchronizeRecordClient(cfg),
 	}, nil
 }
 
@@ -143,17 +148,18 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:         ctx,
-		config:      cfg,
-		ChatMessage: NewChatMessageClient(cfg),
-		LoadRecord:  NewLoadRecordClient(cfg),
+		ctx:                 ctx,
+		config:              cfg,
+		GroupChatMessage:    NewGroupChatMessageClient(cfg),
+		PersonalChatMessage: NewPersonalChatMessageClient(cfg),
+		SynchronizeRecord:   NewSynchronizeRecordClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		ChatMessage.
+//		GroupChatMessage.
 //		Query().
 //		Count(ctx)
 //
@@ -176,115 +182,119 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.ChatMessage.Use(hooks...)
-	c.LoadRecord.Use(hooks...)
+	c.GroupChatMessage.Use(hooks...)
+	c.PersonalChatMessage.Use(hooks...)
+	c.SynchronizeRecord.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.ChatMessage.Intercept(interceptors...)
-	c.LoadRecord.Intercept(interceptors...)
+	c.GroupChatMessage.Intercept(interceptors...)
+	c.PersonalChatMessage.Intercept(interceptors...)
+	c.SynchronizeRecord.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
-	case *ChatMessageMutation:
-		return c.ChatMessage.mutate(ctx, m)
-	case *LoadRecordMutation:
-		return c.LoadRecord.mutate(ctx, m)
+	case *GroupChatMessageMutation:
+		return c.GroupChatMessage.mutate(ctx, m)
+	case *PersonalChatMessageMutation:
+		return c.PersonalChatMessage.mutate(ctx, m)
+	case *SynchronizeRecordMutation:
+		return c.SynchronizeRecord.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
 }
 
-// ChatMessageClient is a client for the ChatMessage schema.
-type ChatMessageClient struct {
+// GroupChatMessageClient is a client for the GroupChatMessage schema.
+type GroupChatMessageClient struct {
 	config
 }
 
-// NewChatMessageClient returns a client for the ChatMessage from the given config.
-func NewChatMessageClient(c config) *ChatMessageClient {
-	return &ChatMessageClient{config: c}
+// NewGroupChatMessageClient returns a client for the GroupChatMessage from the given config.
+func NewGroupChatMessageClient(c config) *GroupChatMessageClient {
+	return &GroupChatMessageClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `chatmessage.Hooks(f(g(h())))`.
-func (c *ChatMessageClient) Use(hooks ...Hook) {
-	c.hooks.ChatMessage = append(c.hooks.ChatMessage, hooks...)
+// A call to `Use(f, g, h)` equals to `groupchatmessage.Hooks(f(g(h())))`.
+func (c *GroupChatMessageClient) Use(hooks ...Hook) {
+	c.hooks.GroupChatMessage = append(c.hooks.GroupChatMessage, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `chatmessage.Intercept(f(g(h())))`.
-func (c *ChatMessageClient) Intercept(interceptors ...Interceptor) {
-	c.inters.ChatMessage = append(c.inters.ChatMessage, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `groupchatmessage.Intercept(f(g(h())))`.
+func (c *GroupChatMessageClient) Intercept(interceptors ...Interceptor) {
+	c.inters.GroupChatMessage = append(c.inters.GroupChatMessage, interceptors...)
 }
 
-// Create returns a builder for creating a ChatMessage entity.
-func (c *ChatMessageClient) Create() *ChatMessageCreate {
-	mutation := newChatMessageMutation(c.config, OpCreate)
-	return &ChatMessageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a GroupChatMessage entity.
+func (c *GroupChatMessageClient) Create() *GroupChatMessageCreate {
+	mutation := newGroupChatMessageMutation(c.config, OpCreate)
+	return &GroupChatMessageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of ChatMessage entities.
-func (c *ChatMessageClient) CreateBulk(builders ...*ChatMessageCreate) *ChatMessageCreateBulk {
-	return &ChatMessageCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of GroupChatMessage entities.
+func (c *GroupChatMessageClient) CreateBulk(builders ...*GroupChatMessageCreate) *GroupChatMessageCreateBulk {
+	return &GroupChatMessageCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for ChatMessage.
-func (c *ChatMessageClient) Update() *ChatMessageUpdate {
-	mutation := newChatMessageMutation(c.config, OpUpdate)
-	return &ChatMessageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for GroupChatMessage.
+func (c *GroupChatMessageClient) Update() *GroupChatMessageUpdate {
+	mutation := newGroupChatMessageMutation(c.config, OpUpdate)
+	return &GroupChatMessageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *ChatMessageClient) UpdateOne(cm *ChatMessage) *ChatMessageUpdateOne {
-	mutation := newChatMessageMutation(c.config, OpUpdateOne, withChatMessage(cm))
-	return &ChatMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *GroupChatMessageClient) UpdateOne(gcm *GroupChatMessage) *GroupChatMessageUpdateOne {
+	mutation := newGroupChatMessageMutation(c.config, OpUpdateOne, withGroupChatMessage(gcm))
+	return &GroupChatMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ChatMessageClient) UpdateOneID(id int) *ChatMessageUpdateOne {
-	mutation := newChatMessageMutation(c.config, OpUpdateOne, withChatMessageID(id))
-	return &ChatMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *GroupChatMessageClient) UpdateOneID(id int) *GroupChatMessageUpdateOne {
+	mutation := newGroupChatMessageMutation(c.config, OpUpdateOne, withGroupChatMessageID(id))
+	return &GroupChatMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for ChatMessage.
-func (c *ChatMessageClient) Delete() *ChatMessageDelete {
-	mutation := newChatMessageMutation(c.config, OpDelete)
-	return &ChatMessageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for GroupChatMessage.
+func (c *GroupChatMessageClient) Delete() *GroupChatMessageDelete {
+	mutation := newGroupChatMessageMutation(c.config, OpDelete)
+	return &GroupChatMessageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *ChatMessageClient) DeleteOne(cm *ChatMessage) *ChatMessageDeleteOne {
-	return c.DeleteOneID(cm.ID)
+func (c *GroupChatMessageClient) DeleteOne(gcm *GroupChatMessage) *GroupChatMessageDeleteOne {
+	return c.DeleteOneID(gcm.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ChatMessageClient) DeleteOneID(id int) *ChatMessageDeleteOne {
-	builder := c.Delete().Where(chatmessage.ID(id))
+func (c *GroupChatMessageClient) DeleteOneID(id int) *GroupChatMessageDeleteOne {
+	builder := c.Delete().Where(groupchatmessage.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &ChatMessageDeleteOne{builder}
+	return &GroupChatMessageDeleteOne{builder}
 }
 
-// Query returns a query builder for ChatMessage.
-func (c *ChatMessageClient) Query() *ChatMessageQuery {
-	return &ChatMessageQuery{
+// Query returns a query builder for GroupChatMessage.
+func (c *GroupChatMessageClient) Query() *GroupChatMessageQuery {
+	return &GroupChatMessageQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeChatMessage},
+		ctx:    &QueryContext{Type: TypeGroupChatMessage},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a ChatMessage entity by its id.
-func (c *ChatMessageClient) Get(ctx context.Context, id int) (*ChatMessage, error) {
-	return c.Query().Where(chatmessage.ID(id)).Only(ctx)
+// Get returns a GroupChatMessage entity by its id.
+func (c *GroupChatMessageClient) Get(ctx context.Context, id int) (*GroupChatMessage, error) {
+	return c.Query().Where(groupchatmessage.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ChatMessageClient) GetX(ctx context.Context, id int) *ChatMessage {
+func (c *GroupChatMessageClient) GetX(ctx context.Context, id int) *GroupChatMessage {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -293,118 +303,118 @@ func (c *ChatMessageClient) GetX(ctx context.Context, id int) *ChatMessage {
 }
 
 // Hooks returns the client hooks.
-func (c *ChatMessageClient) Hooks() []Hook {
-	hooks := c.hooks.ChatMessage
-	return append(hooks[:len(hooks):len(hooks)], chatmessage.Hooks[:]...)
+func (c *GroupChatMessageClient) Hooks() []Hook {
+	hooks := c.hooks.GroupChatMessage
+	return append(hooks[:len(hooks):len(hooks)], groupchatmessage.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
-func (c *ChatMessageClient) Interceptors() []Interceptor {
-	inters := c.inters.ChatMessage
-	return append(inters[:len(inters):len(inters)], chatmessage.Interceptors[:]...)
+func (c *GroupChatMessageClient) Interceptors() []Interceptor {
+	inters := c.inters.GroupChatMessage
+	return append(inters[:len(inters):len(inters)], groupchatmessage.Interceptors[:]...)
 }
 
-func (c *ChatMessageClient) mutate(ctx context.Context, m *ChatMessageMutation) (Value, error) {
+func (c *GroupChatMessageClient) mutate(ctx context.Context, m *GroupChatMessageMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&ChatMessageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&GroupChatMessageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&ChatMessageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&GroupChatMessageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&ChatMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&GroupChatMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&ChatMessageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&GroupChatMessageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown ChatMessage mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown GroupChatMessage mutation op: %q", m.Op())
 	}
 }
 
-// LoadRecordClient is a client for the LoadRecord schema.
-type LoadRecordClient struct {
+// PersonalChatMessageClient is a client for the PersonalChatMessage schema.
+type PersonalChatMessageClient struct {
 	config
 }
 
-// NewLoadRecordClient returns a client for the LoadRecord from the given config.
-func NewLoadRecordClient(c config) *LoadRecordClient {
-	return &LoadRecordClient{config: c}
+// NewPersonalChatMessageClient returns a client for the PersonalChatMessage from the given config.
+func NewPersonalChatMessageClient(c config) *PersonalChatMessageClient {
+	return &PersonalChatMessageClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `loadrecord.Hooks(f(g(h())))`.
-func (c *LoadRecordClient) Use(hooks ...Hook) {
-	c.hooks.LoadRecord = append(c.hooks.LoadRecord, hooks...)
+// A call to `Use(f, g, h)` equals to `personalchatmessage.Hooks(f(g(h())))`.
+func (c *PersonalChatMessageClient) Use(hooks ...Hook) {
+	c.hooks.PersonalChatMessage = append(c.hooks.PersonalChatMessage, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `loadrecord.Intercept(f(g(h())))`.
-func (c *LoadRecordClient) Intercept(interceptors ...Interceptor) {
-	c.inters.LoadRecord = append(c.inters.LoadRecord, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `personalchatmessage.Intercept(f(g(h())))`.
+func (c *PersonalChatMessageClient) Intercept(interceptors ...Interceptor) {
+	c.inters.PersonalChatMessage = append(c.inters.PersonalChatMessage, interceptors...)
 }
 
-// Create returns a builder for creating a LoadRecord entity.
-func (c *LoadRecordClient) Create() *LoadRecordCreate {
-	mutation := newLoadRecordMutation(c.config, OpCreate)
-	return &LoadRecordCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a PersonalChatMessage entity.
+func (c *PersonalChatMessageClient) Create() *PersonalChatMessageCreate {
+	mutation := newPersonalChatMessageMutation(c.config, OpCreate)
+	return &PersonalChatMessageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of LoadRecord entities.
-func (c *LoadRecordClient) CreateBulk(builders ...*LoadRecordCreate) *LoadRecordCreateBulk {
-	return &LoadRecordCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of PersonalChatMessage entities.
+func (c *PersonalChatMessageClient) CreateBulk(builders ...*PersonalChatMessageCreate) *PersonalChatMessageCreateBulk {
+	return &PersonalChatMessageCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for LoadRecord.
-func (c *LoadRecordClient) Update() *LoadRecordUpdate {
-	mutation := newLoadRecordMutation(c.config, OpUpdate)
-	return &LoadRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for PersonalChatMessage.
+func (c *PersonalChatMessageClient) Update() *PersonalChatMessageUpdate {
+	mutation := newPersonalChatMessageMutation(c.config, OpUpdate)
+	return &PersonalChatMessageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *LoadRecordClient) UpdateOne(lr *LoadRecord) *LoadRecordUpdateOne {
-	mutation := newLoadRecordMutation(c.config, OpUpdateOne, withLoadRecord(lr))
-	return &LoadRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *PersonalChatMessageClient) UpdateOne(pcm *PersonalChatMessage) *PersonalChatMessageUpdateOne {
+	mutation := newPersonalChatMessageMutation(c.config, OpUpdateOne, withPersonalChatMessage(pcm))
+	return &PersonalChatMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *LoadRecordClient) UpdateOneID(id int) *LoadRecordUpdateOne {
-	mutation := newLoadRecordMutation(c.config, OpUpdateOne, withLoadRecordID(id))
-	return &LoadRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *PersonalChatMessageClient) UpdateOneID(id int) *PersonalChatMessageUpdateOne {
+	mutation := newPersonalChatMessageMutation(c.config, OpUpdateOne, withPersonalChatMessageID(id))
+	return &PersonalChatMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for LoadRecord.
-func (c *LoadRecordClient) Delete() *LoadRecordDelete {
-	mutation := newLoadRecordMutation(c.config, OpDelete)
-	return &LoadRecordDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for PersonalChatMessage.
+func (c *PersonalChatMessageClient) Delete() *PersonalChatMessageDelete {
+	mutation := newPersonalChatMessageMutation(c.config, OpDelete)
+	return &PersonalChatMessageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *LoadRecordClient) DeleteOne(lr *LoadRecord) *LoadRecordDeleteOne {
-	return c.DeleteOneID(lr.ID)
+func (c *PersonalChatMessageClient) DeleteOne(pcm *PersonalChatMessage) *PersonalChatMessageDeleteOne {
+	return c.DeleteOneID(pcm.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *LoadRecordClient) DeleteOneID(id int) *LoadRecordDeleteOne {
-	builder := c.Delete().Where(loadrecord.ID(id))
+func (c *PersonalChatMessageClient) DeleteOneID(id int) *PersonalChatMessageDeleteOne {
+	builder := c.Delete().Where(personalchatmessage.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &LoadRecordDeleteOne{builder}
+	return &PersonalChatMessageDeleteOne{builder}
 }
 
-// Query returns a query builder for LoadRecord.
-func (c *LoadRecordClient) Query() *LoadRecordQuery {
-	return &LoadRecordQuery{
+// Query returns a query builder for PersonalChatMessage.
+func (c *PersonalChatMessageClient) Query() *PersonalChatMessageQuery {
+	return &PersonalChatMessageQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeLoadRecord},
+		ctx:    &QueryContext{Type: TypePersonalChatMessage},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a LoadRecord entity by its id.
-func (c *LoadRecordClient) Get(ctx context.Context, id int) (*LoadRecord, error) {
-	return c.Query().Where(loadrecord.ID(id)).Only(ctx)
+// Get returns a PersonalChatMessage entity by its id.
+func (c *PersonalChatMessageClient) Get(ctx context.Context, id int) (*PersonalChatMessage, error) {
+	return c.Query().Where(personalchatmessage.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *LoadRecordClient) GetX(ctx context.Context, id int) *LoadRecord {
+func (c *PersonalChatMessageClient) GetX(ctx context.Context, id int) *PersonalChatMessage {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -413,36 +423,156 @@ func (c *LoadRecordClient) GetX(ctx context.Context, id int) *LoadRecord {
 }
 
 // Hooks returns the client hooks.
-func (c *LoadRecordClient) Hooks() []Hook {
-	return c.hooks.LoadRecord
+func (c *PersonalChatMessageClient) Hooks() []Hook {
+	hooks := c.hooks.PersonalChatMessage
+	return append(hooks[:len(hooks):len(hooks)], personalchatmessage.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
-func (c *LoadRecordClient) Interceptors() []Interceptor {
-	return c.inters.LoadRecord
+func (c *PersonalChatMessageClient) Interceptors() []Interceptor {
+	inters := c.inters.PersonalChatMessage
+	return append(inters[:len(inters):len(inters)], personalchatmessage.Interceptors[:]...)
 }
 
-func (c *LoadRecordClient) mutate(ctx context.Context, m *LoadRecordMutation) (Value, error) {
+func (c *PersonalChatMessageClient) mutate(ctx context.Context, m *PersonalChatMessageMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&LoadRecordCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&PersonalChatMessageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&LoadRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&PersonalChatMessageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&LoadRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&PersonalChatMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&LoadRecordDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&PersonalChatMessageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown LoadRecord mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown PersonalChatMessage mutation op: %q", m.Op())
+	}
+}
+
+// SynchronizeRecordClient is a client for the SynchronizeRecord schema.
+type SynchronizeRecordClient struct {
+	config
+}
+
+// NewSynchronizeRecordClient returns a client for the SynchronizeRecord from the given config.
+func NewSynchronizeRecordClient(c config) *SynchronizeRecordClient {
+	return &SynchronizeRecordClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `synchronizerecord.Hooks(f(g(h())))`.
+func (c *SynchronizeRecordClient) Use(hooks ...Hook) {
+	c.hooks.SynchronizeRecord = append(c.hooks.SynchronizeRecord, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `synchronizerecord.Intercept(f(g(h())))`.
+func (c *SynchronizeRecordClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SynchronizeRecord = append(c.inters.SynchronizeRecord, interceptors...)
+}
+
+// Create returns a builder for creating a SynchronizeRecord entity.
+func (c *SynchronizeRecordClient) Create() *SynchronizeRecordCreate {
+	mutation := newSynchronizeRecordMutation(c.config, OpCreate)
+	return &SynchronizeRecordCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SynchronizeRecord entities.
+func (c *SynchronizeRecordClient) CreateBulk(builders ...*SynchronizeRecordCreate) *SynchronizeRecordCreateBulk {
+	return &SynchronizeRecordCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SynchronizeRecord.
+func (c *SynchronizeRecordClient) Update() *SynchronizeRecordUpdate {
+	mutation := newSynchronizeRecordMutation(c.config, OpUpdate)
+	return &SynchronizeRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SynchronizeRecordClient) UpdateOne(sr *SynchronizeRecord) *SynchronizeRecordUpdateOne {
+	mutation := newSynchronizeRecordMutation(c.config, OpUpdateOne, withSynchronizeRecord(sr))
+	return &SynchronizeRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SynchronizeRecordClient) UpdateOneID(id int) *SynchronizeRecordUpdateOne {
+	mutation := newSynchronizeRecordMutation(c.config, OpUpdateOne, withSynchronizeRecordID(id))
+	return &SynchronizeRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SynchronizeRecord.
+func (c *SynchronizeRecordClient) Delete() *SynchronizeRecordDelete {
+	mutation := newSynchronizeRecordMutation(c.config, OpDelete)
+	return &SynchronizeRecordDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SynchronizeRecordClient) DeleteOne(sr *SynchronizeRecord) *SynchronizeRecordDeleteOne {
+	return c.DeleteOneID(sr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SynchronizeRecordClient) DeleteOneID(id int) *SynchronizeRecordDeleteOne {
+	builder := c.Delete().Where(synchronizerecord.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SynchronizeRecordDeleteOne{builder}
+}
+
+// Query returns a query builder for SynchronizeRecord.
+func (c *SynchronizeRecordClient) Query() *SynchronizeRecordQuery {
+	return &SynchronizeRecordQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSynchronizeRecord},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SynchronizeRecord entity by its id.
+func (c *SynchronizeRecordClient) Get(ctx context.Context, id int) (*SynchronizeRecord, error) {
+	return c.Query().Where(synchronizerecord.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SynchronizeRecordClient) GetX(ctx context.Context, id int) *SynchronizeRecord {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *SynchronizeRecordClient) Hooks() []Hook {
+	return c.hooks.SynchronizeRecord
+}
+
+// Interceptors returns the client interceptors.
+func (c *SynchronizeRecordClient) Interceptors() []Interceptor {
+	return c.inters.SynchronizeRecord
+}
+
+func (c *SynchronizeRecordClient) mutate(ctx context.Context, m *SynchronizeRecordMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SynchronizeRecordCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SynchronizeRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SynchronizeRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SynchronizeRecordDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown SynchronizeRecord mutation op: %q", m.Op())
 	}
 }
 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		ChatMessage, LoadRecord []ent.Hook
+		GroupChatMessage, PersonalChatMessage, SynchronizeRecord []ent.Hook
 	}
 	inters struct {
-		ChatMessage, LoadRecord []ent.Interceptor
+		GroupChatMessage, PersonalChatMessage, SynchronizeRecord []ent.Interceptor
 	}
 )

@@ -28,6 +28,7 @@ const OperationUserJoinGroup = "/api.user.service.v1.User/JoinGroup"
 const OperationUserListFriend = "/api.user.service.v1.User/ListFriend"
 const OperationUserListGroup = "/api.user.service.v1.User/ListGroup"
 const OperationUserListUser = "/api.user.service.v1.User/ListUser"
+const OperationUserListUserByGroup = "/api.user.service.v1.User/ListUserByGroup"
 const OperationUserLoginUser = "/api.user.service.v1.User/LoginUser"
 const OperationUserUpdateUser = "/api.user.service.v1.User/UpdateUser"
 
@@ -41,6 +42,7 @@ type UserHTTPServer interface {
 	ListFriend(context.Context, *ListFriendRequest) (*ListFriendReply, error)
 	ListGroup(context.Context, *ListGroupRequest) (*ListGroupReply, error)
 	ListUser(context.Context, *ListUserRequest) (*ListUserReply, error)
+	ListUserByGroup(context.Context, *ListUserByGroupRequest) (*ListUserByGroupReply, error)
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserReply, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserReply, error)
 }
@@ -58,6 +60,7 @@ func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r.POST("/user/v1/group/list", _User_ListGroup0_HTTP_Handler(srv))
 	r.POST("/user/v1/group/join", _User_JoinGroup0_HTTP_Handler(srv))
 	r.POST("/user/v1/group/create", _User_CreateGroup0_HTTP_Handler(srv))
+	r.POST("/user/v1/group/list_user", _User_ListUserByGroup0_HTTP_Handler(srv))
 }
 
 func _User_CreateUser0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
@@ -269,6 +272,25 @@ func _User_CreateGroup0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) 
 	}
 }
 
+func _User_ListUserByGroup0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListUserByGroupRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserListUserByGroup)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListUserByGroup(ctx, req.(*ListUserByGroupRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListUserByGroupReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type UserHTTPClient interface {
 	AddFriend(ctx context.Context, req *AddFriendRequest, opts ...http.CallOption) (rsp *AddFriendReply, err error)
 	CreateGroup(ctx context.Context, req *CreateGroupRequest, opts ...http.CallOption) (rsp *CreateGroupReply, err error)
@@ -279,6 +301,7 @@ type UserHTTPClient interface {
 	ListFriend(ctx context.Context, req *ListFriendRequest, opts ...http.CallOption) (rsp *ListFriendReply, err error)
 	ListGroup(ctx context.Context, req *ListGroupRequest, opts ...http.CallOption) (rsp *ListGroupReply, err error)
 	ListUser(ctx context.Context, req *ListUserRequest, opts ...http.CallOption) (rsp *ListUserReply, err error)
+	ListUserByGroup(ctx context.Context, req *ListUserByGroupRequest, opts ...http.CallOption) (rsp *ListUserByGroupReply, err error)
 	LoginUser(ctx context.Context, req *LoginUserRequest, opts ...http.CallOption) (rsp *LoginUserReply, err error)
 	UpdateUser(ctx context.Context, req *UpdateUserRequest, opts ...http.CallOption) (rsp *UpdateUserReply, err error)
 }
@@ -400,6 +423,19 @@ func (c *UserHTTPClientImpl) ListUser(ctx context.Context, in *ListUserRequest, 
 	pattern := "/user/v1/list"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationUserListUser))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *UserHTTPClientImpl) ListUserByGroup(ctx context.Context, in *ListUserByGroupRequest, opts ...http.CallOption) (*ListUserByGroupReply, error) {
+	var out ListUserByGroupReply
+	pattern := "/user/v1/group/list_user"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserListUserByGroup))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

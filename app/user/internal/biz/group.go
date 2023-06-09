@@ -21,8 +21,11 @@ type Group struct {
 // GroupRepo is a Greater repo.
 type GroupRepo interface {
 	ListByUserID(context.Context, int) ([]*Group, error)
+	ListUserByID(context.Context, int) ([]*User, error)
+	FindByID(context.Context, int) (*Group, error)
 	FindByName(context.Context, string) (*Group, error)
-	Join(context.Context, int, string) error
+	IsJoined(context.Context, int, int) (bool, error)
+	Join(context.Context, int, int) error
 	Create(context.Context, int, *Group) error
 }
 
@@ -54,7 +57,15 @@ func (c *GroupUseCase) JoinGroup(ctx context.Context, userID int, groupName stri
 		c.log.WithContext(ctx).Errorf("get group error: %s", err)
 		return nil, errors.BadRequest("QUERY_ERROR", "get group error")
 	}
-	err = c.repo.Join(ctx, userID, groupName)
+	isJoined, err := c.repo.IsJoined(ctx, userID, group.ID)
+	if err != nil {
+		c.log.Errorf("request is join error: %s", err)
+		return nil, errors.BadRequest("QUERY_ERROR", "request is join error")
+	}
+	if isJoined {
+		return nil, errors.BadRequest("JOIN_ERROR", "the group already join")
+	}
+	err = c.repo.Join(ctx, userID, group.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +79,7 @@ func (c *GroupUseCase) CreateGroup(ctx context.Context, userID int, req *pb.Crea
 		return nil, pb.ErrorItemExists("the group already exists")
 	}
 	gp := &Group{
-		Type: req.Type,
+		Type: int32(req.Type.Number()),
 		Name: req.Name,
 		Icon: req.Icon,
 		Memo: req.Memo,
@@ -79,4 +90,17 @@ func (c *GroupUseCase) CreateGroup(ctx context.Context, userID int, req *pb.Crea
 	}
 
 	return gp, nil
+}
+
+func (c *GroupUseCase) ListUserByID(ctx context.Context, groupID int) ([]*User, error) {
+	_, err := c.repo.FindByID(ctx, groupID)
+	if err != nil {
+		return nil, errors.BadRequest("QUERY_ERROR", "the group dont exist")
+	}
+	users, err := c.repo.ListUserByID(ctx, groupID)
+	if err != nil {
+		return nil, errors.BadRequest("QUERY_ERROR", "list users error")
+	}
+
+	return users, nil
 }

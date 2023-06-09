@@ -19,17 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	User_CreateUser_FullMethodName  = "/api.user.service.v1.User/CreateUser"
-	User_UpdateUser_FullMethodName  = "/api.user.service.v1.User/UpdateUser"
-	User_DeleteUser_FullMethodName  = "/api.user.service.v1.User/DeleteUser"
-	User_ListUser_FullMethodName    = "/api.user.service.v1.User/ListUser"
-	User_LoginUser_FullMethodName   = "/api.user.service.v1.User/LoginUser"
-	User_GetUser_FullMethodName     = "/api.user.service.v1.User/GetUser"
-	User_ListFriend_FullMethodName  = "/api.user.service.v1.User/ListFriend"
-	User_AddFriend_FullMethodName   = "/api.user.service.v1.User/AddFriend"
-	User_ListGroup_FullMethodName   = "/api.user.service.v1.User/ListGroup"
-	User_JoinGroup_FullMethodName   = "/api.user.service.v1.User/JoinGroup"
-	User_CreateGroup_FullMethodName = "/api.user.service.v1.User/CreateGroup"
+	User_CreateUser_FullMethodName      = "/api.user.service.v1.User/CreateUser"
+	User_UpdateUser_FullMethodName      = "/api.user.service.v1.User/UpdateUser"
+	User_DeleteUser_FullMethodName      = "/api.user.service.v1.User/DeleteUser"
+	User_ListUser_FullMethodName        = "/api.user.service.v1.User/ListUser"
+	User_LoginUser_FullMethodName       = "/api.user.service.v1.User/LoginUser"
+	User_GetUser_FullMethodName         = "/api.user.service.v1.User/GetUser"
+	User_ListFriend_FullMethodName      = "/api.user.service.v1.User/ListFriend"
+	User_AddFriend_FullMethodName       = "/api.user.service.v1.User/AddFriend"
+	User_ListGroup_FullMethodName       = "/api.user.service.v1.User/ListGroup"
+	User_JoinGroup_FullMethodName       = "/api.user.service.v1.User/JoinGroup"
+	User_CreateGroup_FullMethodName     = "/api.user.service.v1.User/CreateGroup"
+	User_ListUserByGroup_FullMethodName = "/api.user.service.v1.User/ListUserByGroup"
 )
 
 // UserClient is the client API for User service.
@@ -47,6 +48,7 @@ type UserClient interface {
 	ListGroup(ctx context.Context, in *ListGroupRequest, opts ...grpc.CallOption) (*ListGroupReply, error)
 	JoinGroup(ctx context.Context, in *JoinGroupRequest, opts ...grpc.CallOption) (*JoinGroupReply, error)
 	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...grpc.CallOption) (*CreateGroupReply, error)
+	ListUserByGroup(ctx context.Context, in *ListUserByGroupRequest, opts ...grpc.CallOption) (*ListUserByGroupReply, error)
 }
 
 type userClient struct {
@@ -156,6 +158,15 @@ func (c *userClient) CreateGroup(ctx context.Context, in *CreateGroupRequest, op
 	return out, nil
 }
 
+func (c *userClient) ListUserByGroup(ctx context.Context, in *ListUserByGroupRequest, opts ...grpc.CallOption) (*ListUserByGroupReply, error) {
+	out := new(ListUserByGroupReply)
+	err := c.cc.Invoke(ctx, User_ListUserByGroup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
@@ -171,6 +182,7 @@ type UserServer interface {
 	ListGroup(context.Context, *ListGroupRequest) (*ListGroupReply, error)
 	JoinGroup(context.Context, *JoinGroupRequest) (*JoinGroupReply, error)
 	CreateGroup(context.Context, *CreateGroupRequest) (*CreateGroupReply, error)
+	ListUserByGroup(context.Context, *ListUserByGroupRequest) (*ListUserByGroupReply, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -210,6 +222,9 @@ func (UnimplementedUserServer) JoinGroup(context.Context, *JoinGroupRequest) (*J
 }
 func (UnimplementedUserServer) CreateGroup(context.Context, *CreateGroupRequest) (*CreateGroupReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateGroup not implemented")
+}
+func (UnimplementedUserServer) ListUserByGroup(context.Context, *ListUserByGroupRequest) (*ListUserByGroupReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListUserByGroup not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -422,6 +437,24 @@ func _User_CreateGroup_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_ListUserByGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUserByGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).ListUserByGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_ListUserByGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).ListUserByGroup(ctx, req.(*ListUserByGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -472,6 +505,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateGroup",
 			Handler:    _User_CreateGroup_Handler,
+		},
+		{
+			MethodName: "ListUserByGroup",
+			Handler:    _User_ListUserByGroup_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

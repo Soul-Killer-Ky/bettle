@@ -60,6 +60,10 @@ func init() {
 	groupmemberDescCreatedAt := groupmemberMixinFields0[0].Descriptor()
 	// groupmember.DefaultCreatedAt holds the default value on creation for the created_at field.
 	groupmember.DefaultCreatedAt = groupmemberDescCreatedAt.Default.(func() time.Time)
+	// groupmemberDescRole is the schema descriptor for role field.
+	groupmemberDescRole := groupmemberFields[0].Descriptor()
+	// groupmember.DefaultRole holds the default value on creation for the role field.
+	groupmember.DefaultRole = groupmemberDescRole.Default.(int32)
 	userMixin := schema.User{}.Mixin()
 	userMixinHooks2 := userMixin[2].Hooks()
 	user.Hooks[0] = userMixinHooks2[0]

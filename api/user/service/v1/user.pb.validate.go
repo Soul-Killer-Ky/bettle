@@ -2257,9 +2257,9 @@ func (m *JoinGroupRequest) validate(all bool) error {
 
 	var errors []error
 
-	if l := utf8.RuneCountInString(m.GetGroupName()); l < 6 || l > 30 {
+	if l := utf8.RuneCountInString(m.GetName()); l < 6 || l > 30 {
 		err := JoinGroupRequestValidationError{
-			field:  "GroupName",
+			field:  "Name",
 			reason: "value length must be between 6 and 30 runes, inclusive",
 		}
 		if !all {
@@ -2499,10 +2499,10 @@ func (m *CreateGroupRequest) validate(all bool) error {
 
 	// no validation rules for Type
 
-	if !_CreateGroupRequest_Name_Pattern.MatchString(m.GetName()) {
+	if l := utf8.RuneCountInString(m.GetName()); l < 6 || l > 30 {
 		err := CreateGroupRequestValidationError{
 			field:  "Name",
-			reason: "value does not match regex pattern \"^[u4e00-u9fa5,\\\\w,-]{4,20}$\"",
+			reason: "value length must be between 6 and 30 runes, inclusive",
 		}
 		if !all {
 			return err
@@ -2593,8 +2593,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CreateGroupRequestValidationError{}
-
-var _CreateGroupRequest_Name_Pattern = regexp.MustCompile("^[u4e00-u9fa5,\\w,-]{4,20}$")
 
 // Validate checks the field values on CreateGroupReply with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -2724,3 +2722,357 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CreateGroupReplyValidationError{}
+
+// Validate checks the field values on ListUserByGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListUserByGroupRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListUserByGroupRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListUserByGroupRequestMultiError, or nil if none found.
+func (m *ListUserByGroupRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListUserByGroupRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for GroupId
+
+	if len(errors) > 0 {
+		return ListUserByGroupRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListUserByGroupRequestMultiError is an error wrapping multiple validation
+// errors returned by ListUserByGroupRequest.ValidateAll() if the designated
+// constraints aren't met.
+type ListUserByGroupRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListUserByGroupRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListUserByGroupRequestMultiError) AllErrors() []error { return m }
+
+// ListUserByGroupRequestValidationError is the validation error returned by
+// ListUserByGroupRequest.Validate if the designated constraints aren't met.
+type ListUserByGroupRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListUserByGroupRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListUserByGroupRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListUserByGroupRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListUserByGroupRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListUserByGroupRequestValidationError) ErrorName() string {
+	return "ListUserByGroupRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListUserByGroupRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListUserByGroupRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListUserByGroupRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListUserByGroupRequestValidationError{}
+
+// Validate checks the field values on ListUserByGroupReply with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListUserByGroupReply) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListUserByGroupReply with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListUserByGroupReplyMultiError, or nil if none found.
+func (m *ListUserByGroupReply) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListUserByGroupReply) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetUsers() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListUserByGroupReplyValidationError{
+						field:  fmt.Sprintf("Users[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListUserByGroupReplyValidationError{
+						field:  fmt.Sprintf("Users[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListUserByGroupReplyValidationError{
+					field:  fmt.Sprintf("Users[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return ListUserByGroupReplyMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListUserByGroupReplyMultiError is an error wrapping multiple validation
+// errors returned by ListUserByGroupReply.ValidateAll() if the designated
+// constraints aren't met.
+type ListUserByGroupReplyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListUserByGroupReplyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListUserByGroupReplyMultiError) AllErrors() []error { return m }
+
+// ListUserByGroupReplyValidationError is the validation error returned by
+// ListUserByGroupReply.Validate if the designated constraints aren't met.
+type ListUserByGroupReplyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListUserByGroupReplyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListUserByGroupReplyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListUserByGroupReplyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListUserByGroupReplyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListUserByGroupReplyValidationError) ErrorName() string {
+	return "ListUserByGroupReplyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListUserByGroupReplyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListUserByGroupReply.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListUserByGroupReplyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListUserByGroupReplyValidationError{}
+
+// Validate checks the field values on ListUserByGroupReply_User with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListUserByGroupReply_User) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListUserByGroupReply_User with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListUserByGroupReply_UserMultiError, or nil if none found.
+func (m *ListUserByGroupReply_User) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListUserByGroupReply_User) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for Phone
+
+	// no validation rules for Username
+
+	// no validation rules for Nickname
+
+	// no validation rules for Avatar
+
+	// no validation rules for Memo
+
+	if len(errors) > 0 {
+		return ListUserByGroupReply_UserMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListUserByGroupReply_UserMultiError is an error wrapping multiple validation
+// errors returned by ListUserByGroupReply_User.ValidateAll() if the
+// designated constraints aren't met.
+type ListUserByGroupReply_UserMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListUserByGroupReply_UserMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListUserByGroupReply_UserMultiError) AllErrors() []error { return m }
+
+// ListUserByGroupReply_UserValidationError is the validation error returned by
+// ListUserByGroupReply_User.Validate if the designated constraints aren't met.
+type ListUserByGroupReply_UserValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListUserByGroupReply_UserValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListUserByGroupReply_UserValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListUserByGroupReply_UserValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListUserByGroupReply_UserValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListUserByGroupReply_UserValidationError) ErrorName() string {
+	return "ListUserByGroupReply_UserValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListUserByGroupReply_UserValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListUserByGroupReply_User.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListUserByGroupReply_UserValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListUserByGroupReply_UserValidationError{}

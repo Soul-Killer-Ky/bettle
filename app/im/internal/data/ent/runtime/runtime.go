@@ -3,9 +3,10 @@
 package runtime
 
 import (
-	"beetle/app/im/internal/data/ent/chatmessage"
-	"beetle/app/im/internal/data/ent/loadrecord"
+	"beetle/app/im/internal/data/ent/groupchatmessage"
+	"beetle/app/im/internal/data/ent/personalchatmessage"
 	"beetle/app/im/internal/data/ent/schema"
+	"beetle/app/im/internal/data/ent/synchronizerecord"
 	"time"
 )
 
@@ -13,28 +14,49 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	chatmessageMixin := schema.ChatMessage{}.Mixin()
-	chatmessageMixinHooks1 := chatmessageMixin[1].Hooks()
-	chatmessage.Hooks[0] = chatmessageMixinHooks1[0]
-	chatmessageMixinInters1 := chatmessageMixin[1].Interceptors()
-	chatmessage.Interceptors[0] = chatmessageMixinInters1[0]
-	chatmessageMixinFields0 := chatmessageMixin[0].Fields()
-	_ = chatmessageMixinFields0
-	chatmessageFields := schema.ChatMessage{}.Fields()
-	_ = chatmessageFields
-	// chatmessageDescCreatedAt is the schema descriptor for created_at field.
-	chatmessageDescCreatedAt := chatmessageMixinFields0[0].Descriptor()
-	// chatmessage.DefaultCreatedAt holds the default value on creation for the created_at field.
-	chatmessage.DefaultCreatedAt = chatmessageDescCreatedAt.Default.(func() time.Time)
-	loadrecordMixin := schema.LoadRecord{}.Mixin()
-	loadrecordMixinFields0 := loadrecordMixin[0].Fields()
-	_ = loadrecordMixinFields0
-	loadrecordFields := schema.LoadRecord{}.Fields()
-	_ = loadrecordFields
-	// loadrecordDescCreatedAt is the schema descriptor for created_at field.
-	loadrecordDescCreatedAt := loadrecordMixinFields0[0].Descriptor()
-	// loadrecord.DefaultCreatedAt holds the default value on creation for the created_at field.
-	loadrecord.DefaultCreatedAt = loadrecordDescCreatedAt.Default.(func() time.Time)
+	groupchatmessageMixin := schema.GroupChatMessage{}.Mixin()
+	groupchatmessageMixinHooks1 := groupchatmessageMixin[1].Hooks()
+	groupchatmessage.Hooks[0] = groupchatmessageMixinHooks1[0]
+	groupchatmessageMixinInters1 := groupchatmessageMixin[1].Interceptors()
+	groupchatmessage.Interceptors[0] = groupchatmessageMixinInters1[0]
+	groupchatmessageMixinFields0 := groupchatmessageMixin[0].Fields()
+	_ = groupchatmessageMixinFields0
+	groupchatmessageFields := schema.GroupChatMessage{}.Fields()
+	_ = groupchatmessageFields
+	// groupchatmessageDescCreatedAt is the schema descriptor for created_at field.
+	groupchatmessageDescCreatedAt := groupchatmessageMixinFields0[0].Descriptor()
+	// groupchatmessage.DefaultCreatedAt holds the default value on creation for the created_at field.
+	groupchatmessage.DefaultCreatedAt = groupchatmessageDescCreatedAt.Default.(func() time.Time)
+	personalchatmessageMixin := schema.PersonalChatMessage{}.Mixin()
+	personalchatmessageMixinHooks1 := personalchatmessageMixin[1].Hooks()
+	personalchatmessage.Hooks[0] = personalchatmessageMixinHooks1[0]
+	personalchatmessageMixinInters1 := personalchatmessageMixin[1].Interceptors()
+	personalchatmessage.Interceptors[0] = personalchatmessageMixinInters1[0]
+	personalchatmessageMixinFields0 := personalchatmessageMixin[0].Fields()
+	_ = personalchatmessageMixinFields0
+	personalchatmessageFields := schema.PersonalChatMessage{}.Fields()
+	_ = personalchatmessageFields
+	// personalchatmessageDescCreatedAt is the schema descriptor for created_at field.
+	personalchatmessageDescCreatedAt := personalchatmessageMixinFields0[0].Descriptor()
+	// personalchatmessage.DefaultCreatedAt holds the default value on creation for the created_at field.
+	personalchatmessage.DefaultCreatedAt = personalchatmessageDescCreatedAt.Default.(func() time.Time)
+	synchronizerecordMixin := schema.SynchronizeRecord{}.Mixin()
+	synchronizerecordMixinFields0 := synchronizerecordMixin[0].Fields()
+	_ = synchronizerecordMixinFields0
+	synchronizerecordMixinFields1 := synchronizerecordMixin[1].Fields()
+	_ = synchronizerecordMixinFields1
+	synchronizerecordFields := schema.SynchronizeRecord{}.Fields()
+	_ = synchronizerecordFields
+	// synchronizerecordDescCreatedAt is the schema descriptor for created_at field.
+	synchronizerecordDescCreatedAt := synchronizerecordMixinFields0[0].Descriptor()
+	// synchronizerecord.DefaultCreatedAt holds the default value on creation for the created_at field.
+	synchronizerecord.DefaultCreatedAt = synchronizerecordDescCreatedAt.Default.(func() time.Time)
+	// synchronizerecordDescUpdatedAt is the schema descriptor for updated_at field.
+	synchronizerecordDescUpdatedAt := synchronizerecordMixinFields1[0].Descriptor()
+	// synchronizerecord.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	synchronizerecord.DefaultUpdatedAt = synchronizerecordDescUpdatedAt.Default.(func() time.Time)
+	// synchronizerecord.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	synchronizerecord.UpdateDefaultUpdatedAt = synchronizerecordDescUpdatedAt.UpdateDefault.(func() time.Time)
 }
 
 const (

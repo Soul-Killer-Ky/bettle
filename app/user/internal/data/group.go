@@ -1,13 +1,13 @@
 package data
 
 import (
-	"context"
-	"fmt"
-
+	pb "beetle/api/user/service/v1"
 	"beetle/app/user/internal/biz"
 	"beetle/app/user/internal/data/ent"
 	"beetle/app/user/internal/data/ent/group"
+	"beetle/app/user/internal/data/ent/groupmember"
 	"beetle/app/user/internal/data/ent/user"
+	"context"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -47,6 +47,41 @@ func (r *groupRepo) ListByUserID(ctx context.Context, userID int) ([]*biz.Group,
 	return rv, nil
 }
 
+func (r *groupRepo) ListUserByID(ctx context.Context, id int) ([]*biz.User, error) {
+	members, err := r.data.db.GroupMember.Query().Where(groupmember.GroupID(id)).All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rv := make([]*biz.User, 0)
+	for _, p := range members {
+		u := p.QueryUser().OnlyX(ctx)
+		rv = append(rv, &biz.User{
+			ID:       u.ID,
+			Phone:    u.Phone,
+			Username: u.Username,
+			Password: u.Password,
+			Nickname: u.Nickname,
+			Avatar:   u.Avatar,
+			Memo:     u.Memo,
+		})
+	}
+	return rv, nil
+}
+
+func (r *groupRepo) FindByID(ctx context.Context, id int) (*biz.Group, error) {
+	p, err := r.data.db.Group.Query().Where(group.ID(id)).First(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &biz.Group{
+		ID:   p.ID,
+		Name: p.Name,
+		Icon: p.Icon,
+		Memo: p.Memo,
+	}, nil
+}
+
 func (r *groupRepo) FindByName(ctx context.Context, name string) (*biz.Group, error) {
 	p, err := r.data.db.Group.Query().Where(group.Name(name)).First(ctx)
 	if err != nil {
@@ -61,21 +96,21 @@ func (r *groupRepo) FindByName(ctx context.Context, name string) (*biz.Group, er
 	}, nil
 }
 
-func (r *groupRepo) Join(ctx context.Context, userID int, name string) error {
-	u, err := r.data.db.User.Query().Where(user.ID(userID)).First(ctx)
+func (r *groupRepo) IsJoined(ctx context.Context, userID, groupID int) (exist bool, err error) {
+	return r.data.db.GroupMember.Query().
+		Where(groupmember.UserID(userID), groupmember.GroupID(groupID)).
+		Exist(ctx)
+}
+
+func (r *groupRepo) Join(ctx context.Context, userID int, groupID int) error {
+	_, err := r.data.db.GroupMember.Create().
+		SetGroupID(groupID).
+		SetUserID(userID).
+		Save(ctx)
 	if err != nil {
 		return err
 	}
-	gp, err := u.QueryJoinedGroups().Where(group.Name(name)).First(ctx)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return fmt.Errorf("already in the group: %s", name)
-		} else {
-			return err
-		}
-	}
-	_, err = u.Update().AddJoinedGroups(gp).Save(ctx)
-	return err
+	return nil
 }
 
 func (r *groupRepo) Create(ctx context.Context, userID int, gp *biz.Group) error {
@@ -94,7 +129,7 @@ func (r *groupRepo) Create(ctx context.Context, userID int, gp *biz.Group) error
 		_, err = tx.GroupMember.Create().
 			SetGroup(p).
 			SetUserID(userID).
-			SetRole(1).
+			SetRole(int32(pb.GroupUserRole_Administrator)).
 			Save(ctx)
 		return err
 	})

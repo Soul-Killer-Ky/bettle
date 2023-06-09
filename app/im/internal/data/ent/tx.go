@@ -12,10 +12,12 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// ChatMessage is the client for interacting with the ChatMessage builders.
-	ChatMessage *ChatMessageClient
-	// LoadRecord is the client for interacting with the LoadRecord builders.
-	LoadRecord *LoadRecordClient
+	// GroupChatMessage is the client for interacting with the GroupChatMessage builders.
+	GroupChatMessage *GroupChatMessageClient
+	// PersonalChatMessage is the client for interacting with the PersonalChatMessage builders.
+	PersonalChatMessage *PersonalChatMessageClient
+	// SynchronizeRecord is the client for interacting with the SynchronizeRecord builders.
+	SynchronizeRecord *SynchronizeRecordClient
 
 	// lazily loaded.
 	client     *Client
@@ -147,8 +149,9 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.ChatMessage = NewChatMessageClient(tx.config)
-	tx.LoadRecord = NewLoadRecordClient(tx.config)
+	tx.GroupChatMessage = NewGroupChatMessageClient(tx.config)
+	tx.PersonalChatMessage = NewPersonalChatMessageClient(tx.config)
+	tx.SynchronizeRecord = NewSynchronizeRecordClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -158,7 +161,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: ChatMessage.QueryXXX(), the query will be executed
+// applies a query, for example: GroupChatMessage.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

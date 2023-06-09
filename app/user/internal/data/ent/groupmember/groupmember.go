@@ -17,12 +17,12 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
+	// FieldRole holds the string denoting the role field in the database.
+	FieldRole = "role"
 	// FieldGroupID holds the string denoting the group_id field in the database.
 	FieldGroupID = "group_id"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
-	// FieldRole holds the string denoting the role field in the database.
-	FieldRole = "role"
 	// EdgeGroup holds the string denoting the group edge name in mutations.
 	EdgeGroup = "group"
 	// EdgeUser holds the string denoting the user edge name in mutations.
@@ -53,9 +53,9 @@ const (
 var Columns = []string{
 	FieldCreatedAt,
 	FieldDeletedAt,
+	FieldRole,
 	FieldGroupID,
 	FieldUserID,
-	FieldRole,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -79,6 +79,8 @@ var (
 	Interceptors [1]ent.Interceptor
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
+	// DefaultRole holds the default value on creation for the "role" field.
+	DefaultRole int32
 )
 
 // OrderOption defines the ordering options for the GroupMember queries.
@@ -94,6 +96,11 @@ func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
 }
 
+// ByRole orders the results by the role field.
+func ByRole(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRole, opts...).ToFunc()
+}
+
 // ByGroupID orders the results by the group_id field.
 func ByGroupID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldGroupID, opts...).ToFunc()
@@ -102,11 +109,6 @@ func ByGroupID(opts ...sql.OrderTermOption) OrderOption {
 // ByUserID orders the results by the user_id field.
 func ByUserID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUserID, opts...).ToFunc()
-}
-
-// ByRole orders the results by the role field.
-func ByRole(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldRole, opts...).ToFunc()
 }
 
 // ByGroupField orders the results by group field.

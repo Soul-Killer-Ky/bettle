@@ -8,28 +8,40 @@ import (
 	"fmt"
 )
 
-// The ChatMessageFunc type is an adapter to allow the use of ordinary
-// function as ChatMessage mutator.
-type ChatMessageFunc func(context.Context, *ent.ChatMessageMutation) (ent.Value, error)
+// The GroupChatMessageFunc type is an adapter to allow the use of ordinary
+// function as GroupChatMessage mutator.
+type GroupChatMessageFunc func(context.Context, *ent.GroupChatMessageMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f ChatMessageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ChatMessageMutation); ok {
+func (f GroupChatMessageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.GroupChatMessageMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChatMessageMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GroupChatMessageMutation", m)
 }
 
-// The LoadRecordFunc type is an adapter to allow the use of ordinary
-// function as LoadRecord mutator.
-type LoadRecordFunc func(context.Context, *ent.LoadRecordMutation) (ent.Value, error)
+// The PersonalChatMessageFunc type is an adapter to allow the use of ordinary
+// function as PersonalChatMessage mutator.
+type PersonalChatMessageFunc func(context.Context, *ent.PersonalChatMessageMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f LoadRecordFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.LoadRecordMutation); ok {
+func (f PersonalChatMessageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PersonalChatMessageMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LoadRecordMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PersonalChatMessageMutation", m)
+}
+
+// The SynchronizeRecordFunc type is an adapter to allow the use of ordinary
+// function as SynchronizeRecord mutator.
+type SynchronizeRecordFunc func(context.Context, *ent.SynchronizeRecordMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SynchronizeRecordFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SynchronizeRecordMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SynchronizeRecordMutation", m)
 }
 
 // Condition is a hook condition function.

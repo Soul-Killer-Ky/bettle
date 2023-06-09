@@ -3,8 +3,9 @@
 package ent
 
 import (
-	"beetle/app/im/internal/data/ent/chatmessage"
-	"beetle/app/im/internal/data/ent/loadrecord"
+	"beetle/app/im/internal/data/ent/groupchatmessage"
+	"beetle/app/im/internal/data/ent/personalchatmessage"
+	"beetle/app/im/internal/data/ent/synchronizerecord"
 	"context"
 	"errors"
 	"fmt"
@@ -74,8 +75,9 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			chatmessage.Table: chatmessage.ValidColumn,
-			loadrecord.Table:  loadrecord.ValidColumn,
+			groupchatmessage.Table:    groupchatmessage.ValidColumn,
+			personalchatmessage.Table: personalchatmessage.ValidColumn,
+			synchronizerecord.Table:   synchronizerecord.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

@@ -999,44 +999,6 @@ func (m *GroupMemberMutation) ResetDeletedAt() {
 	delete(m.clearedFields, groupmember.FieldDeletedAt)
 }
 
-// SetGroupID sets the "group_id" field.
-func (m *GroupMemberMutation) SetGroupID(i int) {
-	m.group = &i
-}
-
-// GroupID returns the value of the "group_id" field in the mutation.
-func (m *GroupMemberMutation) GroupID() (r int, exists bool) {
-	v := m.group
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetGroupID resets all changes to the "group_id" field.
-func (m *GroupMemberMutation) ResetGroupID() {
-	m.group = nil
-}
-
-// SetUserID sets the "user_id" field.
-func (m *GroupMemberMutation) SetUserID(i int) {
-	m.user = &i
-}
-
-// UserID returns the value of the "user_id" field in the mutation.
-func (m *GroupMemberMutation) UserID() (r int, exists bool) {
-	v := m.user
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetUserID resets all changes to the "user_id" field.
-func (m *GroupMemberMutation) ResetUserID() {
-	m.user = nil
-}
-
 // SetRole sets the "role" field.
 func (m *GroupMemberMutation) SetRole(i int32) {
 	m.role = &i
@@ -1074,6 +1036,44 @@ func (m *GroupMemberMutation) AddedRole() (r int32, exists bool) {
 func (m *GroupMemberMutation) ResetRole() {
 	m.role = nil
 	m.addrole = nil
+}
+
+// SetGroupID sets the "group_id" field.
+func (m *GroupMemberMutation) SetGroupID(i int) {
+	m.group = &i
+}
+
+// GroupID returns the value of the "group_id" field in the mutation.
+func (m *GroupMemberMutation) GroupID() (r int, exists bool) {
+	v := m.group
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetGroupID resets all changes to the "group_id" field.
+func (m *GroupMemberMutation) ResetGroupID() {
+	m.group = nil
+}
+
+// SetUserID sets the "user_id" field.
+func (m *GroupMemberMutation) SetUserID(i int) {
+	m.user = &i
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *GroupMemberMutation) UserID() (r int, exists bool) {
+	v := m.user
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *GroupMemberMutation) ResetUserID() {
+	m.user = nil
 }
 
 // ClearGroup clears the "group" edge to the Group entity.
@@ -1169,14 +1169,14 @@ func (m *GroupMemberMutation) Fields() []string {
 	if m.deleted_at != nil {
 		fields = append(fields, groupmember.FieldDeletedAt)
 	}
+	if m.role != nil {
+		fields = append(fields, groupmember.FieldRole)
+	}
 	if m.group != nil {
 		fields = append(fields, groupmember.FieldGroupID)
 	}
 	if m.user != nil {
 		fields = append(fields, groupmember.FieldUserID)
-	}
-	if m.role != nil {
-		fields = append(fields, groupmember.FieldRole)
 	}
 	return fields
 }
@@ -1190,12 +1190,12 @@ func (m *GroupMemberMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case groupmember.FieldDeletedAt:
 		return m.DeletedAt()
+	case groupmember.FieldRole:
+		return m.Role()
 	case groupmember.FieldGroupID:
 		return m.GroupID()
 	case groupmember.FieldUserID:
 		return m.UserID()
-	case groupmember.FieldRole:
-		return m.Role()
 	}
 	return nil, false
 }
@@ -1226,6 +1226,13 @@ func (m *GroupMemberMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDeletedAt(v)
 		return nil
+	case groupmember.FieldRole:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRole(v)
+		return nil
 	case groupmember.FieldGroupID:
 		v, ok := value.(int)
 		if !ok {
@@ -1239,13 +1246,6 @@ func (m *GroupMemberMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUserID(v)
-		return nil
-	case groupmember.FieldRole:
-		v, ok := value.(int32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRole(v)
 		return nil
 	}
 	return fmt.Errorf("unknown GroupMember field %s", name)
@@ -1326,14 +1326,14 @@ func (m *GroupMemberMutation) ResetField(name string) error {
 	case groupmember.FieldDeletedAt:
 		m.ResetDeletedAt()
 		return nil
+	case groupmember.FieldRole:
+		m.ResetRole()
+		return nil
 	case groupmember.FieldGroupID:
 		m.ResetGroupID()
 		return nil
 	case groupmember.FieldUserID:
 		m.ResetUserID()
-		return nil
-	case groupmember.FieldRole:
-		m.ResetRole()
 		return nil
 	}
 	return fmt.Errorf("unknown GroupMember field %s", name)

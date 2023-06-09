@@ -8,8 +8,23 @@ import (
 )
 
 var (
-	// ChatMessagesColumns holds the columns for the "chat_messages" table.
-	ChatMessagesColumns = []*schema.Column{
+	// GroupChatMessagesColumns holds the columns for the "group_chat_messages" table.
+	GroupChatMessagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "from", Type: field.TypeInt},
+		{Name: "group_id", Type: field.TypeInt},
+		{Name: "message", Type: field.TypeString, Size: 2147483647},
+	}
+	// GroupChatMessagesTable holds the schema information for the "group_chat_messages" table.
+	GroupChatMessagesTable = &schema.Table{
+		Name:       "group_chat_messages",
+		Columns:    GroupChatMessagesColumns,
+		PrimaryKey: []*schema.Column{GroupChatMessagesColumns[0]},
+	}
+	// PersonalChatMessagesColumns holds the columns for the "personal_chat_messages" table.
+	PersonalChatMessagesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "datetime"}},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
@@ -17,29 +32,38 @@ var (
 		{Name: "sender", Type: field.TypeInt},
 		{Name: "message", Type: field.TypeString, Size: 2147483647},
 	}
-	// ChatMessagesTable holds the schema information for the "chat_messages" table.
-	ChatMessagesTable = &schema.Table{
-		Name:       "chat_messages",
-		Columns:    ChatMessagesColumns,
-		PrimaryKey: []*schema.Column{ChatMessagesColumns[0]},
+	// PersonalChatMessagesTable holds the schema information for the "personal_chat_messages" table.
+	PersonalChatMessagesTable = &schema.Table{
+		Name:       "personal_chat_messages",
+		Columns:    PersonalChatMessagesColumns,
+		PrimaryKey: []*schema.Column{PersonalChatMessagesColumns[0]},
 	}
-	// LoadRecordsColumns holds the columns for the "load_records" table.
-	LoadRecordsColumns = []*schema.Column{
+	// SynchronizeRecordsColumns holds the columns for the "synchronize_records" table.
+	SynchronizeRecordsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "datetime"}},
 		{Name: "user_id", Type: field.TypeInt},
 		{Name: "device_id", Type: field.TypeUUID},
 	}
-	// LoadRecordsTable holds the schema information for the "load_records" table.
-	LoadRecordsTable = &schema.Table{
-		Name:       "load_records",
-		Columns:    LoadRecordsColumns,
-		PrimaryKey: []*schema.Column{LoadRecordsColumns[0]},
+	// SynchronizeRecordsTable holds the schema information for the "synchronize_records" table.
+	SynchronizeRecordsTable = &schema.Table{
+		Name:       "synchronize_records",
+		Columns:    SynchronizeRecordsColumns,
+		PrimaryKey: []*schema.Column{SynchronizeRecordsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "synchronizerecord_user_id_device_id",
+				Unique:  true,
+				Columns: []*schema.Column{SynchronizeRecordsColumns[3], SynchronizeRecordsColumns[4]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		ChatMessagesTable,
-		LoadRecordsTable,
+		GroupChatMessagesTable,
+		PersonalChatMessagesTable,
+		SynchronizeRecordsTable,
 	}
 )
 

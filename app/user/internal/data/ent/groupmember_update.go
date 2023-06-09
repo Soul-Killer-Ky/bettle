@@ -50,6 +50,27 @@ func (gmu *GroupMemberUpdate) ClearDeletedAt() *GroupMemberUpdate {
 	return gmu
 }
 
+// SetRole sets the "role" field.
+func (gmu *GroupMemberUpdate) SetRole(i int32) *GroupMemberUpdate {
+	gmu.mutation.ResetRole()
+	gmu.mutation.SetRole(i)
+	return gmu
+}
+
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (gmu *GroupMemberUpdate) SetNillableRole(i *int32) *GroupMemberUpdate {
+	if i != nil {
+		gmu.SetRole(*i)
+	}
+	return gmu
+}
+
+// AddRole adds i to the "role" field.
+func (gmu *GroupMemberUpdate) AddRole(i int32) *GroupMemberUpdate {
+	gmu.mutation.AddRole(i)
+	return gmu
+}
+
 // SetGroupID sets the "group_id" field.
 func (gmu *GroupMemberUpdate) SetGroupID(i int) *GroupMemberUpdate {
 	gmu.mutation.SetGroupID(i)
@@ -59,19 +80,6 @@ func (gmu *GroupMemberUpdate) SetGroupID(i int) *GroupMemberUpdate {
 // SetUserID sets the "user_id" field.
 func (gmu *GroupMemberUpdate) SetUserID(i int) *GroupMemberUpdate {
 	gmu.mutation.SetUserID(i)
-	return gmu
-}
-
-// SetRole sets the "role" field.
-func (gmu *GroupMemberUpdate) SetRole(i int32) *GroupMemberUpdate {
-	gmu.mutation.ResetRole()
-	gmu.mutation.SetRole(i)
-	return gmu
-}
-
-// AddRole adds i to the "role" field.
-func (gmu *GroupMemberUpdate) AddRole(i int32) *GroupMemberUpdate {
-	gmu.mutation.AddRole(i)
 	return gmu
 }
 
@@ -262,6 +270,27 @@ func (gmuo *GroupMemberUpdateOne) ClearDeletedAt() *GroupMemberUpdateOne {
 	return gmuo
 }
 
+// SetRole sets the "role" field.
+func (gmuo *GroupMemberUpdateOne) SetRole(i int32) *GroupMemberUpdateOne {
+	gmuo.mutation.ResetRole()
+	gmuo.mutation.SetRole(i)
+	return gmuo
+}
+
+// SetNillableRole sets the "role" field if the given value is not nil.
+func (gmuo *GroupMemberUpdateOne) SetNillableRole(i *int32) *GroupMemberUpdateOne {
+	if i != nil {
+		gmuo.SetRole(*i)
+	}
+	return gmuo
+}
+
+// AddRole adds i to the "role" field.
+func (gmuo *GroupMemberUpdateOne) AddRole(i int32) *GroupMemberUpdateOne {
+	gmuo.mutation.AddRole(i)
+	return gmuo
+}
+
 // SetGroupID sets the "group_id" field.
 func (gmuo *GroupMemberUpdateOne) SetGroupID(i int) *GroupMemberUpdateOne {
 	gmuo.mutation.SetGroupID(i)
@@ -271,19 +300,6 @@ func (gmuo *GroupMemberUpdateOne) SetGroupID(i int) *GroupMemberUpdateOne {
 // SetUserID sets the "user_id" field.
 func (gmuo *GroupMemberUpdateOne) SetUserID(i int) *GroupMemberUpdateOne {
 	gmuo.mutation.SetUserID(i)
-	return gmuo
-}
-
-// SetRole sets the "role" field.
-func (gmuo *GroupMemberUpdateOne) SetRole(i int32) *GroupMemberUpdateOne {
-	gmuo.mutation.ResetRole()
-	gmuo.mutation.SetRole(i)
-	return gmuo
-}
-
-// AddRole adds i to the "role" field.
-func (gmuo *GroupMemberUpdateOne) AddRole(i int32) *GroupMemberUpdateOne {
-	gmuo.mutation.AddRole(i)
 	return gmuo
 }
 
