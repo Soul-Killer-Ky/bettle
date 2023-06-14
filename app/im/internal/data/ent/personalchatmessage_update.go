@@ -48,6 +48,19 @@ func (pcmu *PersonalChatMessageUpdate) ClearDeletedAt() *PersonalChatMessageUpda
 	return pcmu
 }
 
+// SetMessageID sets the "message_id" field.
+func (pcmu *PersonalChatMessageUpdate) SetMessageID(i int64) *PersonalChatMessageUpdate {
+	pcmu.mutation.ResetMessageID()
+	pcmu.mutation.SetMessageID(i)
+	return pcmu
+}
+
+// AddMessageID adds i to the "message_id" field.
+func (pcmu *PersonalChatMessageUpdate) AddMessageID(i int64) *PersonalChatMessageUpdate {
+	pcmu.mutation.AddMessageID(i)
+	return pcmu
+}
+
 // SetFrom sets the "from" field.
 func (pcmu *PersonalChatMessageUpdate) SetFrom(i int) *PersonalChatMessageUpdate {
 	pcmu.mutation.ResetFrom()
@@ -127,6 +140,12 @@ func (pcmu *PersonalChatMessageUpdate) sqlSave(ctx context.Context) (n int, err 
 	if pcmu.mutation.DeletedAtCleared() {
 		_spec.ClearField(personalchatmessage.FieldDeletedAt, field.TypeTime)
 	}
+	if value, ok := pcmu.mutation.MessageID(); ok {
+		_spec.SetField(personalchatmessage.FieldMessageID, field.TypeInt64, value)
+	}
+	if value, ok := pcmu.mutation.AddedMessageID(); ok {
+		_spec.AddField(personalchatmessage.FieldMessageID, field.TypeInt64, value)
+	}
 	if value, ok := pcmu.mutation.From(); ok {
 		_spec.SetField(personalchatmessage.FieldFrom, field.TypeInt, value)
 	}
@@ -179,6 +198,19 @@ func (pcmuo *PersonalChatMessageUpdateOne) SetNillableDeletedAt(t *time.Time) *P
 // ClearDeletedAt clears the value of the "deleted_at" field.
 func (pcmuo *PersonalChatMessageUpdateOne) ClearDeletedAt() *PersonalChatMessageUpdateOne {
 	pcmuo.mutation.ClearDeletedAt()
+	return pcmuo
+}
+
+// SetMessageID sets the "message_id" field.
+func (pcmuo *PersonalChatMessageUpdateOne) SetMessageID(i int64) *PersonalChatMessageUpdateOne {
+	pcmuo.mutation.ResetMessageID()
+	pcmuo.mutation.SetMessageID(i)
+	return pcmuo
+}
+
+// AddMessageID adds i to the "message_id" field.
+func (pcmuo *PersonalChatMessageUpdateOne) AddMessageID(i int64) *PersonalChatMessageUpdateOne {
+	pcmuo.mutation.AddMessageID(i)
 	return pcmuo
 }
 
@@ -290,6 +322,12 @@ func (pcmuo *PersonalChatMessageUpdateOne) sqlSave(ctx context.Context) (_node *
 	}
 	if pcmuo.mutation.DeletedAtCleared() {
 		_spec.ClearField(personalchatmessage.FieldDeletedAt, field.TypeTime)
+	}
+	if value, ok := pcmuo.mutation.MessageID(); ok {
+		_spec.SetField(personalchatmessage.FieldMessageID, field.TypeInt64, value)
+	}
+	if value, ok := pcmuo.mutation.AddedMessageID(); ok {
+		_spec.AddField(personalchatmessage.FieldMessageID, field.TypeInt64, value)
 	}
 	if value, ok := pcmuo.mutation.From(); ok {
 		_spec.SetField(personalchatmessage.FieldFrom, field.TypeInt, value)

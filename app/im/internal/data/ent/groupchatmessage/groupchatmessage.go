@@ -18,6 +18,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
+	// FieldMessageID holds the string denoting the message_id field in the database.
+	FieldMessageID = "message_id"
 	// FieldFrom holds the string denoting the from field in the database.
 	FieldFrom = "from"
 	// FieldGroupID holds the string denoting the group_id field in the database.
@@ -33,6 +35,7 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldDeletedAt,
+	FieldMessageID,
 	FieldFrom,
 	FieldGroupID,
 	FieldMessage,
@@ -77,6 +80,11 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByDeletedAt orders the results by the deleted_at field.
 func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
+}
+
+// ByMessageID orders the results by the message_id field.
+func ByMessageID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMessageID, opts...).ToFunc()
 }
 
 // ByFrom orders the results by the from field.

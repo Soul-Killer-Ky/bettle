@@ -54,6 +54,19 @@ func (sru *SynchronizeRecordUpdate) SetDeviceID(u uuid.UUID) *SynchronizeRecordU
 	return sru
 }
 
+// SetLastMessageID sets the "last_message_id" field.
+func (sru *SynchronizeRecordUpdate) SetLastMessageID(i int64) *SynchronizeRecordUpdate {
+	sru.mutation.ResetLastMessageID()
+	sru.mutation.SetLastMessageID(i)
+	return sru
+}
+
+// AddLastMessageID adds i to the "last_message_id" field.
+func (sru *SynchronizeRecordUpdate) AddLastMessageID(i int64) *SynchronizeRecordUpdate {
+	sru.mutation.AddLastMessageID(i)
+	return sru
+}
+
 // Mutation returns the SynchronizeRecordMutation object of the builder.
 func (sru *SynchronizeRecordUpdate) Mutation() *SynchronizeRecordMutation {
 	return sru.mutation
@@ -116,6 +129,12 @@ func (sru *SynchronizeRecordUpdate) sqlSave(ctx context.Context) (n int, err err
 	if value, ok := sru.mutation.DeviceID(); ok {
 		_spec.SetField(synchronizerecord.FieldDeviceID, field.TypeUUID, value)
 	}
+	if value, ok := sru.mutation.LastMessageID(); ok {
+		_spec.SetField(synchronizerecord.FieldLastMessageID, field.TypeInt64, value)
+	}
+	if value, ok := sru.mutation.AddedLastMessageID(); ok {
+		_spec.AddField(synchronizerecord.FieldLastMessageID, field.TypeInt64, value)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, sru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{synchronizerecord.Label}
@@ -158,6 +177,19 @@ func (sruo *SynchronizeRecordUpdateOne) AddUserID(i int) *SynchronizeRecordUpdat
 // SetDeviceID sets the "device_id" field.
 func (sruo *SynchronizeRecordUpdateOne) SetDeviceID(u uuid.UUID) *SynchronizeRecordUpdateOne {
 	sruo.mutation.SetDeviceID(u)
+	return sruo
+}
+
+// SetLastMessageID sets the "last_message_id" field.
+func (sruo *SynchronizeRecordUpdateOne) SetLastMessageID(i int64) *SynchronizeRecordUpdateOne {
+	sruo.mutation.ResetLastMessageID()
+	sruo.mutation.SetLastMessageID(i)
+	return sruo
+}
+
+// AddLastMessageID adds i to the "last_message_id" field.
+func (sruo *SynchronizeRecordUpdateOne) AddLastMessageID(i int64) *SynchronizeRecordUpdateOne {
+	sruo.mutation.AddLastMessageID(i)
 	return sruo
 }
 
@@ -252,6 +284,12 @@ func (sruo *SynchronizeRecordUpdateOne) sqlSave(ctx context.Context) (_node *Syn
 	}
 	if value, ok := sruo.mutation.DeviceID(); ok {
 		_spec.SetField(synchronizerecord.FieldDeviceID, field.TypeUUID, value)
+	}
+	if value, ok := sruo.mutation.LastMessageID(); ok {
+		_spec.SetField(synchronizerecord.FieldLastMessageID, field.TypeInt64, value)
+	}
+	if value, ok := sruo.mutation.AddedLastMessageID(); ok {
+		_spec.AddField(synchronizerecord.FieldLastMessageID, field.TypeInt64, value)
 	}
 	_node = &SynchronizeRecord{config: sruo.config}
 	_spec.Assign = _node.assignValues

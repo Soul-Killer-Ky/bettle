@@ -27,39 +27,47 @@ func (r *synchronizeRecordRepo) FindByUserDeviceID(ctx context.Context, uid int,
 		return nil, err
 	}
 	return &biz.SynchronizedRecord{
-		UserID:    p.UserID,
-		DeviceID:  p.DeviceID,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		UserID:        p.UserID,
+		DeviceID:      p.DeviceID,
+		LastMessageID: p.LastMessageID,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
 	}, err
 }
 
-func (r *synchronizeRecordRepo) Create(ctx context.Context, uid int, deviceID uuid.UUID) (*biz.SynchronizedRecord, error) {
-	p, err := r.data.db.SynchronizeRecord.Create().SetUserID(uid).SetDeviceID(deviceID).Save(ctx)
+func (r *synchronizeRecordRepo) Create(ctx context.Context, uid int, deviceID uuid.UUID, messageID int64) (*biz.SynchronizedRecord, error) {
+	p, err := r.data.db.SynchronizeRecord.
+		Create().
+		SetUserID(uid).
+		SetDeviceID(deviceID).
+		SetLastMessageID(messageID).
+		Save(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return &biz.SynchronizedRecord{
-		UserID:    p.UserID,
-		DeviceID:  p.DeviceID,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		UserID:        p.UserID,
+		DeviceID:      p.DeviceID,
+		LastMessageID: p.LastMessageID,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
 	}, nil
 }
 
-func (r *synchronizeRecordRepo) Update(ctx context.Context, uid int, deviceID uuid.UUID) (*biz.SynchronizedRecord, error) {
+func (r *synchronizeRecordRepo) Update(ctx context.Context, uid int, deviceID uuid.UUID, messageID int64) (*biz.SynchronizedRecord, error) {
 	p, err := r.data.db.SynchronizeRecord.Query().Where(synchronizerecord.UserID(uid), synchronizerecord.DeviceID(deviceID)).Only(ctx)
 	if err != nil {
 		return nil, err
 	}
-	p, err = p.Update().Save(ctx)
+	p, err = p.Update().SetLastMessageID(messageID).Save(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return &biz.SynchronizedRecord{
-		UserID:    p.UserID,
-		DeviceID:  p.DeviceID,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		UserID:        p.UserID,
+		DeviceID:      p.DeviceID,
+		LastMessageID: p.LastMessageID,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
 	}, nil
 }

@@ -48,6 +48,19 @@ func (gcmu *GroupChatMessageUpdate) ClearDeletedAt() *GroupChatMessageUpdate {
 	return gcmu
 }
 
+// SetMessageID sets the "message_id" field.
+func (gcmu *GroupChatMessageUpdate) SetMessageID(i int64) *GroupChatMessageUpdate {
+	gcmu.mutation.ResetMessageID()
+	gcmu.mutation.SetMessageID(i)
+	return gcmu
+}
+
+// AddMessageID adds i to the "message_id" field.
+func (gcmu *GroupChatMessageUpdate) AddMessageID(i int64) *GroupChatMessageUpdate {
+	gcmu.mutation.AddMessageID(i)
+	return gcmu
+}
+
 // SetFrom sets the "from" field.
 func (gcmu *GroupChatMessageUpdate) SetFrom(i int) *GroupChatMessageUpdate {
 	gcmu.mutation.ResetFrom()
@@ -127,6 +140,12 @@ func (gcmu *GroupChatMessageUpdate) sqlSave(ctx context.Context) (n int, err err
 	if gcmu.mutation.DeletedAtCleared() {
 		_spec.ClearField(groupchatmessage.FieldDeletedAt, field.TypeTime)
 	}
+	if value, ok := gcmu.mutation.MessageID(); ok {
+		_spec.SetField(groupchatmessage.FieldMessageID, field.TypeInt64, value)
+	}
+	if value, ok := gcmu.mutation.AddedMessageID(); ok {
+		_spec.AddField(groupchatmessage.FieldMessageID, field.TypeInt64, value)
+	}
 	if value, ok := gcmu.mutation.From(); ok {
 		_spec.SetField(groupchatmessage.FieldFrom, field.TypeInt, value)
 	}
@@ -179,6 +198,19 @@ func (gcmuo *GroupChatMessageUpdateOne) SetNillableDeletedAt(t *time.Time) *Grou
 // ClearDeletedAt clears the value of the "deleted_at" field.
 func (gcmuo *GroupChatMessageUpdateOne) ClearDeletedAt() *GroupChatMessageUpdateOne {
 	gcmuo.mutation.ClearDeletedAt()
+	return gcmuo
+}
+
+// SetMessageID sets the "message_id" field.
+func (gcmuo *GroupChatMessageUpdateOne) SetMessageID(i int64) *GroupChatMessageUpdateOne {
+	gcmuo.mutation.ResetMessageID()
+	gcmuo.mutation.SetMessageID(i)
+	return gcmuo
+}
+
+// AddMessageID adds i to the "message_id" field.
+func (gcmuo *GroupChatMessageUpdateOne) AddMessageID(i int64) *GroupChatMessageUpdateOne {
+	gcmuo.mutation.AddMessageID(i)
 	return gcmuo
 }
 
@@ -290,6 +322,12 @@ func (gcmuo *GroupChatMessageUpdateOne) sqlSave(ctx context.Context) (_node *Gro
 	}
 	if gcmuo.mutation.DeletedAtCleared() {
 		_spec.ClearField(groupchatmessage.FieldDeletedAt, field.TypeTime)
+	}
+	if value, ok := gcmuo.mutation.MessageID(); ok {
+		_spec.SetField(groupchatmessage.FieldMessageID, field.TypeInt64, value)
+	}
+	if value, ok := gcmuo.mutation.AddedMessageID(); ok {
+		_spec.AddField(groupchatmessage.FieldMessageID, field.TypeInt64, value)
 	}
 	if value, ok := gcmuo.mutation.From(); ok {
 		_spec.SetField(groupchatmessage.FieldFrom, field.TypeInt, value)

@@ -1,27 +1,20 @@
 package biz
 
 import (
+	pb "beetle/api/im/service/v1"
 	"context"
 	"strconv"
-	"time"
-
-	pb "beetle/api/im/service/v1"
 
 	"github.com/go-kratos/kratos/v2/encoding"
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 )
 
-type Message struct {
-	MessageType pb.MessageType
-	Payload     interface{}
-}
-
 type MessageRepo interface {
-	SavePersonalChatMessage(context.Context, int, int, string) error
-	GetPersonalChatMessages(context.Context, int, time.Time) ([]*pb.PersonalChatMessage, error)
-	SaveGroupChatMessage(context.Context, int, int, string) error
-	GetGroupChatMessages(context.Context, int, time.Time) ([]*pb.GroupChatMessage, error)
+	SavePersonalChatMessage(context.Context, int, int, int64, string) error
+	GetPersonalChatMessages(context.Context, int, int64) ([]*pb.PersonalChatMessage, error)
+	SaveGroupChatMessage(context.Context, int, int, int64, string) error
+	GetGroupChatMessages(context.Context, []int, int64) ([]*pb.GroupChatMessage, error)
 	SetCache(context.Context, string, interface{}) error
 }
 
@@ -45,7 +38,7 @@ func (c *MessageUseCase) SaveMessage(ctx context.Context, messageType pb.Message
 		if err != nil {
 			return err
 		}
-		err = c.repo.SavePersonalChatMessage(ctx, int(t.From), int(t.Sender), string(buf))
+		err = c.repo.SavePersonalChatMessage(ctx, int(t.From), int(t.Sender), t.MessageId, string(buf))
 		if err != nil {
 			return err
 		}
@@ -57,7 +50,7 @@ func (c *MessageUseCase) SaveMessage(ctx context.Context, messageType pb.Message
 		if err != nil {
 			return err
 		}
-		err = c.repo.SaveGroupChatMessage(ctx, int(t.From), int(t.GroupId), string(buf))
+		err = c.repo.SaveGroupChatMessage(ctx, int(t.From), int(t.GroupId), t.MessageId, string(buf))
 		if err == nil {
 			err = c.repo.SetCache(ctx, messageKey, buf)
 		}
@@ -67,30 +60,22 @@ func (c *MessageUseCase) SaveMessage(ctx context.Context, messageType pb.Message
 	return err
 }
 
-func (c *MessageUseCase) GetChatMessages(ctx context.Context, uid int, lastTime time.Time) ([]*Message, error) {
-	pms, err := c.repo.GetPersonalChatMessages(ctx, uid, lastTime)
+func (c *MessageUseCase) GetPersonalChatMessages(ctx context.Context, uid int, lastMessageID int64) ([]*pb.PersonalChatMessage, error) {
+	pms, err := c.repo.GetPersonalChatMessages(ctx, uid, lastMessageID)
 	if err != nil {
 		c.log.WithContext(ctx).Errorf("get personal-chat message error: %s", err)
 		return nil, err
 	}
-	rv := make([]*Message, 0)
-	for _, pm := range pms {
-		rv = append(rv, &Message{
-			MessageType: pb.MessageType_PersonalChat,
-			Payload:     pm,
-		})
-	}
-	gms, err := c.repo.GetPersonalChatMessages(ctx, uid, lastTime)
+
+	return pms, nil
+}
+
+func (c *MessageUseCase) GetGroupChatMessages(ctx context.Context, groupIDs []int, lastMessageID int64) ([]*pb.GroupChatMessage, error) {
+	gms, err := c.repo.GetGroupChatMessages(ctx, groupIDs, lastMessageID)
 	if err != nil {
 		c.log.WithContext(ctx).Errorf("get group-chat message error: %s", err)
 		return nil, err
 	}
-	for _, gm := range gms {
-		rv = append(rv, &Message{
-			MessageType: pb.MessageType_GroupChat,
-			Payload:     gm,
-		})
-	}
 
-	return rv, nil
+	return gms, nil
 }

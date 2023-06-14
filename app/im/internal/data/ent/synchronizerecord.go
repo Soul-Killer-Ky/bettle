@@ -25,8 +25,10 @@ type SynchronizeRecord struct {
 	// 用户ID
 	UserID int `json:"user_id,omitempty"`
 	// 设备号
-	DeviceID     uuid.UUID `json:"device_id,omitempty"`
-	selectValues sql.SelectValues
+	DeviceID uuid.UUID `json:"device_id,omitempty"`
+	// 消息ID
+	LastMessageID int64 `json:"last_message_id,omitempty"`
+	selectValues  sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -34,7 +36,7 @@ func (*SynchronizeRecord) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case synchronizerecord.FieldID, synchronizerecord.FieldUserID:
+		case synchronizerecord.FieldID, synchronizerecord.FieldUserID, synchronizerecord.FieldLastMessageID:
 			values[i] = new(sql.NullInt64)
 		case synchronizerecord.FieldCreatedAt, synchronizerecord.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -85,6 +87,12 @@ func (sr *SynchronizeRecord) assignValues(columns []string, values []any) error 
 			} else if value != nil {
 				sr.DeviceID = *value
 			}
+		case synchronizerecord.FieldLastMessageID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field last_message_id", values[i])
+			} else if value.Valid {
+				sr.LastMessageID = value.Int64
+			}
 		default:
 			sr.selectValues.Set(columns[i], values[i])
 		}
@@ -132,6 +140,9 @@ func (sr *SynchronizeRecord) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("device_id=")
 	builder.WriteString(fmt.Sprintf("%v", sr.DeviceID))
+	builder.WriteString(", ")
+	builder.WriteString("last_message_id=")
+	builder.WriteString(fmt.Sprintf("%v", sr.LastMessageID))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -53,3 +53,21 @@ func (r *userRepo) ListUserByGroup(ctx context.Context, groupID int) ([]*biz.Use
 	}
 	return rv, nil
 }
+
+func (r *userRepo) ListGroup(ctx context.Context) ([]*biz.Group, error) {
+	reply, err := r.data.uc.ListGroup(ctx, &pbUser.ListGroupRequest{})
+	if err != nil {
+		return nil, err
+	}
+	rv := make([]*biz.Group, 0)
+	for _, g := range reply.Groups {
+		rv = append(rv, &biz.Group{
+			ID:   int(g.Id),
+			Type: g.Type,
+			Name: g.Name,
+			Icon: g.Icon,
+			Memo: g.Memo,
+		})
+	}
+	return rv, nil
+}

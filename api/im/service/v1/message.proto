@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package api.im.service.v1;
 
+import "google/api/annotations.proto";
+import "validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "beetle/api/im/service/v1;v1";
@@ -32,21 +34,38 @@ message Content {
 }
 
 message PersonalChatMessage {
-	Content content = 1;
-	int64 from = 2;
-	int64 sender = 3;
-	google.protobuf.Timestamp timestamp = 4;
+	int64 message_id = 1;
+	Content content = 2;
+	int64 from = 3;
+	int64 sender = 4;
+	google.protobuf.Timestamp timestamp = 5;
 }
 
 message GroupChatMessage {
-	Content content = 1;
-	int64 from = 2;
-	int64 group_id = 3;
-	google.protobuf.Timestamp timestamp = 4;
+	int64 message_id = 1;
+	Content content = 2;
+	int64 from = 3;
+	int64 group_id = 4;
+	google.protobuf.Timestamp timestamp = 5;
 }
 
 message BroadcastMessage {
-	Content content = 1;
-	int64 from = 2;
-	google.protobuf.Timestamp timestamp = 3;
+	int64 message_id = 1;
+	Content content = 2;
+	int64 from = 3;
+	google.protobuf.Timestamp timestamp = 4;
 }
+
+service Message {
+	rpc ListOfflineMessage (ListOfflineMessageRequest) returns (ListOfflineMessageReply) {
+		option (google.api.http) = {
+			post: "/im/v1/message/list_offline"
+			body: "*"
+		};
+	}
+}
+
+message ListOfflineMessageRequest {
+	int64 last_message_id = 1;
+}
+message ListOfflineMessageReply {}

@@ -34,3 +34,15 @@ func IsInvalidPayloadType(err error) bool {
 func ErrorInvalidPayloadType(format string, args ...interface{}) *errors.Error {
 	return errors.New(500, ErrorReason_INVALID_PAYLOAD_TYPE.String(), fmt.Sprintf(format, args...))
 }
+
+func IsMessageIdGenerateFailure(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_MESSAGE_ID_GENERATE_FAILURE.String() && e.Code == 500
+}
+
+func ErrorMessageIdGenerateFailure(format string, args ...interface{}) *errors.Error {
+	return errors.New(500, ErrorReason_MESSAGE_ID_GENERATE_FAILURE.String(), fmt.Sprintf(format, args...))
+}

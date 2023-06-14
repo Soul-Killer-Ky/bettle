@@ -61,6 +61,12 @@ func (src *SynchronizeRecordCreate) SetDeviceID(u uuid.UUID) *SynchronizeRecordC
 	return src
 }
 
+// SetLastMessageID sets the "last_message_id" field.
+func (src *SynchronizeRecordCreate) SetLastMessageID(i int64) *SynchronizeRecordCreate {
+	src.mutation.SetLastMessageID(i)
+	return src
+}
+
 // Mutation returns the SynchronizeRecordMutation object of the builder.
 func (src *SynchronizeRecordCreate) Mutation() *SynchronizeRecordMutation {
 	return src.mutation
@@ -120,6 +126,9 @@ func (src *SynchronizeRecordCreate) check() error {
 	if _, ok := src.mutation.DeviceID(); !ok {
 		return &ValidationError{Name: "device_id", err: errors.New(`ent: missing required field "SynchronizeRecord.device_id"`)}
 	}
+	if _, ok := src.mutation.LastMessageID(); !ok {
+		return &ValidationError{Name: "last_message_id", err: errors.New(`ent: missing required field "SynchronizeRecord.last_message_id"`)}
+	}
 	return nil
 }
 
@@ -161,6 +170,10 @@ func (src *SynchronizeRecordCreate) createSpec() (*SynchronizeRecord, *sqlgraph.
 	if value, ok := src.mutation.DeviceID(); ok {
 		_spec.SetField(synchronizerecord.FieldDeviceID, field.TypeUUID, value)
 		_node.DeviceID = value
+	}
+	if value, ok := src.mutation.LastMessageID(); ok {
+		_spec.SetField(synchronizerecord.FieldLastMessageID, field.TypeInt64, value)
+		_node.LastMessageID = value
 	}
 	return _node, _spec
 }

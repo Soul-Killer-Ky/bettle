@@ -75,6 +75,11 @@ func DeviceID(v uuid.UUID) predicate.SynchronizeRecord {
 	return predicate.SynchronizeRecord(sql.FieldEQ(FieldDeviceID, v))
 }
 
+// LastMessageID applies equality check predicate on the "last_message_id" field. It's identical to LastMessageIDEQ.
+func LastMessageID(v int64) predicate.SynchronizeRecord {
+	return predicate.SynchronizeRecord(sql.FieldEQ(FieldLastMessageID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.SynchronizeRecord {
 	return predicate.SynchronizeRecord(sql.FieldEQ(FieldCreatedAt, v))
@@ -233,6 +238,46 @@ func DeviceIDLT(v uuid.UUID) predicate.SynchronizeRecord {
 // DeviceIDLTE applies the LTE predicate on the "device_id" field.
 func DeviceIDLTE(v uuid.UUID) predicate.SynchronizeRecord {
 	return predicate.SynchronizeRecord(sql.FieldLTE(FieldDeviceID, v))
+}
+
+// LastMessageIDEQ applies the EQ predicate on the "last_message_id" field.
+func LastMessageIDEQ(v int64) predicate.SynchronizeRecord {
+	return predicate.SynchronizeRecord(sql.FieldEQ(FieldLastMessageID, v))
+}
+
+// LastMessageIDNEQ applies the NEQ predicate on the "last_message_id" field.
+func LastMessageIDNEQ(v int64) predicate.SynchronizeRecord {
+	return predicate.SynchronizeRecord(sql.FieldNEQ(FieldLastMessageID, v))
+}
+
+// LastMessageIDIn applies the In predicate on the "last_message_id" field.
+func LastMessageIDIn(vs ...int64) predicate.SynchronizeRecord {
+	return predicate.SynchronizeRecord(sql.FieldIn(FieldLastMessageID, vs...))
+}
+
+// LastMessageIDNotIn applies the NotIn predicate on the "last_message_id" field.
+func LastMessageIDNotIn(vs ...int64) predicate.SynchronizeRecord {
+	return predicate.SynchronizeRecord(sql.FieldNotIn(FieldLastMessageID, vs...))
+}
+
+// LastMessageIDGT applies the GT predicate on the "last_message_id" field.
+func LastMessageIDGT(v int64) predicate.SynchronizeRecord {
+	return predicate.SynchronizeRecord(sql.FieldGT(FieldLastMessageID, v))
+}
+
+// LastMessageIDGTE applies the GTE predicate on the "last_message_id" field.
+func LastMessageIDGTE(v int64) predicate.SynchronizeRecord {
+	return predicate.SynchronizeRecord(sql.FieldGTE(FieldLastMessageID, v))
+}
+
+// LastMessageIDLT applies the LT predicate on the "last_message_id" field.
+func LastMessageIDLT(v int64) predicate.SynchronizeRecord {
+	return predicate.SynchronizeRecord(sql.FieldLT(FieldLastMessageID, v))
+}
+
+// LastMessageIDLTE applies the LTE predicate on the "last_message_id" field.
+func LastMessageIDLTE(v int64) predicate.SynchronizeRecord {
+	return predicate.SynchronizeRecord(sql.FieldLTE(FieldLastMessageID, v))
 }
 
 // And groups predicates with the AND operator between them.

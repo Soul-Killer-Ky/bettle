@@ -9,6 +9,7 @@ import (
 
 type ImService struct {
 	pb.UnimplementedImServer
+	pb.UnimplementedMessageServer
 
 	log *log.Helper
 }
@@ -42,4 +43,8 @@ func (s *ImService) ConnectIm(ctx context.Context, req *pb.ConnectImRequest) (*p
 	//s.ic.Connect(ctx, request, response.(*http.ResponseWriter))
 
 	return &pb.ConnectImReply{}, nil
+}
+
+func (s *ImService) ListOfflineMessage(ctx context.Context, req *pb.ListOfflineMessageRequest) (*pb.ListOfflineMessageReply, error) {
+	return &pb.ListOfflineMessageReply{}, nil
 }

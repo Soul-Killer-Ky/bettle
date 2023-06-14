@@ -6,8 +6,6 @@ import (
 	"beetle/app/im/internal/data/ent/groupchatmessage"
 	"beetle/app/im/internal/data/ent/personalchatmessage"
 	"context"
-	"time"
-
 	"github.com/go-kratos/kratos/v2/encoding"
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -25,14 +23,27 @@ func NewMessageRepo(data *Data, logger log.Logger) biz.MessageRepo {
 	}
 }
 
-func (r *messageRepo) SavePersonalChatMessage(ctx context.Context, from int, sender int, message string) error {
-	_, err := r.data.db.PersonalChatMessage.Create().SetFrom(from).SetSender(sender).SetMessage(message).Save(ctx)
+func (r *messageRepo) SavePersonalChatMessage(ctx context.Context, from int, sender int, messageID int64, message string) error {
+	_, err := r.data.db.PersonalChatMessage.
+		Create().
+		SetMessageID(messageID).
+		SetFrom(from).
+		SetSender(sender).
+		SetMessage(message).
+		Save(ctx)
 	return err
 }
 
-func (r *messageRepo) GetPersonalChatMessages(ctx context.Context, sender int, lastTime time.Time) ([]*pb.PersonalChatMessage, error) {
+func (r *messageRepo) GetPersonalChatMessages(ctx context.Context, sender int, lastMessageID int64) ([]*pb.PersonalChatMessage, error) {
 	ps, err := r.data.db.PersonalChatMessage.Query().
-		Where(personalchatmessage.Sender(sender), personalchatmessage.CreatedAtGT(lastTime)).All(ctx)
+		Where(
+			personalchatmessage.MessageIDGT(lastMessageID),
+			personalchatmessage.Or(
+				personalchatmessage.Sender(sender),
+				personalchatmessage.From(sender),
+			),
+		).
+		All(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -49,14 +60,24 @@ func (r *messageRepo) GetPersonalChatMessages(ctx context.Context, sender int, l
 	return rv, nil
 }
 
-func (r *messageRepo) SaveGroupChatMessage(ctx context.Context, from int, groupID int, message string) error {
-	_, err := r.data.db.GroupChatMessage.Create().SetFrom(from).SetGroupID(groupID).SetMessage(message).Save(ctx)
+func (r *messageRepo) SaveGroupChatMessage(ctx context.Context, from int, groupID int, messageID int64, message string) error {
+	_, err := r.data.db.GroupChatMessage.
+		Create().
+		SetMessageID(messageID).
+		SetFrom(from).
+		SetGroupID(groupID).
+		SetMessage(message).
+		Save(ctx)
 	return err
 }
 
-func (r *messageRepo) GetGroupChatMessages(ctx context.Context, groupID int, lastTime time.Time) ([]*pb.GroupChatMessage, error) {
+func (r *messageRepo) GetGroupChatMessages(ctx context.Context, groupIDs []int, lastMessageID int64) ([]*pb.GroupChatMessage, error) {
 	ps, err := r.data.db.GroupChatMessage.Query().
-		Where(groupchatmessage.GroupID(groupID), groupchatmessage.CreatedAtGT(lastTime)).All(ctx)
+		Where(
+			groupchatmessage.MessageIDGT(lastMessageID),
+			groupchatmessage.GroupIDIn(groupIDs...),
+		).
+		All(ctx)
 	if err != nil {
 		return nil, err
 	}

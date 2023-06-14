@@ -11,6 +11,7 @@ type GroupChatMessage struct {
 
 func (GroupChatMessage) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int64("message_id").Comment("消息ID").Unique(),
 		field.Int("from").Comment("发送者"),
 		field.Int("group_id").Comment("群ID"),
 		field.Text("message").Comment("消息内容"),

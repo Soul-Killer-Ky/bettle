@@ -15,4 +15,6 @@ enum ErrorReason {
 	AUTH_FAILURE = 0 [(errors.code) = 403];
 
 	INVALID_PAYLOAD_TYPE = 1;
+
+	MESSAGE_ID_GENERATE_FAILURE = 2;
 }

@@ -15,9 +15,18 @@ type User struct {
 	Memo     string
 }
 
+type Group struct {
+	ID   int
+	Type int32
+	Name string
+	Icon string
+	Memo string
+}
+
 type UserRepo interface {
 	GetUser(context.Context, int) (*User, error)
 	ListUserByGroup(context.Context, int) ([]*User, error)
+	ListGroup(context.Context) ([]*Group, error)
 }
 
 type UserUseCase struct {
@@ -38,4 +47,14 @@ func (c *UserUseCase) ListUserByGroupID(ctx context.Context, groupID int) ([]*Us
 	}
 
 	return users, nil
+}
+
+func (c *UserUseCase) ListGroup(ctx context.Context) ([]*Group, error) {
+	groups, err := c.repo.ListGroup(ctx)
+	if err != nil {
+		c.log.Errorf("list group error: %s", err)
+		return nil, err
+	}
+
+	return groups, nil
 }

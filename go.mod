@@ -5,6 +5,7 @@ go 1.18
 require (
 	entgo.io/ent v0.12.3
 	github.com/Soul-Killer-Ky/kratos/websocket v0.0.0-20230517101042-dac4ea47e53b
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/envoyproxy/protoc-gen-validate v0.9.1-SNAPSHOT.1
 	github.com/go-kratos/kratos/contrib/registry/kubernetes/v2 v2.0.0-20230519061918-96480c11ee42
 	github.com/go-kratos/kratos/v2 v2.6.2

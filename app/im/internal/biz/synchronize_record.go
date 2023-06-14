@@ -11,16 +11,17 @@ import (
 )
 
 type SynchronizedRecord struct {
-	UserID    int
-	DeviceID  uuid.UUID
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	UserID        int
+	DeviceID      uuid.UUID
+	LastMessageID int64
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 
 type SynchronizeRecordRepo interface {
 	FindByUserDeviceID(context.Context, int, uuid.UUID) (*SynchronizedRecord, error)
-	Create(context.Context, int, uuid.UUID) (*SynchronizedRecord, error)
-	Update(context.Context, int, uuid.UUID) (*SynchronizedRecord, error)
+	Create(context.Context, int, uuid.UUID, int64) (*SynchronizedRecord, error)
+	Update(context.Context, int, uuid.UUID, int64) (*SynchronizedRecord, error)
 }
 
 type SynchronizeRecordUseCase struct {
@@ -36,16 +37,16 @@ func NewLoadRecordUseCase(repo SynchronizeRecordRepo, logger log.Logger) *Synchr
 	}
 }
 
-func (c *SynchronizeRecordUseCase) SaveSynchronizeRecord(ctx context.Context, uid int, deviceID uuid.UUID) (*SynchronizedRecord, error) {
+func (c *SynchronizeRecordUseCase) SaveSynchronizeRecord(ctx context.Context, uid int, deviceID uuid.UUID, messageID int64) (*SynchronizedRecord, error) {
 	p, err := c.repo.FindByUserDeviceID(ctx, uid, deviceID)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			p, err = c.repo.Create(ctx, uid, deviceID)
+			p, err = c.repo.Create(ctx, uid, deviceID, messageID)
 		} else {
 			return nil, err
 		}
 	} else {
-		p, err = c.repo.Update(ctx, uid, deviceID)
+		p, err = c.repo.Update(ctx, uid, deviceID, messageID)
 	}
 	return p, err
 }
@@ -60,4 +61,15 @@ func (c *SynchronizeRecordUseCase) GetLastTime(ctx context.Context, uid int, dev
 		return nil, err
 	}
 	return &p.UpdatedAt, nil
+}
+
+func (c *SynchronizeRecordUseCase) GetLastMessageID(ctx context.Context, uid int, deviceID uuid.UUID) (int64, error) {
+	p, err := c.repo.FindByUserDeviceID(ctx, uid, deviceID)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return 0, nil
+		}
+		return 0, err
+	}
+	return p.LastMessageID, nil
 }

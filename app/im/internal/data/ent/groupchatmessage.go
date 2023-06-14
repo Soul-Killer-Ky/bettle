@@ -21,6 +21,8 @@ type GroupChatMessage struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	// 消息ID
+	MessageID int64 `json:"message_id,omitempty"`
 	// 发送者
 	From int `json:"from,omitempty"`
 	// 群ID
@@ -35,7 +37,7 @@ func (*GroupChatMessage) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case groupchatmessage.FieldID, groupchatmessage.FieldFrom, groupchatmessage.FieldGroupID:
+		case groupchatmessage.FieldID, groupchatmessage.FieldMessageID, groupchatmessage.FieldFrom, groupchatmessage.FieldGroupID:
 			values[i] = new(sql.NullInt64)
 		case groupchatmessage.FieldMessage:
 			values[i] = new(sql.NullString)
@@ -74,6 +76,12 @@ func (gcm *GroupChatMessage) assignValues(columns []string, values []any) error 
 			} else if value.Valid {
 				gcm.DeletedAt = new(time.Time)
 				*gcm.DeletedAt = value.Time
+			}
+		case groupchatmessage.FieldMessageID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field message_id", values[i])
+			} else if value.Valid {
+				gcm.MessageID = value.Int64
 			}
 		case groupchatmessage.FieldFrom:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -136,6 +144,9 @@ func (gcm *GroupChatMessage) String() string {
 		builder.WriteString("deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
+	builder.WriteString(", ")
+	builder.WriteString("message_id=")
+	builder.WriteString(fmt.Sprintf("%v", gcm.MessageID))
 	builder.WriteString(", ")
 	builder.WriteString("from=")
 	builder.WriteString(fmt.Sprintf("%v", gcm.From))

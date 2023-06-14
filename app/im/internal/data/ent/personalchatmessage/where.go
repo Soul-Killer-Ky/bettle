@@ -64,6 +64,11 @@ func DeletedAt(v time.Time) predicate.PersonalChatMessage {
 	return predicate.PersonalChatMessage(sql.FieldEQ(FieldDeletedAt, v))
 }
 
+// MessageID applies equality check predicate on the "message_id" field. It's identical to MessageIDEQ.
+func MessageID(v int64) predicate.PersonalChatMessage {
+	return predicate.PersonalChatMessage(sql.FieldEQ(FieldMessageID, v))
+}
+
 // From applies equality check predicate on the "from" field. It's identical to FromEQ.
 func From(v int) predicate.PersonalChatMessage {
 	return predicate.PersonalChatMessage(sql.FieldEQ(FieldFrom, v))
@@ -167,6 +172,46 @@ func DeletedAtIsNil() predicate.PersonalChatMessage {
 // DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
 func DeletedAtNotNil() predicate.PersonalChatMessage {
 	return predicate.PersonalChatMessage(sql.FieldNotNull(FieldDeletedAt))
+}
+
+// MessageIDEQ applies the EQ predicate on the "message_id" field.
+func MessageIDEQ(v int64) predicate.PersonalChatMessage {
+	return predicate.PersonalChatMessage(sql.FieldEQ(FieldMessageID, v))
+}
+
+// MessageIDNEQ applies the NEQ predicate on the "message_id" field.
+func MessageIDNEQ(v int64) predicate.PersonalChatMessage {
+	return predicate.PersonalChatMessage(sql.FieldNEQ(FieldMessageID, v))
+}
+
+// MessageIDIn applies the In predicate on the "message_id" field.
+func MessageIDIn(vs ...int64) predicate.PersonalChatMessage {
+	return predicate.PersonalChatMessage(sql.FieldIn(FieldMessageID, vs...))
+}
+
+// MessageIDNotIn applies the NotIn predicate on the "message_id" field.
+func MessageIDNotIn(vs ...int64) predicate.PersonalChatMessage {
+	return predicate.PersonalChatMessage(sql.FieldNotIn(FieldMessageID, vs...))
+}
+
+// MessageIDGT applies the GT predicate on the "message_id" field.
+func MessageIDGT(v int64) predicate.PersonalChatMessage {
+	return predicate.PersonalChatMessage(sql.FieldGT(FieldMessageID, v))
+}
+
+// MessageIDGTE applies the GTE predicate on the "message_id" field.
+func MessageIDGTE(v int64) predicate.PersonalChatMessage {
+	return predicate.PersonalChatMessage(sql.FieldGTE(FieldMessageID, v))
+}
+
+// MessageIDLT applies the LT predicate on the "message_id" field.
+func MessageIDLT(v int64) predicate.PersonalChatMessage {
+	return predicate.PersonalChatMessage(sql.FieldLT(FieldMessageID, v))
+}
+
+// MessageIDLTE applies the LTE predicate on the "message_id" field.
+func MessageIDLTE(v int64) predicate.PersonalChatMessage {
+	return predicate.PersonalChatMessage(sql.FieldLTE(FieldMessageID, v))
 }
 
 // FromEQ applies the EQ predicate on the "from" field.

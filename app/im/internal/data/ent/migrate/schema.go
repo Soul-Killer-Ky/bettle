@@ -13,6 +13,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "datetime"}},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "message_id", Type: field.TypeInt64, Unique: true},
 		{Name: "from", Type: field.TypeInt},
 		{Name: "group_id", Type: field.TypeInt},
 		{Name: "message", Type: field.TypeString, Size: 2147483647},
@@ -28,6 +29,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "datetime"}},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"mysql": "datetime"}},
+		{Name: "message_id", Type: field.TypeInt64, Unique: true},
 		{Name: "from", Type: field.TypeInt},
 		{Name: "sender", Type: field.TypeInt},
 		{Name: "message", Type: field.TypeString, Size: 2147483647},
@@ -45,6 +47,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "datetime"}},
 		{Name: "user_id", Type: field.TypeInt},
 		{Name: "device_id", Type: field.TypeUUID},
+		{Name: "last_message_id", Type: field.TypeInt64},
 	}
 	// SynchronizeRecordsTable holds the schema information for the "synchronize_records" table.
 	SynchronizeRecordsTable = &schema.Table{

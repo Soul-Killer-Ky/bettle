@@ -37,6 +37,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.im.service.v1.ConnectImReply'
+    /im/v1/message/list_offline:
+        post:
+            tags:
+                - Message
+            operationId: Message_ListOfflineMessage
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.im.service.v1.ListOfflineMessageRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.im.service.v1.ListOfflineMessageReply'
     /user/v1/create:
         post:
             tags:
@@ -258,6 +276,15 @@ components:
         api.im.service.v1.ConnectImReply:
             type: object
             properties: {}
+        api.im.service.v1.ListOfflineMessageReply:
+            type: object
+            properties: {}
+        api.im.service.v1.ListOfflineMessageRequest:
+            type: object
+            properties:
+                lastMessageId:
+                    type: integer
+                    format: int64
         api.user.service.v1.AddFriendReply:
             type: object
             properties:
@@ -459,4 +486,5 @@ tags:
     - name: Greeter
       description: The greeting service definition.
     - name: Im
+    - name: Message
     - name: User

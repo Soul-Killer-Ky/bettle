@@ -19,7 +19,7 @@ import (
 // NewWebsocketServer create a websocket server.
 func NewWebsocketServer(c *conf.Server, ac *conf.Auth, logger log.Logger, svc *ws.Service) *websocket.Server {
 	//l := log.NewHelper(logger)
-	json.MarshalOptions.UseProtoNames = true
+	//json.MarshalOptions.UseProtoNames = true
 	json.MarshalOptions.UseEnumNumbers = true
 
 	srv := websocket.NewServer(
@@ -52,29 +52,6 @@ func NewWebsocketServer(c *conf.Server, ac *conf.Auth, logger log.Logger, svc *w
 	)
 
 	svc.SetWebsocketServer(srv)
-
-	//srv.RegisterMessageHandler(websocket.MessageType(pb.MessageType_PersonalChat),
-	//	func(session *websocket.Session, payload websocket.MessagePayload) error {
-	//		switch t := payload.(type) {
-	//		case *pb.PersonalChatMessage:
-	//			return svc.OnPersonalChatMessage(session, t)
-	//		default:
-	//			return errors.New("invalid payload type")
-	//		}
-	//	},
-	//	func() websocket.Any { return &pb.PersonalChatMessage{} },
-	//)
-	//srv.RegisterMessageHandler(websocket.MessageType(pb.MessageType_GroupChat),
-	//	func(session *websocket.Session, payload websocket.MessagePayload) error {
-	//		switch t := payload.(type) {
-	//		case *pb.GroupChatMessage:
-	//			return svc.OnGroupChatMessage(session, t)
-	//		default:
-	//			return errors.New("invalid payload type")
-	//		}
-	//	},
-	//	func() websocket.Any { return &pb.GroupChatMessage{} },
-	//)
 
 	return srv
 }

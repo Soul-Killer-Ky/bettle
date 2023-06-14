@@ -21,6 +21,8 @@ const (
 	FieldUserID = "user_id"
 	// FieldDeviceID holds the string denoting the device_id field in the database.
 	FieldDeviceID = "device_id"
+	// FieldLastMessageID holds the string denoting the last_message_id field in the database.
+	FieldLastMessageID = "last_message_id"
 	// Table holds the table name of the synchronizerecord in the database.
 	Table = "synchronize_records"
 )
@@ -32,6 +34,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldUserID,
 	FieldDeviceID,
+	FieldLastMessageID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -79,4 +82,9 @@ func ByUserID(opts ...sql.OrderTermOption) OrderOption {
 // ByDeviceID orders the results by the device_id field.
 func ByDeviceID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeviceID, opts...).ToFunc()
+}
+
+// ByLastMessageID orders the results by the last_message_id field.
+func ByLastMessageID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastMessageID, opts...).ToFunc()
 }

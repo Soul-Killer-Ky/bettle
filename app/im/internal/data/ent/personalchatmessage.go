@@ -21,6 +21,8 @@ type PersonalChatMessage struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	// 消息ID
+	MessageID int64 `json:"message_id,omitempty"`
 	// 发送者
 	From int `json:"from,omitempty"`
 	// 接收者
@@ -35,7 +37,7 @@ func (*PersonalChatMessage) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case personalchatmessage.FieldID, personalchatmessage.FieldFrom, personalchatmessage.FieldSender:
+		case personalchatmessage.FieldID, personalchatmessage.FieldMessageID, personalchatmessage.FieldFrom, personalchatmessage.FieldSender:
 			values[i] = new(sql.NullInt64)
 		case personalchatmessage.FieldMessage:
 			values[i] = new(sql.NullString)
@@ -74,6 +76,12 @@ func (pcm *PersonalChatMessage) assignValues(columns []string, values []any) err
 			} else if value.Valid {
 				pcm.DeletedAt = new(time.Time)
 				*pcm.DeletedAt = value.Time
+			}
+		case personalchatmessage.FieldMessageID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field message_id", values[i])
+			} else if value.Valid {
+				pcm.MessageID = value.Int64
 			}
 		case personalchatmessage.FieldFrom:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -136,6 +144,9 @@ func (pcm *PersonalChatMessage) String() string {
 		builder.WriteString("deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
+	builder.WriteString(", ")
+	builder.WriteString("message_id=")
+	builder.WriteString(fmt.Sprintf("%v", pcm.MessageID))
 	builder.WriteString(", ")
 	builder.WriteString("from=")
 	builder.WriteString(fmt.Sprintf("%v", pcm.From))

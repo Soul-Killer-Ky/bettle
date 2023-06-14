@@ -48,6 +48,12 @@ func (pcmc *PersonalChatMessageCreate) SetNillableDeletedAt(t *time.Time) *Perso
 	return pcmc
 }
 
+// SetMessageID sets the "message_id" field.
+func (pcmc *PersonalChatMessageCreate) SetMessageID(i int64) *PersonalChatMessageCreate {
+	pcmc.mutation.SetMessageID(i)
+	return pcmc
+}
+
 // SetFrom sets the "from" field.
 func (pcmc *PersonalChatMessageCreate) SetFrom(i int) *PersonalChatMessageCreate {
 	pcmc.mutation.SetFrom(i)
@@ -118,6 +124,9 @@ func (pcmc *PersonalChatMessageCreate) check() error {
 	if _, ok := pcmc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "PersonalChatMessage.created_at"`)}
 	}
+	if _, ok := pcmc.mutation.MessageID(); !ok {
+		return &ValidationError{Name: "message_id", err: errors.New(`ent: missing required field "PersonalChatMessage.message_id"`)}
+	}
 	if _, ok := pcmc.mutation.From(); !ok {
 		return &ValidationError{Name: "from", err: errors.New(`ent: missing required field "PersonalChatMessage.from"`)}
 	}
@@ -160,6 +169,10 @@ func (pcmc *PersonalChatMessageCreate) createSpec() (*PersonalChatMessage, *sqlg
 	if value, ok := pcmc.mutation.DeletedAt(); ok {
 		_spec.SetField(personalchatmessage.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
+	}
+	if value, ok := pcmc.mutation.MessageID(); ok {
+		_spec.SetField(personalchatmessage.FieldMessageID, field.TypeInt64, value)
+		_node.MessageID = value
 	}
 	if value, ok := pcmc.mutation.From(); ok {
 		_spec.SetField(personalchatmessage.FieldFrom, field.TypeInt, value)

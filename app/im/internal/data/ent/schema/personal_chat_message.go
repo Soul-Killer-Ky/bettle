@@ -11,6 +11,7 @@ type PersonalChatMessage struct {
 
 func (PersonalChatMessage) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int64("message_id").Comment("消息ID").Unique(),
 		field.Int("from").Comment("发送者"),
 		field.Int("sender").Comment("接收者"),
 		field.Text("message").Comment("消息内容"),

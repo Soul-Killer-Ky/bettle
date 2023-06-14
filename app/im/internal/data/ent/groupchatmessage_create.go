@@ -48,6 +48,12 @@ func (gcmc *GroupChatMessageCreate) SetNillableDeletedAt(t *time.Time) *GroupCha
 	return gcmc
 }
 
+// SetMessageID sets the "message_id" field.
+func (gcmc *GroupChatMessageCreate) SetMessageID(i int64) *GroupChatMessageCreate {
+	gcmc.mutation.SetMessageID(i)
+	return gcmc
+}
+
 // SetFrom sets the "from" field.
 func (gcmc *GroupChatMessageCreate) SetFrom(i int) *GroupChatMessageCreate {
 	gcmc.mutation.SetFrom(i)
@@ -118,6 +124,9 @@ func (gcmc *GroupChatMessageCreate) check() error {
 	if _, ok := gcmc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "GroupChatMessage.created_at"`)}
 	}
+	if _, ok := gcmc.mutation.MessageID(); !ok {
+		return &ValidationError{Name: "message_id", err: errors.New(`ent: missing required field "GroupChatMessage.message_id"`)}
+	}
 	if _, ok := gcmc.mutation.From(); !ok {
 		return &ValidationError{Name: "from", err: errors.New(`ent: missing required field "GroupChatMessage.from"`)}
 	}
@@ -160,6 +169,10 @@ func (gcmc *GroupChatMessageCreate) createSpec() (*GroupChatMessage, *sqlgraph.C
 	if value, ok := gcmc.mutation.DeletedAt(); ok {
 		_spec.SetField(groupchatmessage.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
+	}
+	if value, ok := gcmc.mutation.MessageID(); ok {
+		_spec.SetField(groupchatmessage.FieldMessageID, field.TypeInt64, value)
+		_node.MessageID = value
 	}
 	if value, ok := gcmc.mutation.From(); ok {
 		_spec.SetField(groupchatmessage.FieldFrom, field.TypeInt, value)

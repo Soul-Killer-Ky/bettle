@@ -15,6 +15,7 @@ func (SynchronizeRecord) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("user_id").Comment("用户ID"),
 		field.UUID("device_id", uuid.New()).Comment("设备号"),
+		field.Int64("last_message_id").Comment("消息ID"),
 	}
 }
 
