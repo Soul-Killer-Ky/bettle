@@ -55,6 +55,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.im.service.v1.ListOfflineMessageReply'
+    /im/v1/upload:
+        post:
+            tags:
+                - Im
+            operationId: Im_Upload
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.im.service.v1.UploadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.im.service.v1.UploadReply'
     /user/v1/create:
         post:
             tags:
@@ -271,6 +289,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.user.service.v1.UpdateUserReply'
+    /v1/upload:
+        post:
+            tags:
+                - Filesystem
+            operationId: Filesystem_Upload
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.storage.v1.UploadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.storage.v1.UploadReply'
 components:
     schemas:
         api.im.service.v1.ConnectImReply:
@@ -285,6 +321,36 @@ components:
                 lastMessageId:
                     type: integer
                     format: int64
+        api.im.service.v1.UploadReply:
+            type: object
+            properties:
+                url:
+                    type: string
+        api.im.service.v1.UploadRequest:
+            type: object
+            properties:
+                type:
+                    type: integer
+                    format: enum
+                chunk:
+                    type: string
+                    format: bytes
+        api.storage.v1.UploadReply:
+            type: object
+            properties:
+                url:
+                    type: string
+        api.storage.v1.UploadRequest:
+            type: object
+            properties:
+                type:
+                    type: integer
+                    format: enum
+                name:
+                    type: string
+                file:
+                    type: string
+                    format: bytes
         api.user.service.v1.AddFriendReply:
             type: object
             properties:
@@ -483,6 +549,7 @@ components:
                     type: string
             description: The response message containing the greetings
 tags:
+    - name: Filesystem
     - name: Greeter
       description: The greeting service definition.
     - name: Im

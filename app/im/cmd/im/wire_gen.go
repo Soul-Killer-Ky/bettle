@@ -26,7 +26,8 @@ import (
 
 // wireApp init kratos application.
 func wireApp(confServer *conf.Server, confData *conf.Data, auth *conf.Auth, logger log.Logger, tracerProvider *trace.TracerProvider) (*kratos.App, func(), error) {
-	imService := service.NewImService(logger)
+	imUseCase := biz.NewImUseCase(logger)
+	imService := service.NewImService(imUseCase, logger)
 	grpcServer := server.NewGRPCServer(confServer, auth, imService, logger)
 	httpServer := server.NewHTTPServer(confServer, auth, imService, logger)
 	registry := data.NewK8sRegistry()

@@ -7,4 +7,5 @@ var ProviderSet = wire.NewSet(
 	NewMessageUseCase,
 	NewLoadRecordUseCase,
 	NewUserUseCase,
+	NewImUseCase,
 )

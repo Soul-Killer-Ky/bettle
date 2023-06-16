@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package api.storage.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "beetle/api/filesystem/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.filesystem.v1";
+
+service Filesystem {
+	rpc CreateStorage (CreateStorageRequest) returns (CreateStorageReply);
+	rpc UpdateStorage (UpdateStorageRequest) returns (UpdateStorageReply);
+	rpc DeleteStorage (DeleteStorageRequest) returns (DeleteStorageReply);
+	rpc GetStorage (GetStorageRequest) returns (GetStorageReply);
+	rpc ListStorage (ListStorageRequest) returns (ListStorageReply);
+
+	rpc Upload (UploadRequest) returns (UploadReply) {
+		option (google.api.http) = {
+			post: "/v1/upload"
+			body: "*"
+		};
+	}
+}
+
+message CreateStorageRequest {}
+message CreateStorageReply {}
+
+message UpdateStorageRequest {}
+message UpdateStorageReply {}
+
+message DeleteStorageRequest {}
+message DeleteStorageReply {}
+
+message GetStorageRequest {}
+message GetStorageReply {}
+
+message ListStorageRequest {}
+message ListStorageReply {}
+
+enum UploadType {
+	UT_File = 0;
+	UT_Image = 1;
+}
+
+message UploadRequest {
+	UploadType type = 1;
+	string name = 2;
+	bytes file = 3;
+}
+message UploadReply {
+	string url = 1;
+}

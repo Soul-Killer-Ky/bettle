@@ -20,6 +20,12 @@ service Im {
 			get: "/im/v1/connect"
 		};
 	}
+	rpc Upload (stream UploadRequest) returns (UploadReply) {
+		option (google.api.http) = {
+			post: "/im/v1/upload"
+			body: "*"
+		};
+	}
 }
 
 message CreateImRequest {}
@@ -39,3 +45,16 @@ message ListImReply {}
 
 message ConnectImRequest {}
 message ConnectImReply {}
+
+enum UploadType {
+	UT_File = 0;
+	UT_Image = 1;
+}
+
+message UploadRequest {
+	UploadType type = 1;
+	bytes chunk = 2;
+}
+message UploadReply {
+	string url = 1;
+}

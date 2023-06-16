@@ -1,9 +1,9 @@
 package service
 
 import (
-	"context"
-
 	pb "beetle/api/im/service/v1"
+	"beetle/app/im/internal/biz"
+	"context"
 	"github.com/go-kratos/kratos/v2/log"
 )
 
@@ -11,11 +11,13 @@ type ImService struct {
 	pb.UnimplementedImServer
 	pb.UnimplementedMessageServer
 
+	ic *biz.ImUseCase
+
 	log *log.Helper
 }
 
-func NewImService(logger log.Logger) *ImService {
-	return &ImService{log: log.NewHelper(logger)}
+func NewImService(ic *biz.ImUseCase, logger log.Logger) *ImService {
+	return &ImService{ic: ic, log: log.NewHelper(logger)}
 }
 
 func (s *ImService) CreateIm(ctx context.Context, req *pb.CreateImRequest) (*pb.CreateImReply, error) {
@@ -47,4 +49,9 @@ func (s *ImService) ConnectIm(ctx context.Context, req *pb.ConnectImRequest) (*p
 
 func (s *ImService) ListOfflineMessage(ctx context.Context, req *pb.ListOfflineMessageRequest) (*pb.ListOfflineMessageReply, error) {
 	return &pb.ListOfflineMessageReply{}, nil
+}
+
+func (s *ImService) Upload(stream pb.Im_UploadServer) error {
+	err := s.ic.Upload(stream)
+	return err
 }

@@ -16,8 +16,9 @@ func (s *Service) OnGroupChatMessage(session *websocket.Session, payload *pb.Gro
 		return err
 	}
 
+	userID := int(payload.From)
 	// 发给自己
-	s.SendMessage(int(payload.From), pb.MessageType_GroupChat, payload)
+	s.SendMessage(userID, pb.MessageType_GroupChat, payload)
 	// 发给目标
 	go func(retryCount int) {
 		for i := 0; i < retryCount; i++ {
@@ -27,6 +28,9 @@ func (s *Service) OnGroupChatMessage(session *websocket.Session, payload *pb.Gro
 				continue
 			}
 			for _, u := range users {
+				if u.ID == userID {
+					continue
+				}
 				s.log.Infof("send group-chat to user: %s", *u.Username)
 				s.SendMessage(u.ID, pb.MessageType_GroupChat, payload)
 			}

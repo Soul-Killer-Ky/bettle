@@ -59,7 +59,7 @@ func main() {
 		}
 		cli.SendMessage(1, pb.PersonalChatMessage{
 			Content: &pb.Content{
-				Type: pb.ContentType_Text,
+				Type: pb.ContentType_CT_Text,
 				Body: msg,
 			},
 			Sender: 2,

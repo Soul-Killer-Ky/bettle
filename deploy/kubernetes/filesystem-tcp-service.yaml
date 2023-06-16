@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -o deploy/tmp/
+    kompose.service.type: loadbalancer
+    kompose.version: 1.28.0 (c4137012e)
+    kompose.volume.type: configMap
+  creationTimestamp: null
+  labels:
+    io.kompose.service: filesystem-tcp
+  name: filesystem-tcp
+spec:
+  ports:
+    - name: "9100"
+      port: 9100
+      targetPort: 9100
+  selector:
+    io.kompose.service: filesystem
+  type: LoadBalancer
+status:
+  loadBalancer: {}

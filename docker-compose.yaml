@@ -140,6 +140,7 @@ services:
 #    hostname: im-svc
     volumes:
       - ./app/im/configs:/data/conf
+      - /data/docker/mount/beetle_upload:/var/lib/beetle_upload
     expose:
       - "9000"
       - "10000"
@@ -171,3 +172,20 @@ services:
     networks:
       beetle_network:
         ipv4_address: 192.168.16.200
+  filesystem:
+    build:
+      context: .
+      args:
+        APP: filesystem
+    image: beetle/filesystem:0.0.1
+    labels:
+      kompose.volume.type: configMap
+      kompose.service.type: loadbalancer
+    hostname: gateway
+    volumes:
+      - ./app/filesystem/configs:/data/conf
+    ports:
+      - "9100:9100"
+    networks:
+      beetle_network:
+        ipv4_address: 192.168.16.201

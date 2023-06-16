@@ -19,13 +19,13 @@ enum MessageType {
 
 enum ContentType {
 	// 不使用类型默认值0，因为proto生成的go结构存在`omitempty`选项，导致json序列化时忽略空(默认值)字段，js解析json后该字段为undefined
-//	None = 0;
-	Text = 0;
-	Image = 1;
-	Voice = 2;
-	Video = 3;
-	File = 4;
-	Location = 5;
+//	CT_None = 0;
+	CT_Text = 0;
+	CT_Image = 1;
+	CT_Voice = 2;
+	CT_Video = 3;
+	CT_File = 4;
+	CT_Location = 5;
 }
 
 message Content {

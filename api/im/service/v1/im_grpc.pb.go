@@ -25,6 +25,7 @@ const (
 	Im_GetIm_FullMethodName     = "/api.im.service.v1.Im/GetIm"
 	Im_ListIm_FullMethodName    = "/api.im.service.v1.Im/ListIm"
 	Im_ConnectIm_FullMethodName = "/api.im.service.v1.Im/ConnectIm"
+	Im_Upload_FullMethodName    = "/api.im.service.v1.Im/Upload"
 )
 
 // ImClient is the client API for Im service.
@@ -37,6 +38,7 @@ type ImClient interface {
 	GetIm(ctx context.Context, in *GetImRequest, opts ...grpc.CallOption) (*GetImReply, error)
 	ListIm(ctx context.Context, in *ListImRequest, opts ...grpc.CallOption) (*ListImReply, error)
 	ConnectIm(ctx context.Context, in *ConnectImRequest, opts ...grpc.CallOption) (*ConnectImReply, error)
+	Upload(ctx context.Context, opts ...grpc.CallOption) (Im_UploadClient, error)
 }
 
 type imClient struct {
@@ -101,6 +103,40 @@ func (c *imClient) ConnectIm(ctx context.Context, in *ConnectImRequest, opts ...
 	return out, nil
 }
 
+func (c *imClient) Upload(ctx context.Context, opts ...grpc.CallOption) (Im_UploadClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Im_ServiceDesc.Streams[0], Im_Upload_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &imUploadClient{stream}
+	return x, nil
+}
+
+type Im_UploadClient interface {
+	Send(*UploadRequest) error
+	CloseAndRecv() (*UploadReply, error)
+	grpc.ClientStream
+}
+
+type imUploadClient struct {
+	grpc.ClientStream
+}
+
+func (x *imUploadClient) Send(m *UploadRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *imUploadClient) CloseAndRecv() (*UploadReply, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(UploadReply)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // ImServer is the server API for Im service.
 // All implementations must embed UnimplementedImServer
 // for forward compatibility
@@ -111,6 +147,7 @@ type ImServer interface {
 	GetIm(context.Context, *GetImRequest) (*GetImReply, error)
 	ListIm(context.Context, *ListImRequest) (*ListImReply, error)
 	ConnectIm(context.Context, *ConnectImRequest) (*ConnectImReply, error)
+	Upload(Im_UploadServer) error
 	mustEmbedUnimplementedImServer()
 }
 
@@ -135,6 +172,9 @@ func (UnimplementedImServer) ListIm(context.Context, *ListImRequest) (*ListImRep
 }
 func (UnimplementedImServer) ConnectIm(context.Context, *ConnectImRequest) (*ConnectImReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConnectIm not implemented")
+}
+func (UnimplementedImServer) Upload(Im_UploadServer) error {
+	return status.Errorf(codes.Unimplemented, "method Upload not implemented")
 }
 func (UnimplementedImServer) mustEmbedUnimplementedImServer() {}
 
@@ -257,6 +297,32 @@ func _Im_ConnectIm_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Im_Upload_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ImServer).Upload(&imUploadServer{stream})
+}
+
+type Im_UploadServer interface {
+	SendAndClose(*UploadReply) error
+	Recv() (*UploadRequest, error)
+	grpc.ServerStream
+}
+
+type imUploadServer struct {
+	grpc.ServerStream
+}
+
+func (x *imUploadServer) SendAndClose(m *UploadReply) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *imUploadServer) Recv() (*UploadRequest, error) {
+	m := new(UploadRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // Im_ServiceDesc is the grpc.ServiceDesc for Im service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -289,6 +355,12 @@ var Im_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Im_ConnectIm_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Upload",
+			Handler:       _Im_Upload_Handler,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "im/service/v1/im.proto",
 }

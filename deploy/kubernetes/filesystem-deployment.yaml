@@ -3,49 +3,45 @@ kind: Deployment
 metadata:
   annotations:
     kompose.cmd: kompose convert -o deploy/tmp/
+    kompose.service.type: loadbalancer
     kompose.version: 1.28.0 (c4137012e)
     kompose.volume.type: configMap
   creationTimestamp: null
   labels:
-    io.kompose.service: im-svc
-  name: im-svc
+    io.kompose.service: filesystem
+  name: filesystem
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: im-svc
+      io.kompose.service: filesystem
   strategy:
     type: Recreate
   template:
     metadata:
       annotations:
         kompose.cmd: kompose convert -o deploy/tmp/
+        kompose.service.type: loadbalancer
         kompose.version: 1.28.0 (c4137012e)
         kompose.volume.type: configMap
       creationTimestamp: null
       labels:
         io.kompose.network/beetle-beetle-network: "true"
-        io.kompose.service: im-svc
+        io.kompose.service: filesystem
     spec:
       containers:
-        - image: beetle/im:0.0.1
-          name: im-svc
+        - image: beetle/filesystem:0.0.1
+          name: filesystem
           ports:
-            - containerPort: 8000
-            - containerPort: 9000
+            - containerPort: 9100
           resources: {}
           volumeMounts:
             - mountPath: /data/conf
-              name: im-svc-cm0
-            - mountPath: /var/lib/beetle_upload
-              name: im-svc-claim1
-#      hostname: im-svc
+              name: filesystem-cm0
+      hostname: gateway
       restartPolicy: Always
       volumes:
         - configMap:
-            name: im-svc-cm0
-          name: im-svc-cm0
-        - name: im-svc-claim1
-          persistentVolumeClaim:
-            claimName: im-svc-claim1
+            name: filesystem-cm0
+          name: filesystem-cm0
 status: {}

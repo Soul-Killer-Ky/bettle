@@ -130,7 +130,7 @@ func (s *Service) HandleOfflineMessage(ctx context.Context, uid int, deviceID uu
 		if pm.MessageId > lastMessageID {
 			lastMessageID = pm.MessageId
 		}
-		s.log.Infof("send message to user id: %d, payload: %+v", uid, pm)
+		s.log.Infof("send personal-message to user id: %d, payload: %+v", uid, pm)
 		s.ws.SendMessage(session.SessionID(), websocket.MessageType(pb.MessageType_PersonalChat), pm)
 	}
 
@@ -150,7 +150,7 @@ func (s *Service) HandleOfflineMessage(ctx context.Context, uid int, deviceID uu
 			if gm.MessageId > lastMessageID {
 				lastMessageID = gm.MessageId
 			}
-			s.log.Infof("send message to user id: %d, payload: %+v", uid, gm)
+			s.log.Infof("send group-message to user id: %d, payload: %+v", uid, gm)
 			s.ws.SendMessage(session.SessionID(), websocket.MessageType(pb.MessageType_GroupChat), gm)
 		}
 	}
