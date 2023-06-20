@@ -37,15 +37,10 @@ spec:
           volumeMounts:
             - mountPath: /data/conf
               name: im-svc-cm0
-            - mountPath: /var/lib/beetle_upload
-              name: im-svc-claim1
 #      hostname: im-svc
       restartPolicy: Always
       volumes:
         - configMap:
             name: im-svc-cm0
           name: im-svc-cm0
-        - name: im-svc-claim1
-          persistentVolumeClaim:
-            claimName: im-svc-claim1
 status: {}

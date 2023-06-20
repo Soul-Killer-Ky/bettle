@@ -44,10 +44,15 @@ enum UploadType {
 	UT_Image = 1;
 }
 
+message File {
+	string name = 1;
+	int64 size = 2;
+	bytes body = 3;
+}
+
 message UploadRequest {
 	UploadType type = 1;
-	string name = 2;
-	bytes file = 3;
+	File file = 2;
 }
 message UploadReply {
 	string url = 1;

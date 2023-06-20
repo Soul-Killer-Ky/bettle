@@ -46,3 +46,15 @@ func IsMessageIdGenerateFailure(err error) bool {
 func ErrorMessageIdGenerateFailure(format string, args ...interface{}) *errors.Error {
 	return errors.New(500, ErrorReason_MESSAGE_ID_GENERATE_FAILURE.String(), fmt.Sprintf(format, args...))
 }
+
+func IsUploadFileTooLarge(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == ErrorReason_UPLOAD_FILE_TOO_LARGE.String() && e.Code == 500
+}
+
+func ErrorUploadFileTooLarge(format string, args ...interface{}) *errors.Error {
+	return errors.New(500, ErrorReason_UPLOAD_FILE_TOO_LARGE.String(), fmt.Sprintf(format, args...))
+}

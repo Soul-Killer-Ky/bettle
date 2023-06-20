@@ -1,7 +1,6 @@
 package server
 
 import (
-	pb "beetle/api/filesystem/v1"
 	"beetle/app/filesystem/internal/conf"
 	"beetle/app/filesystem/internal/service"
 
@@ -27,6 +26,6 @@ func NewGRPCServer(c *conf.Server, filesystem *service.FilesystemService, logger
 		opts = append(opts, grpc.Timeout(c.Grpc.Timeout.AsDuration()))
 	}
 	srv := grpc.NewServer(opts...)
-	pb.RegisterFilesystemServer(srv, filesystem)
+	//pb.RegisterFilesystemServer(srv, filesystem)
 	return srv
 }

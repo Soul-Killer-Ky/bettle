@@ -335,6 +335,17 @@ components:
                 chunk:
                     type: string
                     format: bytes
+        api.storage.v1.File:
+            type: object
+            properties:
+                name:
+                    type: string
+                size:
+                    type: integer
+                    format: int64
+                body:
+                    type: string
+                    format: bytes
         api.storage.v1.UploadReply:
             type: object
             properties:
@@ -346,11 +357,8 @@ components:
                 type:
                     type: integer
                     format: enum
-                name:
-                    type: string
                 file:
-                    type: string
-                    format: bytes
+                    $ref: '#/components/schemas/api.storage.v1.File'
         api.user.service.v1.AddFriendReply:
             type: object
             properties:

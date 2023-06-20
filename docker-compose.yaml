@@ -140,7 +140,6 @@ services:
 #    hostname: im-svc
     volumes:
       - ./app/im/configs:/data/conf
-      - /data/docker/mount/beetle_upload:/var/lib/beetle_upload
     expose:
       - "9000"
       - "10000"
@@ -181,9 +180,10 @@ services:
     labels:
       kompose.volume.type: configMap
       kompose.service.type: loadbalancer
-    hostname: gateway
+    hostname: filesystem
     volumes:
       - ./app/filesystem/configs:/data/conf
+      - /data/docker/mount/beetle_filesystem:/var/lib/filesystem
     ports:
       - "9100:9100"
     networks:

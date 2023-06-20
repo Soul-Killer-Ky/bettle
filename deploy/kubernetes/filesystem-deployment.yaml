@@ -38,10 +38,15 @@ spec:
           volumeMounts:
             - mountPath: /data/conf
               name: filesystem-cm0
+            - mountPath: /var/lib/filesystem
+              name: filesystem-claim1
       hostname: gateway
       restartPolicy: Always
       volumes:
         - configMap:
             name: filesystem-cm0
           name: filesystem-cm0
+        - name: filesystem-claim1
+          persistentVolumeClaim:
+            claimName: filesystem-claim1
 status: {}
